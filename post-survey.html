@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post-Session Survey — Raaga & Taala Study</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo" style="text-decoration:none">🎵 Raaga &amp; Taala Study</a>
+      <ul class="nav-links">
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#methodology">Methodology</a></li>
+        <li><a href="index.html#team">Team</a></li>
+        <li><a href="survey.html" class="btn-nav">Survey</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="form-page">
+    <div class="form-container">
+      <div class="form-header">
+        <span class="section-tag">Part 2 — After Your Session</span>
+        <h2>Post-Session Reflection</h2>
+        <p>Fill this out right after completing the cognitive tasks. Your predictions and feelings matter as much as measured performance. Takes ~3 minutes.</p>
+      </div>
+
+      <form id="postSurveyForm">
+
+        <!-- Participant ID -->
+        <div class="form-group">
+          <label>Participant ID
+            <span class="hint">Given to you by the researcher at the start of your session</span>
+          </label>
+          <input type="text" name="participant_id" placeholder="e.g. P-042" required />
+        </div>
+
+        <!-- Section A: Performance Guesses -->
+        <h3 style="color:#1a1040;margin-bottom:20px;font-size:1rem;letter-spacing:0.05em;text-transform:uppercase;opacity:0.5;">A · Your Performance Guesses</h3>
+
+        <div class="form-group">
+          <label>In which music condition do you think you performed BEST on the cognitive tasks?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="best_condition_guess" value="indian_instrumental" required /> Indian Classical — Instrumental</label>
+            <label><input type="radio" name="best_condition_guess" value="indian_lyrical" /> Indian Classical — Lyrical</label>
+            <label><input type="radio" name="best_condition_guess" value="film_music" /> Indian Film Music</label>
+            <label><input type="radio" name="best_condition_guess" value="western" /> Western Music</label>
+            <label><input type="radio" name="best_condition_guess" value="silence" /> Silence / White Noise</label>
+            <label><input type="radio" name="best_condition_guess" value="dont_know" /> I genuinely don't know</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>In which music condition do you think you performed WORST?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="worst_condition_guess" value="indian_instrumental" required /> Indian Classical — Instrumental</label>
+            <label><input type="radio" name="worst_condition_guess" value="indian_lyrical" /> Indian Classical — Lyrical</label>
+            <label><input type="radio" name="worst_condition_guess" value="film_music" /> Indian Film Music</label>
+            <label><input type="radio" name="worst_condition_guess" value="western" /> Western Music</label>
+            <label><input type="radio" name="worst_condition_guess" value="silence" /> Silence / White Noise</label>
+            <label><input type="radio" name="worst_condition_guess" value="dont_know" /> I genuinely don't know</label>
+          </div>
+        </div>
+
+        <!-- Section B: Experience Ratings -->
+        <h3 style="color:#1a1040;margin:32px 0 20px;font-size:1rem;letter-spacing:0.05em;text-transform:uppercase;opacity:0.5;">B · Rating the Experience</h3>
+
+        <div class="form-group">
+          <label>How enjoyable was the Indian Classical (Instrumental) round?</label>
+          <div style="margin-top:8px;">
+            <div class="likert">
+              <span style="font-size:0.8rem;color:#8a8aaa;min-width:80px">Not enjoyable</span>
+              <input type="range" name="enjoy_indian_inst" min="1" max="5" value="3" oninput="this.nextElementSibling.textContent=this.value" />
+              <span style="font-weight:700;color:#1a1040;min-width:20px;text-align:center">3</span>
+              <span style="font-size:0.8rem;color:#8a8aaa;min-width:80px;text-align:right">Very enjoyable</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>How enjoyable was the Indian Classical (Lyrical) round?</label>
+          <div style="margin-top:8px;">
+            <div class="likert">
+              <span style="font-size:0.8rem;color:#8a8aaa;min-width:80px">Not enjoyable</span>
+              <input type="range" name="enjoy_indian_lyr" min="1" max="5" value="3" oninput="this.nextElementSibling.textContent=this.value" />
+              <span style="font-weight:700;color:#1a1040;min-width:20px;text-align:center">3</span>
+              <span style="font-size:0.8rem;color:#8a8aaa;min-width:80px;text-align:right">Very enjoyable</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>How enjoyable was the Indian Film Music round?</label>
+          <div style="margin-top:8px;">
+            <div class="likert">
+              <span style="font-size:0.8rem;color:#8a8aaa;min-width:80px">Not enjoyable</span>
+              <input type="range" name="enjoy_film" min="1" max="5" value="3" oninput="this.nextElementSibling.textContent=this.value" />
+              <span style="font-weight:700;color:#1a1040;min-width:20px;text-align:center">3</span>
+              <span style="font-size:0.8rem;color:#8a8aaa;min-width:80px;text-align:right">Very enjoyable</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>How enjoyable was the Western Music round?</label>
+          <div style="margin-top:8px;">
+            <div class="likert">
+              <span style="font-size:0.8rem;color:#8a8aaa;min-width:80px">Not enjoyable</span>
+              <input type="range" name="enjoy_western" min="1" max="5" value="3" oninput="this.nextElementSibling.textContent=this.value" />
+              <span style="font-weight:700;color:#1a1040;min-width:20px;text-align:center">3</span>
+              <span style="font-size:0.8rem;color:#8a8aaa;min-width:80px;text-align:right">Very enjoyable</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>How enjoyable was the Silence / White Noise round?</label>
+          <div style="margin-top:8px;">
+            <div class="likert">
+              <span style="font-size:0.8rem;color:#8a8aaa;min-width:80px">Not enjoyable</span>
+              <input type="range" name="enjoy_silence" min="1" max="5" value="3" oninput="this.nextElementSibling.textContent=this.value" />
+              <span style="font-weight:700;color:#1a1040;min-width:20px;text-align:center">3</span>
+              <span style="font-size:0.8rem;color:#8a8aaa;min-width:80px;text-align:right">Very enjoyable</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section C: Fatigue & State -->
+        <h3 style="color:#1a1040;margin:32px 0 20px;font-size:1rem;letter-spacing:0.05em;text-transform:uppercase;opacity:0.5;">C · Your State During the Session</h3>
+
+        <div class="form-group">
+          <label>How tired were you when the session STARTED?</label>
+          <div style="margin-top:8px;">
+            <div class="likert">
+              <span style="font-size:0.8rem;color:#8a8aaa;min-width:80px">Fully alert</span>
+              <input type="range" name="fatigue_start" min="1" max="5" value="2" oninput="this.nextElementSibling.textContent=this.value" />
+              <span style="font-weight:700;color:#1a1040;min-width:20px;text-align:center">2</span>
+              <span style="font-size:0.8rem;color:#8a8aaa;min-width:80px;text-align:right">Very tired</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>How tired did you feel by the LAST round?</label>
+          <div style="margin-top:8px;">
+            <div class="likert">
+              <span style="font-size:0.8rem;color:#8a8aaa;min-width:80px">Fully alert</span>
+              <input type="range" name="fatigue_end" min="1" max="5" value="3" oninput="this.nextElementSibling.textContent=this.value" />
+              <span style="font-weight:700;color:#1a1040;min-width:20px;text-align:center">3</span>
+              <span style="font-size:0.8rem;color:#8a8aaa;min-width:80px;text-align:right">Very tired</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Were you distracted by external factors (noise, phone, environment) during the session?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="external_distract" value="not_at_all" required /> Not at all</label>
+            <label><input type="radio" name="external_distract" value="slightly" /> Slightly</label>
+            <label><input type="radio" name="external_distract" value="moderately" /> Moderately</label>
+            <label><input type="radio" name="external_distract" value="a_lot" /> A lot</label>
+          </div>
+        </div>
+
+        <!-- Section D: Open Reflections -->
+        <h3 style="color:#1a1040;margin:32px 0 20px;font-size:1rem;letter-spacing:0.05em;text-transform:uppercase;opacity:0.5;">D · Reflections</h3>
+
+        <div class="form-group">
+          <label>Describe your overall experience during the session.
+            <span class="hint">How did the different music conditions feel? Did any stand out?</span>
+          </label>
+          <textarea name="open_overall" placeholder="e.g. The Indian classical instrumental round felt calming, I could focus much better..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Did your performance match your expectations?
+            <span class="hint">Were you surprised by how you did in any round?</span>
+          </label>
+          <textarea name="open_expectation" placeholder="e.g. I expected silence to be best, but I felt oddly distracted without any music..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Any other comments or feedback about the study?</label>
+          <textarea name="open_feedback" placeholder="Anything about the tasks, music choice, session structure..."></textarea>
+        </div>
+
+        <div class="form-submit">
+          <button type="submit" class="btn-submit">Submit Reflection →</button>
+        </div>
+
+        <div class="success-msg" id="successMsg">
+          ✅ Reflection submitted! Thank you for your time and for contributing to this research.<br>
+          <a href="index.html" style="color:#15803d;margin-top:8px;display:inline-block;">← Back to project homepage</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+  <script>
+    document.getElementById('postSurveyForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const btn = document.querySelector('.btn-submit');
+      btn.disabled = true;
+      btn.textContent = 'Submitting…';
+
+      const data = {};
+      const fd = new FormData(this);
+      for (const [key, value] of fd.entries()) {
+        data[key] = value;
+      }
+      data.survey_type = 'post_session';
+      data.timestamp = new Date().toISOString();
+
+      try {
+        // Submit to Formspree — replace FORM_ID with your actual Formspree form ID
+        const response = await fetch('https://formspree.io/f/FORM_ID_POST', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          document.getElementById('successMsg').style.display = 'block';
+          this.style.display = 'none';
+        } else {
+          throw new Error('Server error');
+        }
+      } catch (err) {
+        const saved = JSON.parse(localStorage.getItem('post_survey_responses') || '[]');
+        saved.push(data);
+        localStorage.setItem('post_survey_responses', JSON.stringify(saved));
+        alert('Submission saved locally. Please contact the research team.\n\nError: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = 'Submit Reflection →';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Raaga & Taala — Music & Concentration Study</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <span class="nav-logo">🎵 Raaga &amp; Taala Study</span>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#methodology">Methodology</a></li>
+        <li><a href="#team">Team</a></li>
+        <li><a href="#survey" class="btn-nav">Take Survey</a></li>
+      </ul>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">☰</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <p class="hero-tag">IIIT Hyderabad · Music Workshop · 2026</p>
+      <h1>Can Indian Classical Music<br><em>Sharpen Your Focus?</em></h1>
+      <p class="hero-sub">A cross-genre study examining how Raagas &amp; Taalas compare to film music, Western music, and silence on human concentration and memory.</p>
+      <div class="hero-btns">
+        <a href="#survey" class="btn-primary">Participate in Our Study →</a>
+        <a href="#about" class="btn-outline">Learn More</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="wave-ring r1"></div>
+      <div class="wave-ring r2"></div>
+      <div class="wave-ring r3"></div>
+      <span class="hero-icon">🪘</span>
+    </div>
+  </header>
+
+  <!-- ABOUT -->
+  <section id="about" class="section section-light">
+    <div class="container">
+      <span class="section-tag">Background</span>
+      <h2>What We're Studying</h2>
+      <p class="section-intro">Raaga (melodic framework) and Taala (rhythmic cycle) are the twin pillars of Indian classical music, widely believed to influence mood and mental state — but direct empirical research is sparse. We're changing that.</p>
+      <div class="cards-3">
+        <div class="card">
+          <div class="card-icon">🧠</div>
+          <h3>Research Question 1</h3>
+          <p>Do different Raagas and Taalas in Indian classical music measurably affect attention and memory?</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🎬</div>
+          <h3>Research Question 2</h3>
+          <p>How does this effect compare to Indian film music and Western music under the same conditions?</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔍</div>
+          <h3>Research Question 3</h3>
+          <p>Does self-reported belief about music's effect on focus actually match measured cognitive performance?</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- METHODOLOGY -->
+  <section id="methodology" class="section section-dark">
+    <div class="container">
+      <span class="section-tag">How It Works</span>
+      <h2>Study Methodology</h2>
+      <div class="method-steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h3>Literature Review</h3>
+            <p>Summarizing neurological and psychological research on Raagas, Taalas, and music's effect on focus across genres.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h3>Habit Survey</h3>
+            <p>Collecting self-reported data on listening habits and perceived effects of different music styles on focus and productivity.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h3>Behavioral Testing</h3>
+            <p>Participants complete 5 randomized cognitive rounds — each ~2–3 min — under different music conditions, followed by a post-session survey.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="sub-heading">Music Conditions Tested</h3>
+      <div class="tags-row">
+        <span class="tag tag-indian">🎻 Indian Classical (Instrumental)</span>
+        <span class="tag tag-indian">🎤 Indian Classical (Lyrical)</span>
+        <span class="tag tag-film">🎬 Indian Film Music</span>
+        <span class="tag tag-western">🎸 Western Music</span>
+        <span class="tag tag-silence">🔇 Silence / White Noise</span>
+      </div>
+
+      <h3 class="sub-heading">Cognitive Tasks (Randomized)</h3>
+      <div class="tasks-grid">
+        <div class="task-card">📖 <strong>Reading + Summary</strong><br><small>Read a short essay (200–250 words), then write a summary scored by an AI evaluator</small></div>
+        <div class="task-card">⌨️ <strong>Reverse Typing</strong><br><small>Type a paragraph with word order reversed, timed</small></div>
+        <div class="task-card">🟥 <strong>Rubik's Cube Face</strong><br><small>Time to solve one face of a 4×4 Rubik's cube</small></div>
+        <div class="task-card">🟣 <strong>Dot Memory Puzzle</strong><br><small>Memorize and reproduce dot patterns</small></div>
+        <div class="task-card">🔄 <strong>Symmetry Test</strong><br><small>Quickly judge whether images are symmetric — how many correct in time?</small></div>
+        <div class="task-card">🔃 <strong>Rotated Image Test</strong><br><small>Yes/no questions on mentally rotated images</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SURVEY CTA -->
+  <section id="survey" class="section section-accent">
+    <div class="container">
+      <span class="section-tag">Participate</span>
+      <h2>Take Part in the Study</h2>
+      <p class="section-intro">Your responses directly power this research. The survey has two parts — a quick habits questionnaire and a brief post-session reflection after the cognitive tasks.</p>
+      <div class="survey-split">
+        <div class="survey-box">
+          <h3>📋 Part 1 — Listening Habits Survey</h3>
+          <p>Tell us about your music habits, preferred genres, and how you perceive music's effect on your focus. Takes about <strong>3–5 minutes</strong>.</p>
+          <a href="survey.html" class="btn-primary">Start Habits Survey →</a>
+        </div>
+        <div class="survey-box">
+          <h3>🧪 Part 2 — Post-Session Reflection</h3>
+          <p>After completing the cognitive tasks in person, fill in your experience, your guesses about performance, and ratings. Takes about <strong>2–3 minutes</strong>.</p>
+          <a href="post-survey.html" class="btn-outline">Post-Session Form →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROGRESS / TIMELINE -->
+  <section id="progress" class="section section-light">
+    <div class="container">
+      <span class="section-tag">Project Status</span>
+      <h2>Where We Are</h2>
+      <div class="timeline">
+        <div class="tl-item done">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <h4>Sprint 1 — Proposal</h4>
+            <p>Project idea selected, scope defined, team formed.</p>
+            <span class="tl-badge done-badge">✓ Done</span>
+          </div>
+        </div>
+        <div class="tl-item done">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <h4>Sprint 2 — Project Plan</h4>
+            <p>Research questions, methodology, and candidate tests finalized.</p>
+            <span class="tl-badge done-badge">✓ Done</span>
+          </div>
+        </div>
+        <div class="tl-item active">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <h4>Sprint 3 — Literature Review &amp; Survey Design</h4>
+            <p>Review existing literature; design and launch the habits survey.</p>
+            <span class="tl-badge active-badge">🔄 In Progress</span>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <h4>Sprint 4 — Song Selection &amp; Task Finalization</h4>
+            <p>Curate neutral music tracks; finalize essay sources and task rules.</p>
+            <span class="tl-badge">⏳ Upcoming</span>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <h4>Sprint 5 — Data Collection (Behavioral Testing)</h4>
+            <p>Run sessions with participants across all 5 music conditions.</p>
+            <span class="tl-badge">⏳ Upcoming</span>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <h4>Sprint 6 — Analysis &amp; AI Scoring</h4>
+            <p>Score summaries with open-source LLM; analyze performance data.</p>
+            <span class="tl-badge">⏳ Upcoming</span>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <h4>Sprint 7 — Recommendation Model &amp; Report</h4>
+            <p>Build concentration-optimized music playlist model; write final report.</p>
+            <span class="tl-badge">⏳ Upcoming</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section id="team" class="section section-dark">
+    <div class="container">
+      <span class="section-tag">The Team</span>
+      <h2>Meet the Researchers</h2>
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="team-avatar">AK</div>
+          <h3>Chanda Akshay Kumar</h3>
+          <p class="team-id">2024102014</p>
+          <a href="mailto:chanda.kumar@students.iiit.ac.in" class="team-mail">chanda.kumar@students.iiit.ac.in</a>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar">KP</div>
+          <h3>Kotha Phanindra Manoj Kumar</h3>
+          <p class="team-id">2023102008</p>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar">YV</div>
+          <h3>Yakkala Viswanadha Kartikeya</h3>
+          <p class="team-id">2024111033</p>
+        </div>
+      </div>
+      <p class="affiliation">IIIT Hyderabad · Music Workshop · 2026</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2026 Raaga &amp; Taala Concentration Study · IIIT Hyderabad</p>
+    <p style="margin-top:6px;opacity:0.5;font-size:0.8rem;">Source code on <a href="https://github.com/akshaybunny18/raaga-taala-study" style="color:inherit">GitHub</a></p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
