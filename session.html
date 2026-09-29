@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Study Session — Raaga &amp; Taala Study</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    .session-screen { min-height:100vh; background:linear-gradient(135deg,#1a1040 0%,#2d1f6e 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px 40px; color:#fff; }
+    .hidden { display:none !important; }
+    .s-card { background:rgba(255,255,255,0.06); border:1px solid rgba(232,163,23,0.3); border-radius:20px; padding:36px 40px; width:100%; max-width:700px; }
+    .s-card h2 { font-family:'Playfair Display',serif; color:#fff; margin-bottom:6px; }
+    .s-card .sub { color:rgba(255,255,255,0.55); font-size:0.88rem; margin-bottom:24px; }
+    /* Task picker */
+    .task-list { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+    .task-opt { display:flex; align-items:center; gap:12px; padding:13px 16px; background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.13); border-radius:12px; cursor:pointer; transition:all 0.18s; position:relative; user-select:none; }
+    .task-opt:hover { border-color:rgba(232,163,23,0.45); background:rgba(232,163,23,0.05); }
+    .task-opt.sel { border-color:#e8a317; background:rgba(232,163,23,0.1); }
+    .task-opt input { accent-color:#e8a317; width:17px; height:17px; pointer-events:none; }
+    .task-opt .oi { font-size:1.4rem; }
+    .task-opt h4 { color:#fff; font-size:0.92rem; font-weight:600; margin:0 0 2px; }
+    .task-opt p { color:rgba(255,255,255,0.45); font-size:0.78rem; margin:0; }
+    .task-dur { position:absolute; right:14px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.35); font-size:0.75rem; }
+    /* Buttons */
+    .btn-go { background:#e8a317; color:#1a1040; border:none; padding:13px 34px; border-radius:40px; font-family:inherit; font-size:0.97rem; font-weight:700; cursor:pointer; transition:all 0.18s; }
+    .btn-go:hover { background:#f5c842; transform:translateY(-2px); }
+    .btn-go:disabled { opacity:0.35; cursor:not-allowed; transform:none; }
+    .btn-ghost { background:transparent; color:rgba(255,255,255,0.65); border:2px solid rgba(255,255,255,0.25); padding:11px 26px; border-radius:40px; font-family:inherit; font-size:0.9rem; font-weight:600; cursor:pointer; transition:all 0.18s; }
+    .btn-ghost:hover { border-color:rgba(255,255,255,0.55); color:#fff; }
+    /* Inputs */
+    .s-inp { background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,255,255,0.2); color:#fff; padding:11px 15px; border-radius:10px; font-family:inherit; font-size:0.93rem; width:100%; outline:none; transition:border-color 0.18s; }
+    .s-inp:focus { border-color:#e8a317; }
+    .s-inp::placeholder { color:rgba(255,255,255,0.3); }
+    .s-lbl { display:block; color:rgba(255,255,255,0.65); font-size:0.83rem; font-weight:600; margin-bottom:7px; letter-spacing:0.02em; }
+    /* Round intro */
+    .prog-dots { display:flex; gap:8px; justify-content:center; margin-bottom:14px; }
+    .prog-dot { width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.18); }
+    .prog-dot.done { background:#22c55e; }
+    .prog-dot.active { background:#e8a317; }
+    .round-badge { display:inline-block; background:rgba(232,163,23,0.18); border:1px solid #e8a317; color:#e8a317; padding:5px 15px; border-radius:20px; font-size:0.82rem; font-weight:700; margin-bottom:18px; }
+    .music-box { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.18); border-radius:14px; padding:18px 22px; margin:16px 0; text-align:center; }
+    .music-box .lbl { color:rgba(255,255,255,0.45); font-size:0.8rem; margin-bottom:6px; }
+    .music-box .val { color:#fff; font-size:1.18rem; font-weight:700; }
+    .music-box .hint { color:rgba(255,255,255,0.35); font-size:0.75rem; margin-top:5px; }
+    .task-prev { background:rgba(232,163,23,0.08); border:1px solid rgba(232,163,23,0.28); border-radius:14px; padding:18px 22px; margin:14px 0; text-align:center; }
+    .task-prev .big-icon { font-size:2.4rem; margin-bottom:6px; }
+    .task-prev h3 { color:#e8a317; font-size:1.22rem; margin-bottom:4px; }
+    .task-prev p { color:rgba(255,255,255,0.55); font-size:0.85rem; }
+    /* Timer */
+    .timer-wrap { text-align:right; }
+    .timer-lbl { color:rgba(255,255,255,0.45); font-size:0.78rem; }
+    .timer { font-size:2.6rem; font-weight:800; font-family:'SF Mono','Fira Code',monospace; color:#e8a317; letter-spacing:0.04em; line-height:1; }
+    .timer.warn { color:#ef4444; animation:blink 1s step-end infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.45} }
+    /* Phase bar */
+    .pbar { background:rgba(255,255,255,0.1); border-radius:6px; height:5px; margin:12px 0; }
+    .pbar-fill { height:100%; background:#e8a317; border-radius:6px; transition:width 1s linear; }
+    /* Essay */
+    .essay-box { background:rgba(255,255,255,0.94); color:#1a1040; border-radius:12px; padding:22px 26px; max-height:260px; overflow-y:auto; font-size:0.9rem; line-height:1.72; margin:12px 0; }
+    .essay-box h4 { font-size:0.97rem; font-weight:700; margin-bottom:10px; color:#1a1040; }
+    /* Textarea */
+    .s-ta { width:100%; min-height:110px; background:rgba(255,255,255,0.07); border:1.5px solid rgba(255,255,255,0.18); color:#fff; border-radius:12px; padding:13px 15px; font-family:inherit; font-size:0.9rem; resize:vertical; outline:none; }
+    .s-ta:focus { border-color:#e8a317; }
+    .s-ta::placeholder { color:rgba(255,255,255,0.28); }
+    /* Typing */
+    .orig-text { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.13); border-radius:11px; padding:15px 18px; font-size:0.96rem; line-height:1.7; color:rgba(255,255,255,0.84); margin:10px 0; font-family:'SF Mono','Fira Code',monospace; }
+    /* Rubik */
+    .rubik-clock { font-size:5.5rem; font-weight:900; font-family:'SF Mono','Fira Code',monospace; color:#e8a317; text-align:center; letter-spacing:0.04em; margin:18px 0; }
+    .rubik-badge { display:inline-flex; gap:14px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.13); border-radius:12px; padding:9px 20px; margin-bottom:18px; }
+    .rubik-badge span { color:rgba(255,255,255,0.65); font-size:0.87rem; }
+    .rubik-badge strong { color:#fff; }
+    .rubik-radio-g { display:flex; flex-direction:column; gap:8px; margin-bottom:18px; }
+    .rubik-radio-g label { display:flex; align-items:center; gap:10px; padding:9px 13px; background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.12); border-radius:10px; cursor:pointer; color:rgba(255,255,255,0.78); font-size:0.88rem; transition:all 0.18s; }
+    .rubik-radio-g label:hover { border-color:rgba(232,163,23,0.38); }
+    .rubik-radio-g input { accent-color:#e8a317; }
+    /* Score strip */
+    .score-strip { display:flex; gap:18px; justify-content:center; background:rgba(255,255,255,0.05); border-radius:12px; padding:11px 18px; margin-bottom:12px; }
+    .sc-item .v { font-size:1.5rem; font-weight:800; color:#e8a317; text-align:center; }
+    .sc-item .l { font-size:0.7rem; color:rgba(255,255,255,0.45); text-align:center; }
+    /* Answer buttons */
+    .ans-row { display:flex; gap:14px; justify-content:center; margin:14px 0; flex-wrap:wrap; }
+    .btn-ans { padding:15px 32px; border-radius:12px; font-family:inherit; font-size:0.97rem; font-weight:700; cursor:pointer; border:2px solid; transition:all 0.14s; min-width:130px; }
+    .btn-yes { background:rgba(34,197,94,0.13); border-color:#22c55e; color:#22c55e; }
+    .btn-yes:hover { background:rgba(34,197,94,0.28); }
+    .btn-no  { background:rgba(239,68,68,0.13); border-color:#ef4444; color:#ef4444; }
+    .btn-no:hover { background:rgba(239,68,68,0.28); }
+    .btn-same { background:rgba(99,102,241,0.13); border-color:#818cf8; color:#818cf8; }
+    .btn-same:hover { background:rgba(99,102,241,0.28); }
+    .btn-mirr { background:rgba(245,158,11,0.13); border-color:#fbbf24; color:#fbbf24; }
+    .btn-mirr:hover { background:rgba(245,158,11,0.28); }
+    /* Flash feedback */
+    @keyframes flashG { 0%,100%{background:transparent} 50%{background:rgba(34,197,94,0.22)} }
+    @keyframes flashR { 0%,100%{background:transparent} 50%{background:rgba(239,68,68,0.22)} }
+    .fl-ok { animation:flashG 0.32s ease; }
+    .fl-bad { animation:flashR 0.32s ease; }
+    /* Grid 2 col */
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media(max-width:520px){ .grid2{grid-template-columns:1fr;} }
+    /* Break */
+    .break-summary { background:rgba(255,255,255,0.06); border-radius:12px; padding:15px 18px; margin-bottom:18px; }
+    /* Results table */
+    .res-table { width:100%; border-collapse:collapse; margin:14px 0; font-size:0.88rem; }
+    .res-table th { text-align:left; padding:9px 11px; border-bottom:1px solid rgba(255,255,255,0.13); color:rgba(255,255,255,0.45); font-size:0.78rem; text-transform:uppercase; font-weight:600; }
+    .res-table td { padding:11px 11px; border-bottom:1px solid rgba(255,255,255,0.07); color:rgba(255,255,255,0.82); }
+    .res-table .sc { color:#e8a317; font-weight:700; }
+    /* Keyboard hint */
+    .kbd-hint { color:rgba(255,255,255,0.28); font-size:0.72rem; margin-top:6px; }
+    .kbd { display:inline-block; border:1px solid rgba(255,255,255,0.25); border-radius:4px; padding:1px 6px; font-family:monospace; }
+    canvas { border-radius:10px; display:block; cursor:default; }
+    hr.div { border:none; border-top:1px solid rgba(255,255,255,0.1); margin:20px 0; }
+    .two-canvas { display:flex; align-items:center; justify-content:center; gap:24px; margin:14px 0; flex-wrap:wrap; }
+    .canvas-lbl { color:rgba(255,255,255,0.45); font-size:0.78rem; text-align:center; margin-top:5px; }
+    .big-emoji { font-size:3.6rem; text-align:center; margin-bottom:10px; }
+    .progress-info { color:rgba(255,255,255,0.5); font-size:0.82rem; margin-bottom:4px; }
+    .progress-info span { color:#e8a317; font-weight:700; }
+    .task-selected-count { font-size:0.85rem; color:rgba(255,255,255,0.55); margin-bottom:14px; }
+    .task-selected-count span { color:#e8a317; font-weight:700; }
+  </style>
+</head>
+<body>
+
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo" style="text-decoration:none">🎵 Raaga &amp; Taala Study</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════ SETUP ══════════════════════ -->
+<div id="sc-setup" class="session-screen">
+  <div class="s-card">
+    <h2>🎧 Session Setup</h2>
+    <p class="sub">The researcher will guide you. Choose your 5 tasks and begin.</p>
+
+    <div style="margin-bottom:18px;">
+      <label class="s-lbl">Participant ID <span style="color:rgba(255,255,255,0.35)">(given by researcher)</span></label>
+      <input type="text" id="pid-inp" class="s-inp" placeholder="e.g. P-001" maxlength="10" />
+    </div>
+    <hr class="div" />
+
+    <p class="task-selected-count">Select exactly <span>5</span> tasks you'd like to do:</p>
+    <div class="task-list" id="task-list"></div>
+    <div class="task-selected-count" id="count-badge">Selected: <span id="sel-count">0</span> / 5</div>
+
+    <div style="text-align:center;margin-top:18px;">
+      <button class="btn-go" id="btn-begin" disabled onclick="beginSession()">Begin Session →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ RUBIK PRE ══════════════════════ -->
+<div id="sc-rubik-pre" class="session-screen hidden">
+  <div class="s-card">
+    <h2>🟥 Rubik's Cube — Quick Setup</h2>
+    <p class="sub">Answer once. This helps us put your times in context.</p>
+
+    <label class="s-lbl">How familiar are you with the Rubik's Cube?</label>
+    <div class="rubik-radio-g" id="rk-fam-g">
+      <label><input type="radio" name="rk_fam" value="never" /> I've never solved one</label>
+      <label><input type="radio" name="rk_fam" value="beginner" /> Beginner — I've tried but rarely finish</label>
+      <label><input type="radio" name="rk_fam" value="intermediate" /> Intermediate — I can solve it sometimes</label>
+      <label><input type="radio" name="rk_fam" value="advanced" /> Advanced — I solve it regularly</label>
+      <label><input type="radio" name="rk_fam" value="expert" /> Expert / Speedcuber</label>
+    </div>
+
+    <div id="rk-best-wrap" class="hidden" style="margin-bottom:18px;">
+      <label class="s-lbl">Your personal best time <span style="color:rgba(255,255,255,0.35)">(optional)</span></label>
+      <input type="text" id="rk-best" class="s-inp" placeholder="e.g. 45 seconds, 2 min 10 sec…" />
+    </div>
+
+    <hr class="div" />
+
+    <div class="grid2">
+      <div>
+        <label class="s-lbl">Cube type</label>
+        <div class="rubik-radio-g">
+          <label><input type="radio" name="rk_size" value="3x3" checked /> 3×3 Cube</label>
+          <label><input type="radio" name="rk_size" value="4x4" /> 4×4 Cube</label>
+        </div>
+      </div>
+      <div>
+        <label class="s-lbl">Challenge</label>
+        <div class="rubik-radio-g">
+          <label><input type="radio" name="rk_ch" value="1_side" checked /> 1 Side only</label>
+          <label><input type="radio" name="rk_ch" value="full" /> Full Cube</label>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:20px;">
+      <button class="btn-go" onclick="saveRubikPre()">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ ROUND INTRO ══════════════════════ -->
+<div id="sc-intro" class="session-screen hidden" style="text-align:center;">
+  <div class="s-card" style="text-align:center;">
+    <div class="prog-dots" id="prog-dots"></div>
+    <div class="round-badge" id="intro-badge">Round 1 of 5</div>
+
+    <div class="music-box">
+      <div class="lbl">🎵 Music condition for this round</div>
+      <div class="val" id="intro-music">—</div>
+      <div class="hint">Please start the music before pressing Start</div>
+    </div>
+
+    <div class="task-prev">
+      <div class="big-icon" id="intro-icon">📖</div>
+      <h3 id="intro-name">Task Name</h3>
+      <p id="intro-desc">Description</p>
+    </div>
+
+    <button class="btn-go" onclick="launchTask()">▶ Start Task</button>
+  </div>
+</div>
+
+<!-- ══════════════════════ TASK: READING ══════════════════════ -->
+<div id="sc-reading" class="session-screen hidden">
+  <div class="s-card" style="max-width:760px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <h3 style="color:#e8a317;" id="rd-phase-lbl">📖 Phase 1 — Read the Essay</h3>
+      <div class="timer-wrap">
+        <div class="timer-lbl" id="rd-timer-lbl">Time to read</div>
+        <div class="timer" id="rd-timer">3:00</div>
+      </div>
+    </div>
+    <div class="pbar"><div class="pbar-fill" id="rd-bar" style="width:100%"></div></div>
+
+    <div id="rd-read">
+      <div class="essay-box"><h4 id="essay-title">—</h4><div id="essay-body"></div></div>
+      <p style="color:rgba(255,255,255,0.38);font-size:0.78rem;text-align:center;margin-top:6px;">Read carefully. You'll write a summary after the timer ends.</p>
+    </div>
+    <div id="rd-write" class="hidden">
+      <p style="color:rgba(255,255,255,0.68);font-size:0.88rem;margin-bottom:10px;">Write a summary of what you just read — as many key points as you can remember.</p>
+      <textarea class="s-ta" id="rd-summary" placeholder="Start writing your summary here…"></textarea>
+      <div style="text-align:center;margin-top:12px;">
+        <button class="btn-go" onclick="submitReading()">Submit Summary →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ TASK: TYPING ══════════════════════ -->
+<div id="sc-typing" class="session-screen hidden">
+  <div class="s-card" style="max-width:700px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <h3 style="color:#e8a317;">⌨️ Reverse Typing</h3>
+      <div class="timer-wrap">
+        <div class="timer-lbl">Elapsed</div>
+        <div class="timer" id="ty-timer">0:00</div>
+      </div>
+    </div>
+    <p style="color:rgba(255,255,255,0.58);font-size:0.83rem;margin-bottom:8px;">Type the paragraph below with the <strong style="color:#e8a317">word order completely reversed</strong> (last word first). Punctuation & caps don't matter.</p>
+    <div class="orig-text" id="ty-orig">—</div>
+    <p style="color:rgba(232,163,23,0.75);font-size:0.8rem;margin:8px 0 4px;">👇 Type the reversed version below:</p>
+    <textarea class="s-ta" id="ty-inp" placeholder="Start typing in reverse order…" style="min-height:76px;" oninput="tyCheck()"></textarea>
+    <div style="margin-top:10px;background:rgba(255,255,255,0.05);border-radius:10px;padding:11px 15px;">
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
+        <span style="color:rgba(255,255,255,0.45);">Words matched</span>
+        <span style="color:#e8a317;font-weight:700;" id="ty-prog">0 / 0</span>
+      </div>
+      <div class="pbar" style="margin:7px 0 0;"><div class="pbar-fill" id="ty-bar" style="width:0%"></div></div>
+    </div>
+    <div style="text-align:center;margin-top:14px;">
+      <button class="btn-go" onclick="submitTyping()">Submit →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ TASK: RUBIK ══════════════════════ -->
+<div id="sc-rubik" class="session-screen hidden">
+  <div class="s-card" style="text-align:center;">
+    <h3 style="color:#e8a317;">🟥 Rubik's Cube Timer</h3>
+    <p style="color:rgba(255,255,255,0.55);font-size:0.83rem;margin:6px 0 16px;">Physical cube is provided. Press <kbd>Space</kbd> or the button to start/stop.</p>
+    <div class="rubik-badge">
+      <span>Cube: <strong id="rk-size-show">3×3</strong></span>
+      <span>|</span>
+      <span>Challenge: <strong id="rk-ch-show">1 Side</strong></span>
+    </div>
+    <div class="rubik-clock" id="rk-clock">0:00.0</div>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;">
+      <button class="btn-go" id="rk-btn" onclick="rkToggle()">▶ Start Timer</button>
+      <button class="btn-ghost" onclick="rkReset()">↺ Reset</button>
+    </div>
+    <button class="btn-go" id="rk-rec-btn" onclick="submitRubik()" style="background:rgba(34,197,94,0.85);color:#fff;" disabled>✓ Record This Time</button>
+  </div>
+</div>
+
+<!-- ══════════════════════ TASK: DOTS ══════════════════════ -->
+<div id="sc-dots" class="session-screen hidden">
+  <div class="s-card" style="text-align:center;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <h3 style="color:#e8a317;">🟣 Dot Memory Puzzle</h3>
+      <div id="dt-timer-wrap" class="hidden timer-wrap">
+        <div class="timer-lbl" id="dt-timer-lbl">Memorize</div>
+        <div class="timer" id="dt-timer" style="font-size:2rem;">6</div>
+      </div>
+    </div>
+    <p id="dt-instr" style="color:rgba(255,255,255,0.62);font-size:0.86rem;margin-bottom:12px;">Remember the positions of the highlighted dots.</p>
+    <div style="display:flex;justify-content:center;">
+      <canvas id="dt-canvas" width="300" height="300" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);"></canvas>
+    </div>
+    <div id="dt-recall-btns" class="hidden" style="margin-top:14px;">
+      <p style="color:rgba(255,255,255,0.42);font-size:0.8rem;margin-bottom:12px;">Click cells to mark dot positions, then submit.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn-go" onclick="submitDots()">Submit Answer →</button>
+        <button class="btn-ghost" onclick="dtClear()">Clear</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ TASK: SYMMETRY ══════════════════════ -->
+<div id="sc-sym" class="session-screen hidden">
+  <div class="s-card" style="text-align:center;max-width:600px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="text-align:left;">
+        <h3 style="color:#e8a317;">🔄 Symmetry Test</h3>
+        <p style="color:rgba(255,255,255,0.45);font-size:0.8rem;">Is the shape symmetric about the vertical centre line?</p>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-lbl">Time left</div>
+        <div class="timer" id="sym-timer">2:00</div>
+      </div>
+    </div>
+    <div class="score-strip">
+      <div class="sc-item"><div class="v" id="sym-ok">0</div><div class="l">Correct</div></div>
+      <div class="sc-item"><div class="v" id="sym-bad">0</div><div class="l">Wrong</div></div>
+      <div class="sc-item"><div class="v" id="sym-tot">0</div><div class="l">Total</div></div>
+    </div>
+    <div id="sym-canvas-wrap" style="display:flex;justify-content:center;margin:12px 0;">
+      <canvas id="sym-canvas" width="280" height="280" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);"></canvas>
+    </div>
+    <div class="ans-row">
+      <button class="btn-ans btn-yes" onclick="answerSym(true)">✓ Symmetric</button>
+      <button class="btn-ans btn-no" onclick="answerSym(false)">✗ Not Symmetric</button>
+    </div>
+    <p class="kbd-hint"><kbd class="kbd">Y</kbd> = Symmetric &nbsp; <kbd class="kbd">N</kbd> = Not Symmetric</p>
+  </div>
+</div>
+
+<!-- ══════════════════════ TASK: ROTATION ══════════════════════ -->
+<div id="sc-rot" class="session-screen hidden">
+  <div class="s-card" style="text-align:center;max-width:660px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="text-align:left;">
+        <h3 style="color:#e8a317;">🔃 Rotated Image Test</h3>
+        <p style="color:rgba(255,255,255,0.45);font-size:0.8rem;">Is Shape B a <em>rotation</em> of A, or a <em>mirror</em> of A?</p>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-lbl">Time left</div>
+        <div class="timer" id="rot-timer">2:00</div>
+      </div>
+    </div>
+    <div class="score-strip">
+      <div class="sc-item"><div class="v" id="rot-ok">0</div><div class="l">Correct</div></div>
+      <div class="sc-item"><div class="v" id="rot-bad">0</div><div class="l">Wrong</div></div>
+      <div class="sc-item"><div class="v" id="rot-tot">0</div><div class="l">Total</div></div>
+    </div>
+    <div id="rot-wrap" class="two-canvas">
+      <div>
+        <canvas id="rot-a" width="190" height="190" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);"></canvas>
+        <div class="canvas-lbl">Shape A</div>
+      </div>
+      <div style="font-size:1.6rem;color:rgba(255,255,255,0.25);">vs</div>
+      <div>
+        <canvas id="rot-b" width="190" height="190" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);"></canvas>
+        <div class="canvas-lbl">Shape B</div>
+      </div>
+    </div>
+    <div class="ans-row">
+      <button class="btn-ans btn-same" onclick="answerRot(false)">🔄 Rotated (Same)</button>
+      <button class="btn-ans btn-mirr" onclick="answerRot(true)">🪞 Mirrored</button>
+    </div>
+    <p class="kbd-hint"><kbd class="kbd">R</kbd> = Rotated &nbsp; <kbd class="kbd">M</kbd> = Mirrored</p>
+  </div>
+</div>
+
+<!-- ══════════════════════ BREAK ══════════════════════ -->
+<div id="sc-break" class="session-screen hidden">
+  <div class="s-card" style="text-align:center;max-width:480px;">
+    <div class="big-emoji">☕</div>
+    <h2>Break Time</h2>
+    <p style="color:rgba(255,255,255,0.55);margin-bottom:18px;">Take 2–3 minutes to rest. Continue when you're ready.</p>
+    <div class="break-summary">
+      <p style="color:rgba(255,255,255,0.42);font-size:0.8rem;margin-bottom:6px;">Round just completed:</p>
+      <p id="brk-text" style="color:#fff;font-size:0.92rem;"></p>
+    </div>
+    <button class="btn-go" onclick="nextRound()">Continue →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════ DONE ══════════════════════ -->
+<div id="sc-done" class="session-screen hidden">
+  <div class="s-card" style="max-width:740px;">
+    <div class="big-emoji">🎉</div>
+    <h2 style="text-align:center;">Session Complete!</h2>
+    <p style="color:rgba(255,255,255,0.55);text-align:center;margin-bottom:18px;">All 5 rounds done. Here's the summary:</p>
+    <table class="res-table">
+      <thead><tr><th>Round</th><th>Task</th><th>Music Condition</th><th>Result</th></tr></thead>
+      <tbody id="res-tbody"></tbody>
+    </table>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px;">
+      <button class="btn-go" onclick="dlResults()">⬇ Download Results (JSON)</button>
+      <a href="post-survey.html" class="btn-go" style="text-decoration:none;">📋 Post-Session Survey →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────
+// ESSAYS (5 × ~220 words)
+// ─────────────────────────────────────────
+const ESSAYS=[
+{title:"The Water Cycle",text:`Water moves constantly through the environment in the water cycle. The sun heats surface water in oceans, lakes, and rivers, causing it to evaporate and rise as water vapor. As the vapor ascends and cools, it condenses around tiny dust particles to form clouds. When enough droplets collect, they fall as precipitation — rain, snow, sleet, or hail.\n\nOnce on the ground, water takes several paths. Some flows across the surface as runoff, reaching rivers and oceans. Some soaks into soil as groundwater, which plants absorb through roots and release as vapor through transpiration. Ice in polar regions and mountains may stay frozen for thousands of years as glaciers before slowly melting.\n\nThe water cycle is critical to life on Earth. It distributes fresh water across continents, regulates climate, and sustains ecosystems. Human activities such as deforestation and urbanization disrupt the cycle by reducing evaporation and increasing runoff, threatening fresh water supplies worldwide. Understanding this cycle is essential for managing water resources in an era of changing climate.`},
+{title:"The Rise of Ancient Rome",text:`Rome began as a small village on the Tiber River around the 8th century BCE. Legend says it was founded by twin brothers Romulus and Remus, raised by a she-wolf. By 509 BCE the Romans expelled their kings and created a republic governed by elected consuls and guided by a Senate of wealthy citizens.\n\nOver centuries, Rome expanded aggressively. Its disciplined army conquered the Italian peninsula, then North Africa, Greece, Spain, and much of Western Europe. Roads, aqueducts, and a legal system unified these territories into an empire that facilitated trade and cultural exchange.\n\nAt its height in the 2nd century CE, the empire housed roughly 60 million people. It gifted the world ideas about law, governance, and architecture. Latin, Rome's language, evolved into modern Italian, French, Spanish, Portuguese, and Romanian. Economic strain and repeated invasions eventually brought down the Western Empire in 476 CE, while the Eastern Empire survived as Byzantium for nearly a thousand more years.`},
+{title:"How Vaccines Work",text:`Vaccines are among medicine's most powerful tools. They train the immune system to recognise and fight specific pathogens — bacteria or viruses — without causing the disease. A vaccine introduces a harmless version or fragment of the pathogen: a weakened form, a killed form, or just a protein from its surface.\n\nThe immune system responds by producing antibodies — proteins that bind and neutralise the pathogen. It also creates memory cells that remain long after the response ends. If the real pathogen enters the body later, memory cells recognise it quickly and mount a rapid defence, often eliminating it before symptoms appear.\n\nDifferent vaccines work differently. Live-attenuated vaccines use weakened pathogens and give strong, long-lasting immunity. Inactivated vaccines use killed pathogens. Newer mRNA vaccines deliver genetic instructions so cells produce a harmless protein fragment that triggers immunity. Widespread vaccination creates herd immunity — enough people are protected that the pathogen struggles to spread, shielding even the unvaccinated. This strategy has eliminated smallpox and greatly reduced polio and measles worldwide.`},
+{title:"The Amazon Rainforest",text:`The Amazon rainforest covers roughly 5.5 million square kilometres across nine South American countries, mostly in Brazil. The world's largest tropical rainforest, it is often called the "lungs of the Earth" because it absorbs vast amounts of carbon dioxide and produces oxygen, helping regulate global climate.\n\nThe Amazon is extraordinarily biodiverse — home to an estimated 10 percent of all species on Earth, including more than 40,000 plant species, 1,300 bird species, 3,000 fish types, and millions of insects, many still unknown to science. Indigenous peoples have lived here for thousands of years, holding deep knowledge of its plants and ecology.\n\nThe Amazon faces severe threats. Cattle ranching, soy farming, illegal logging, and infrastructure projects destroy millions of hectares each year. Burning trees releases stored carbon into the atmosphere, accelerating climate change. Scientists warn that if deforestation continues, the Amazon could reach a tipping point, converting to dry savanna with catastrophic consequences for biodiversity and global climate stability.`},
+{title:"Light and Photosynthesis",text:`Photosynthesis is the process by which plants, algae, and some bacteria convert light into chemical energy stored as sugar. It occurs in chloroplasts, which contain a pigment called chlorophyll. Chlorophyll absorbs red and blue light and reflects green light — which is why most plants look green.\n\nThe process has two stages. In the light-dependent reactions, sunlight energises electrons in the chlorophyll, driving production of ATP and NADPH — energy-carrying molecules — while splitting water molecules and releasing oxygen as a byproduct. This oxygen is what most life on Earth breathes.\n\nIn the Calvin cycle, the plant uses ATP and NADPH to convert carbon dioxide into glucose. This glucose powers the plant and, through the food chain, nearly all other organisms on Earth. Changes in sunlight, carbon dioxide, or water supply directly affect photosynthesis rates, making it a crucial process to understand for food security and climate science. Without photosynthesis, almost no life on Earth would exist.`}
+];
+
+// ─────────────────────────────────────────
+// TYPING PARAGRAPHS
+// ─────────────────────────────────────────
+const TY_PARAS=[
+  "The morning sun rose slowly over the distant hills casting long golden shadows across the quiet valley below",
+  "Scientists recently discovered a new deep sea fish that produces its own blue light to attract unsuspecting prey",
+  "Every great journey begins with a single small step taken in the right direction at precisely the right moment",
+  "The ancient library contained thousands of scrolls written by scholars who devoted their entire lives to knowledge",
+  "Music has the remarkable power to evoke memories and emotions that words alone cannot easily express or capture"
+];
+
+// ─────────────────────────────────────────
+// SYMMETRY SHAPES  (rows of 'X' and ' ')
+// ─────────────────────────────────────────
+const SYM_ITEMS=[
+  {r:["  XXXX  ","  XXXX  "," XXXXXX ","XXXXXXXX"," XXXXXX ","  XXXX  ","  XXXX  "],sym:true},
+  {r:["XXXXXXXX","   XX   ","   XX   ","   XX   ","   XX   ","   XX   "],sym:true},
+  {r:["XX    XX","XX    XX","XXXXXXXX","XX    XX","XX    XX"],sym:true},
+  {r:[" XXXXXX ","X      X","X  XX  X","X  XX  X","X      X"," XXXXXX "],sym:true},
+  {r:["   XX   ","  XXXX  "," XXXXXX ","XXXXXXXX"," XXXXXX ","  XXXX  ","   XX   "],sym:true},
+  {r:["XXXXXXXX","X      X","X      X","X      X","XXXXXXXX"],sym:true},
+  {r:["XX    XX"," XX  XX ","  XXXX  ","  XXXX  "," XX  XX ","XX    XX"],sym:true},
+  {r:["   XX   ","   XX   ","XXXXXXXX","   XX   ","   XX   "],sym:true},
+  // Asymmetric
+  {r:["XX      ","XX      ","XX      ","XX      ","XXXXXXXX"],sym:false},
+  {r:["XXXX    ","   X    ","   XXXXX","       X"],sym:false},
+  {r:["XXXXX   ","X       ","XXXXX   ","    X   ","    XXXX"],sym:false},
+  {r:[" XXXXXX ","X      X","X    XX ","X   X   ","X  X    ","XXXXXXXX"],sym:false},
+  {r:["   XXXXX","      XX","   XXXXX","   X    ","   XXXXX"],sym:false},
+  {r:["X       ","X X     ","X  X    ","X   XXXX"],sym:false},
+  {r:["  XXXXXX","  X     ","  XXXXX ","      X ","  XXXXX "],sym:false},
+  {r:["XXXXXXXX","      X ","    X   ","  X     ","X       "],sym:false},
+];
+
+// ─────────────────────────────────────────
+// ROTATION SHAPES  (polygon points on 0-10 grid, all asymmetric)
+// ─────────────────────────────────────────
+const ROT_SHAPES=[
+  [[1,1],[3,1],[3,7],[8,7],[8,9],[1,9]],           // L-shape
+  [[1,0],[1,9],[3,9],[3,5],[9,3],[9,0]],           // Flag
+  [[0,2],[6,2],[6,0],[10,4],[6,8],[6,6],[0,6]],    // Arrow
+  [[0,0],[6,0],[6,4],[10,4],[10,8],[4,8],[4,4],[0,4]], // Z-step
+  [[0,0],[4,0],[4,3],[7,3],[7,6],[10,6],[10,10],[0,10]], // Staircase
+];
+
+// ─────────────────────────────────────────
+// TASKS METADATA
+// ─────────────────────────────────────────
+const TASKS={
+  reading: {name:"Reading + Summary",  icon:"📖", desc:"Read a short essay (3 min), then write a summary (1.5 min) from memory.", dur:"~4.5 min"},
+  typing:  {name:"Reverse Typing",     icon:"⌨️", desc:"Type a paragraph with the word order completely reversed — last word first.", dur:"~2 min"},
+  rubik:   {name:"Rubik's Cube",       icon:"🟥", desc:"Solve the physical cube provided (your chosen challenge). Just a timer.", dur:"~3 min"},
+  dots:    {name:"Dot Memory Puzzle",  icon:"🟣", desc:"Memorise 7 dot positions in 6 seconds, then reproduce them on the grid.", dur:"~2 min"},
+  symmetry:{name:"Symmetry Test",      icon:"🔄", desc:"2 minutes — for each shape, say if it is left-right symmetric or not.", dur:"2 min"},
+  rotation:{name:"Rotated Image Test", icon:"🔃", desc:"2 minutes — is Shape B a rotation of A, or a mirrored version?", dur:"2 min"},
+};
+
+const MUSIC=[
+  {id:"indian_instrumental",lbl:"🎻 Indian Classical — Instrumental"},
+  {id:"indian_lyrical",     lbl:"🎤 Indian Classical — Lyrical"},
+  {id:"film_music",         lbl:"🎬 Indian Film Music"},
+  {id:"western",            lbl:"🎸 Western Music"},
+  {id:"silence",            lbl:"🔇 Silence / White Noise"},
+];
+
+// ─────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────
+let S={
+  pid:'', tasks:[], taskOrder:[], musicOrder:[],
+  rubikPre:{}, results:[], round:0,
+  essayIdx:0, tyIdx:0,
+  _iv:[],
+};
+
+// ─────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────
+const shuffle=a=>{const b=[...a];for(let i=b.length-1;i>0;i--){const j=0|Math.random()*(i+1);[b[i],b[j]]=[b[j],b[i]];}return b;};
+const nav=id=>{document.querySelectorAll('.session-screen').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');};
+const clearIv=()=>{S._iv.forEach(t=>{clearInterval(t);clearTimeout(t);});S._iv=[];};
+const fmt=(s,dec)=>{const m=0|Math.abs(s)/60,r=Math.abs(s)%60;return dec?`${m}:${r.toFixed(1).padStart(4,'0')}`:`${m}:${String(0|r).padStart(2,'0')}`;};
+
+// roundRect polyfill
+if(!CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){
+    this.beginPath();this.moveTo(x+r,y);this.lineTo(x+w-r,y);this.quadraticCurveTo(x+w,y,x+w,y+r);
+    this.lineTo(x+w,y+h-r);this.quadraticCurveTo(x+w,y+h,x+w-r,y+h);this.lineTo(x+r,y+h);
+    this.quadraticCurveTo(x,y+h,x,y+h-r);this.lineTo(x,y+r);this.quadraticCurveTo(x,y,x+r,y);this.closePath();
+  };
+}
+
+// ─────────────────────────────────────────
+// SETUP SCREEN
+// ─────────────────────────────────────────
+(()=>{
+  const el=document.getElementById('task-list');
+  Object.entries(TASKS).forEach(([k,m])=>{
+    const d=document.createElement('div');
+    d.className='task-opt';d.dataset.k=k;
+    d.innerHTML=`<input type="checkbox" id="t_${k}" value="${k}" onchange="onTkCh()" /><span class="oi">${m.icon}</span><div><h4>${m.name}</h4><p>${m.desc}</p></div><span class="task-dur">${m.dur}</span>`;
+    d.onclick=e=>{if(e.target.tagName!=='INPUT'){const c=d.querySelector('input');c.checked=!c.checked;onTkCh();}};
+    el.appendChild(d);
+  });
+})();
+
+function onTkCh(){
+  const checked=[...document.querySelectorAll('#task-list input:checked')].map(i=>i.value);
+  document.getElementById('sel-count').textContent=checked.length;
+  document.querySelectorAll('.task-opt').forEach(o=>o.classList.toggle('sel',o.querySelector('input').checked));
+  if(checked.length>=5) document.querySelectorAll('#task-list input:not(:checked)').forEach(c=>c.disabled=true);
+  else document.querySelectorAll('#task-list input').forEach(c=>c.disabled=false);
+  document.getElementById('btn-begin').disabled=checked.length!==5;
+}
+
+function beginSession(){
+  const pid=document.getElementById('pid-inp').value.trim();
+  if(!pid){alert('Enter a Participant ID.');return;}
+  const checked=[...document.querySelectorAll('#task-list input:checked')].map(i=>i.value);
+  if(checked.length!==5)return;
+  S.pid=pid;S.tasks=checked;S.taskOrder=shuffle([...checked]);
+  S.musicOrder=shuffle([...MUSIC]);
+  S.essayIdx=0|Math.random()*ESSAYS.length;
+  S.tyIdx=0|Math.random()*TY_PARAS.length;
+  if(checked.includes('rubik')) nav('sc-rubik-pre');
+  else showIntro();
+}
+
+// ─────────────────────────────────────────
+// RUBIK PRE
+// ─────────────────────────────────────────
+document.querySelectorAll('input[name="rk_fam"]').forEach(r=>{
+  r.addEventListener('change',()=>{
+    document.getElementById('rk-best-wrap').classList.toggle('hidden',!['advanced','expert'].includes(r.value));
+  });
+});
+
+function saveRubikPre(){
+  const fam=document.querySelector('input[name="rk_fam"]:checked');
+  const sz=document.querySelector('input[name="rk_size"]:checked');
+  const ch=document.querySelector('input[name="rk_ch"]:checked');
+  if(!fam){alert('Please select your familiarity level.');return;}
+  S.rubikPre={fam:fam.value,best:document.getElementById('rk-best').value,size:sz.value,challenge:ch.value};
+  showIntro();
+}
+
+// ─────────────────────────────────────────
+// ROUND INTRO
+// ─────────────────────────────────────────
+function showIntro(){
+  const r=S.round, task=S.taskOrder[r], music=S.musicOrder[r], m=TASKS[task];
+  const dots=document.getElementById('prog-dots');
+  dots.innerHTML='';
+  for(let i=0;i<5;i++){const d=document.createElement('div');d.className='prog-dot'+(i<r?' done':i===r?' active':'');dots.appendChild(d);}
+  document.getElementById('intro-badge').textContent=`Round ${r+1} of 5`;
+  document.getElementById('intro-music').textContent=music.lbl;
+  document.getElementById('intro-icon').textContent=m.icon;
+  document.getElementById('intro-name').textContent=m.name;
+  document.getElementById('intro-desc').textContent=m.desc;
+  nav('sc-intro');
+}
+
+function launchTask(){
+  const t=S.taskOrder[S.round];
+  const fn={reading:startReading,typing:startTyping,rubik:startRubik,dots:startDots,symmetry:startSym,rotation:startRot};
+  fn[t]();
+}
+
+// ─────────────────────────────────────────
+// TASK: READING
+// ─────────────────────────────────────────
+let RD={phase:'read',left:0};
+
+function startReading(){
+  clearIv();
+  const e=ESSAYS[S.essayIdx%ESSAYS.length];S.essayIdx++;
+  document.getElementById('essay-title').textContent=e.title;
+  document.getElementById('essay-body').textContent=e.text;
+  document.getElementById('rd-phase-lbl').textContent='📖 Phase 1 — Read the Essay';
+  document.getElementById('rd-timer-lbl').textContent='Time to read';
+  document.getElementById('rd-summary').value='';
+  document.getElementById('rd-read').classList.remove('hidden');
+  document.getElementById('rd-write').classList.add('hidden');
+  RD={phase:'read',left:180};
+  nav('sc-reading');
+  runRdTimer();
+}
+
+function runRdTimer(){
+  const total=RD.phase==='read'?180:90;
+  const timerEl=document.getElementById('rd-timer');
+  const barEl=document.getElementById('rd-bar');
+  const iv=setInterval(()=>{
+    RD.left--;
+    timerEl.textContent=fmt(RD.left);
+    timerEl.classList.toggle('warn',RD.left<=20);
+    barEl.style.width=(RD.left/total*100)+'%';
+    if(RD.left<=0){
+      clearInterval(iv);
+      if(RD.phase==='read'){
+        RD.phase='write';RD.left=90;
+        document.getElementById('rd-phase-lbl').textContent='✏️ Phase 2 — Write Your Summary';
+        document.getElementById('rd-timer-lbl').textContent='Time to write';
+        document.getElementById('rd-read').classList.add('hidden');
+        document.getElementById('rd-write').classList.remove('hidden');
+        runRdTimer();
+      } else submitReading();
+    }
+  },1000);
+  S._iv.push(iv);
+}
+
+function submitReading(){
+  clearIv();
+  const s=document.getElementById('rd-summary').value.trim();
+  const wc=s.split(/\s+/).filter(w=>w).length;
+  record('reading',{essay:document.getElementById('essay-title').textContent,summary:s,wordCount:wc,note:'AI-scored later'},`${wc} words written`);
+}
+
+// ─────────────────────────────────────────
+// TASK: TYPING
+// ─────────────────────────────────────────
+let TY={target:[],t0:0};
+
+function startTyping(){
+  clearIv();
+  const p=TY_PARAS[S.tyIdx%TY_PARAS.length];S.tyIdx++;
+  TY.target=p.split(' ').reverse();
+  document.getElementById('ty-orig').textContent=p;
+  document.getElementById('ty-inp').value='';
+  document.getElementById('ty-timer').textContent='0:00';
+  document.getElementById('ty-timer').classList.remove('warn');
+  document.getElementById('ty-prog').textContent=`0 / ${TY.target.length}`;
+  document.getElementById('ty-bar').style.width='0%';
+  nav('sc-typing');
+  TY.t0=Date.now();
+  const iv=setInterval(()=>{document.getElementById('ty-timer').textContent=fmt((Date.now()-TY.t0)/1000|0);},1000);
+  S._iv.push(iv);
+}
+
+function tyCheck(){
+  const typed=document.getElementById('ty-inp').value.trim().split(/\s+/).filter(w=>w).map(w=>w.toLowerCase().replace(/[^a-z]/g,''));
+  const tgt=TY.target.map(w=>w.toLowerCase().replace(/[^a-z]/g,''));
+  let ok=0;typed.forEach((w,i)=>{if(i<tgt.length&&w===tgt[i])ok++;});
+  document.getElementById('ty-prog').textContent=`${ok} / ${tgt.length}`;
+  document.getElementById('ty-bar').style.width=(ok/tgt.length*100)+'%';
+}
+
+function submitTyping(){
+  clearIv();
+  const elapsed=(Date.now()-TY.t0)/1000|0;
+  const typed=document.getElementById('ty-inp').value.trim().split(/\s+/).filter(w=>w).map(w=>w.toLowerCase().replace(/[^a-z]/g,''));
+  const tgt=TY.target.map(w=>w.toLowerCase().replace(/[^a-z]/g,''));
+  let ok=0;typed.forEach((w,i)=>{if(i<tgt.length&&w===tgt[i])ok++;});
+  const acc=tgt.length?Math.round(ok/tgt.length*100):0;
+  record('typing',{time:elapsed,correct:ok,total:tgt.length,accuracy:acc,typed:document.getElementById('ty-inp').value},`${acc}% accuracy in ${fmt(elapsed)}`);
+}
+
+// ─────────────────────────────────────────
+// TASK: RUBIK
+// ─────────────────────────────────────────
+let RK={on:false,t0:null,el:0,iv:null};
+
+function startRubik(){
+  clearIv();
+  RK={on:false,t0:null,el:0,iv:null};
+  const pre=S.rubikPre;
+  document.getElementById('rk-size-show').textContent=pre.size||'3×3';
+  document.getElementById('rk-ch-show').textContent=pre.challenge==='full'?'Full Cube':'1 Side';
+  document.getElementById('rk-clock').textContent='0:00.0';
+  document.getElementById('rk-btn').textContent='▶ Start Timer';
+  document.getElementById('rk-rec-btn').disabled=true;
+  nav('sc-rubik');
+}
+
+function rkToggle(){
+  if(!RK.on){
+    RK.on=true;RK.t0=Date.now()-RK.el*1000;
+    document.getElementById('rk-btn').textContent='⏸ Stop Timer';
+    RK.iv=setInterval(()=>{
+      RK.el=(Date.now()-RK.t0)/1000;
+      const m=0|RK.el/60,s=(RK.el%60).toFixed(1).padStart(4,'0');
+      document.getElementById('rk-clock').textContent=`${m}:${s}`;
+    },100);
+    S._iv.push(RK.iv);
+  } else {
+    RK.on=false;clearInterval(RK.iv);
+    document.getElementById('rk-btn').textContent='▶ Resume';
+    document.getElementById('rk-rec-btn').disabled=false;
+  }
+}
+
+function rkReset(){
+  RK.on=false;clearInterval(RK.iv);RK.el=0;
+  document.getElementById('rk-clock').textContent='0:00.0';
+  document.getElementById('rk-btn').textContent='▶ Start Timer';
+  document.getElementById('rk-rec-btn').disabled=true;
+}
+
+function submitRubik(){
+  clearIv();
+  record('rubik',{time:RK.el,size:S.rubikPre.size,challenge:S.rubikPre.challenge,fam:S.rubikPre.fam,best:S.rubikPre.best},`${fmt(RK.el|0)} (${S.rubikPre.size}, ${S.rubikPre.challenge==='full'?'Full':'1 Side'})`);
+}
+
+// ─────────────────────────────────────────
+// TASK: DOTS
+// ─────────────────────────────────────────
+let DT={targets:[],marked:[],phase:'memo',G:6};
+
+function startDots(){
+  clearIv();
+  const G=DT.G=6;
+  DT.targets=shuffle([...Array(G*G).keys()]).slice(0,7);
+  DT.marked=[];DT.phase='memo';
+  document.getElementById('dt-instr').textContent='Remember the positions of the highlighted dots.';
+  document.getElementById('dt-recall-btns').classList.add('hidden');
+  nav('sc-dots');
+  const tw=document.getElementById('dt-timer-wrap');
+  tw.classList.remove('hidden');
+  drawDots(true);
+  let cd=6;document.getElementById('dt-timer').textContent=cd;
+  const iv=setInterval(()=>{
+    cd--;document.getElementById('dt-timer').textContent=cd;
+    if(cd<=0){
+      clearInterval(iv);tw.classList.add('hidden');
+      DT.phase='recall';
+      document.getElementById('dt-instr').textContent='Click cells to mark where the dots were, then submit.';
+      document.getElementById('dt-recall-btns').classList.remove('hidden');
+      drawDots(false);
+    }
+  },1000);
+  S._iv.push(iv);
+}
+
+function drawDots(show){
+  const cv=document.getElementById('dt-canvas');
+  const ctx=cv.getContext('2d');
+  const G=DT.G,sz=cv.width,cell=sz/G,r=cell*0.34;
+  ctx.clearRect(0,0,sz,sz);
+  ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;
+  for(let i=0;i<=G;i++){ctx.beginPath();ctx.moveTo(i*cell,0);ctx.lineTo(i*cell,sz);ctx.stroke();ctx.beginPath();ctx.moveTo(0,i*cell);ctx.lineTo(sz,i*cell);ctx.stroke();}
+  for(let i=0;i<G*G;i++){
+    const row=0|i/G,col=i%G,cx=col*cell+cell/2,cy=row*cell+cell/2;
+    const isTgt=DT.targets.includes(i),isMk=DT.marked.includes(i);
+    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+    if(show&&isTgt){ctx.fillStyle='#e8a317';ctx.fill();ctx.strokeStyle='#f5c842';ctx.lineWidth=2;ctx.stroke();}
+    else if(!show&&isMk){ctx.fillStyle='rgba(129,140,248,0.85)';ctx.fill();ctx.strokeStyle='#818cf8';ctx.lineWidth=2;ctx.stroke();}
+    else{ctx.fillStyle='rgba(255,255,255,0.06)';ctx.fill();ctx.strokeStyle='rgba(255,255,255,0.12)';ctx.lineWidth=1;ctx.stroke();}
+  }
+}
+
+document.getElementById('dt-canvas').addEventListener('click',e=>{
+  if(DT.phase!=='recall')return;
+  const cv=e.target,rect=cv.getBoundingClientRect();
+  const sx=cv.width/rect.width,sy=cv.height/rect.height;
+  const x=(e.clientX-rect.left)*sx,y=(e.clientY-rect.top)*sy;
+  const G=DT.G,cell=cv.width/G,col=0|x/cell,row=0|y/cell,idx=row*G+col;
+  const p=DT.marked.indexOf(idx);if(p===-1)DT.marked.push(idx);else DT.marked.splice(p,1);
+  drawDots(false);
+});
+
+function dtClear(){DT.marked=[];drawDots(false);}
+
+function submitDots(){
+  clearIv();
+  const tgt=new Set(DT.targets),mk=new Set(DT.marked);
+  const hit=[...tgt].filter(i=>mk.has(i)).length;
+  const extra=[...mk].filter(i=>!tgt.has(i)).length;
+  const score=Math.max(0,hit-extra);
+  record('dots',{targets:DT.targets,marked:DT.marked,hits:hit,extras:extra,total:7,score},`${hit}/7 correct, ${extra} extra → score ${score}/7`);
+}
+
+// ─────────────────────────────────────────
+// TASK: SYMMETRY
+// ─────────────────────────────────────────
+let SY={ok:0,bad:0,tot:0,cur:null,left:120,order:[]};
+
+function startSym(){
+  clearIv();
+  SY={ok:0,bad:0,tot:0,cur:null,left:120,order:shuffle([...Array(SYM_ITEMS.length).keys()])};
+  ['sym-ok','sym-bad','sym-tot'].forEach(id=>document.getElementById(id).textContent='0');
+  nav('sc-sym');
+  nextSymItem();
+  const iv=setInterval(()=>{
+    SY.left--;
+    document.getElementById('sym-timer').textContent=fmt(SY.left);
+    document.getElementById('sym-timer').classList.toggle('warn',SY.left<=20);
+    if(SY.left<=0){clearInterval(iv);submitSym();}
+  },1000);
+  S._iv.push(iv);
+}
+
+function nextSymItem(){
+  if(!SY.order.length)SY.order=shuffle([...Array(SYM_ITEMS.length).keys()]);
+  SY.cur=SYM_ITEMS[SY.order.pop()];
+  drawSymShape(SY.cur);
+}
+
+function drawSymShape(item){
+  const cv=document.getElementById('sym-canvas');
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  const rows=item.r,cols=rows.reduce((m,r)=>Math.max(m,r.length),0);
+  const cell=Math.min(Math.floor(W/(cols+2)),Math.floor(H/(rows.length+2)));
+  const ox=Math.floor((W-cols*cell)/2),oy=Math.floor((H-rows.length*cell)/2);
+  // Draw axis
+  ctx.strokeStyle='rgba(232,163,23,0.18)';ctx.setLineDash([4,4]);ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(W/2,oy-6);ctx.lineTo(W/2,H-oy+6);ctx.stroke();ctx.setLineDash([]);
+  rows.forEach((row,ri)=>{
+    for(let ci=0;ci<row.length;ci++){
+      if(row[ci]==='X'){
+        ctx.fillStyle='#e8a317';
+        ctx.roundRect(ox+ci*cell+2,oy+ri*cell+2,cell-4,cell-4,3);
+        ctx.fill();
+      }
+    }
+  });
+}
+
+function answerSym(yes){
+  const ok=SY.cur.sym===yes;
+  SY.tot++;if(ok)SY.ok++;else SY.bad++;
+  flash('sym-canvas-wrap',ok);
+  document.getElementById('sym-ok').textContent=SY.ok;
+  document.getElementById('sym-bad').textContent=SY.bad;
+  document.getElementById('sym-tot').textContent=SY.tot;
+  nextSymItem();
+}
+
+function submitSym(){
+  clearIv();
+  const acc=SY.tot?Math.round(SY.ok/SY.tot*100):0;
+  record('symmetry',{correct:SY.ok,wrong:SY.bad,total:SY.tot,accuracy:acc},`${SY.ok}/${SY.tot} correct (${acc}%)`);
+}
+
+// ─────────────────────────────────────────
+// TASK: ROTATION
+// ─────────────────────────────────────────
+let RT={ok:0,bad:0,tot:0,isMirror:false,left:120,si:0};
+
+function startRot(){
+  clearIv();
+  RT={ok:0,bad:0,tot:0,isMirror:false,left:120,si:0};
+  ['rot-ok','rot-bad','rot-tot'].forEach(id=>document.getElementById(id).textContent='0');
+  nav('sc-rot');
+  nextRotItem();
+  const iv=setInterval(()=>{
+    RT.left--;
+    document.getElementById('rot-timer').textContent=fmt(RT.left);
+    document.getElementById('rot-timer').classList.toggle('warn',RT.left<=20);
+    if(RT.left<=0){clearInterval(iv);submitRot();}
+  },1000);
+  S._iv.push(iv);
+}
+
+function drawRotShape(cv,pts,deg,mirror){
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height,PAD=22,s=Math.min(W,H)-PAD*2,sc=s/10;
+  ctx.clearRect(0,0,W,H);
+  ctx.save();ctx.translate(W/2,H/2);ctx.rotate(deg*Math.PI/180);if(mirror)ctx.scale(-1,1);
+  ctx.beginPath();
+  ctx.moveTo((pts[0][0]-5)*sc,(pts[0][1]-5)*sc);
+  for(let i=1;i<pts.length;i++)ctx.lineTo((pts[i][0]-5)*sc,(pts[i][1]-5)*sc);
+  ctx.closePath();
+  ctx.fillStyle='rgba(129,140,248,0.8)';ctx.fill();
+  ctx.strokeStyle='#a5b4fc';ctx.lineWidth=2;ctx.stroke();
+  ctx.restore();
+}
+
+function nextRotItem(){
+  const pts=ROT_SHAPES[RT.si%ROT_SHAPES.length];RT.si++;
+  const rots=[0,90,180,270];
+  const rA=rots[0|Math.random()*4],rB=rots[0|Math.random()*4];
+  RT.isMirror=Math.random()>0.5;
+  drawRotShape(document.getElementById('rot-a'),pts,rA,false);
+  drawRotShape(document.getElementById('rot-b'),pts,rB,RT.isMirror);
+}
+
+function answerRot(userMirror){
+  const ok=RT.isMirror===userMirror;
+  RT.tot++;if(ok)RT.ok++;else RT.bad++;
+  flash('rot-wrap',ok);
+  document.getElementById('rot-ok').textContent=RT.ok;
+  document.getElementById('rot-bad').textContent=RT.bad;
+  document.getElementById('rot-tot').textContent=RT.tot;
+  nextRotItem();
+}
+
+function submitRot(){
+  clearIv();
+  const acc=RT.tot?Math.round(RT.ok/RT.tot*100):0;
+  record('rotation',{correct:RT.ok,wrong:RT.bad,total:RT.tot,accuracy:acc},`${RT.ok}/${RT.tot} correct (${acc}%)`);
+}
+
+// ─────────────────────────────────────────
+// FLASH FEEDBACK
+// ─────────────────────────────────────────
+function flash(id,ok){
+  const el=document.getElementById(id)||document.querySelector('.'+id);
+  if(!el)return;
+  el.classList.add(ok?'fl-ok':'fl-bad');
+  setTimeout(()=>el.classList.remove('fl-ok','fl-bad'),320);
+}
+
+// ─────────────────────────────────────────
+// RECORD RESULT → BREAK / DONE
+// ─────────────────────────────────────────
+function record(tk,data,summary){
+  const r=S.round,music=S.musicOrder[r];
+  S.results.push({round:r+1,task:tk,taskName:TASKS[tk].name,musicId:music.id,musicLabel:music.lbl,data,summary,ts:new Date().toISOString()});
+  try{localStorage.setItem('session_'+S.pid,JSON.stringify(S.results));}catch(_){}
+  S.round++;
+  if(S.round>=5) showDone();
+  else showBreak(summary,TASKS[tk].name,music.lbl);
+}
+
+function showBreak(sum,tn,ml){
+  document.getElementById('brk-text').innerHTML=`<strong>${tn}</strong> during <strong>${ml}</strong><br><span style="color:#e8a317">${sum}</span>`;
+  nav('sc-break');
+}
+
+function nextRound(){showIntro();}
+
+function showDone(){
+  const tb=document.getElementById('res-tbody');tb.innerHTML='';
+  S.results.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${r.round}</td><td>${TASKS[r.task].icon} ${r.taskName}</td><td style="font-size:0.8rem">${r.musicLabel}</td><td class="sc">${r.summary}</td>`;
+    tb.appendChild(tr);
+  });
+  nav('sc-done');
+}
+
+function dlResults(){
+  const blob=new Blob([JSON.stringify({participantId:S.pid,date:new Date().toISOString(),rubikPre:S.rubikPre,results:S.results},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`session_${S.pid}_${Date.now()}.json`;a.click();
+}
+
+// ─────────────────────────────────────────
+// KEYBOARD SHORTCUTS
+// ─────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('sc-sym').classList.contains('hidden')){
+    if(e.key.toLowerCase()==='y')answerSym(true);
+    if(e.key.toLowerCase()==='n')answerSym(false);
+  }
+  if(!document.getElementById('sc-rot').classList.contains('hidden')){
+    if(e.key.toLowerCase()==='r')answerRot(false);
+    if(e.key.toLowerCase()==='m')answerRot(true);
+  }
+  if(!document.getElementById('sc-rubik').classList.contains('hidden')&&e.key===' '){
+    e.preventDefault();rkToggle();
+  }
+});
+</script>
+</body>
+</html>
