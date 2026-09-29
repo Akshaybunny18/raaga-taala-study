@@ -377,6 +377,53 @@
   </div>
 </div>
 
+<!-- ══════════════════════ NUM SEQUENCE ══════════════════════ -->
+<div id="sc-numseq" class="session-screen hidden">
+  <div class="s-card" style="max-width:700px;width:100%;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div>
+        <span id="ns-phase-lbl" style="color:#e8a317;font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;">Memorise</span>
+        <div id="ns-instr" style="color:rgba(255,255,255,0.55);font-size:0.82rem;margin-top:2px;">Remember the position of each number</div>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-lbl" id="ns-timer-lbl">Visible for</div>
+        <div class="timer" id="ns-timer">8</div>
+      </div>
+    </div>
+    <div class="pbar"><div class="pbar-fill" id="ns-bar" style="width:100%;"></div></div>
+
+    <!-- Circle arena -->
+    <div id="ns-arena" style="position:relative;width:100%;height:340px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;overflow:hidden;margin:12px 0;"></div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div style="color:rgba(255,255,255,0.45);font-size:0.82rem;">Next to click: <span id="ns-next" style="color:#e8a317;font-weight:800;font-size:1.1rem;">—</span></div>
+      <div>
+        <span id="ns-hits" style="color:#22c55e;font-weight:700;">0</span>
+        <span style="color:rgba(255,255,255,0.35);font-size:0.8rem;"> / 10 correct</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ ALPHABET ══════════════════════ -->
+<div id="sc-alpha" class="session-screen hidden">
+  <div class="s-card" style="max-width:700px;text-align:center;">
+    <h2 style="margin-bottom:4px;">🔤 Alphabet Speed Typing</h2>
+    <p class="sub">Type A → Z as fast as you can. Timer starts when you press A.<br>Wrong keys are silently ignored — only the right next letter counts.</p>
+
+    <div id="al-letters" style="font-size:2.2rem;font-weight:800;letter-spacing:0.1em;line-height:1.5;font-family:'SF Mono','Fira Code',monospace;margin:18px 0;word-break:break-all;"></div>
+
+    <div style="margin-top:10px;">
+      <div class="timer-lbl">Elapsed time</div>
+      <div class="timer" id="al-timer" style="font-size:3rem;">0.000s</div>
+    </div>
+
+    <div id="al-pb" style="color:rgba(255,255,255,0.35);font-size:0.8rem;margin-top:6px;"></div>
+
+    <p style="color:rgba(255,255,255,0.28);font-size:0.75rem;margin-top:14px;">Press any key to start · Physical keyboard only</p>
+  </div>
+</div>
+
 <!-- ══════════════════════ BREAK ══════════════════════ -->
 <div id="sc-break" class="session-screen hidden">
   <div class="s-card" style="text-align:center;max-width:480px;">
@@ -469,12 +516,14 @@ const ROT_SHAPES=[
 // TASKS METADATA
 // ─────────────────────────────────────────
 const TASKS={
-  reading: {name:"Reading + Summary",  icon:"📖", desc:"Read a short essay (3 min), then write a summary (1.5 min) from memory.", dur:"~4.5 min"},
-  typing:  {name:"Reverse Typing",     icon:"⌨️", desc:"Type a paragraph with the word order completely reversed — last word first.", dur:"~2 min"},
-  rubik:   {name:"Rubik's Cube",       icon:"🟥", desc:"Solve the physical cube provided (your chosen challenge). Just a timer.", dur:"~3 min"},
-  dots:    {name:"Dot Memory Puzzle",  icon:"🟣", desc:"Memorise 7 dot positions in 6 seconds, then reproduce them on the grid.", dur:"~2 min"},
-  symmetry:{name:"Symmetry Test",      icon:"🔄", desc:"2 minutes — for each shape, say if it is left-right symmetric or not.", dur:"2 min"},
-  rotation:{name:"Rotated Image Test", icon:"🔃", desc:"2 minutes — is Shape B a rotation of A, or a mirrored version?", dur:"2 min"},
+  reading: {name:"Reading + Summary",    icon:"📖", desc:"Read a short essay (3 min), then write a summary (1.5 min) from memory.", dur:"~4.5 min"},
+  typing:  {name:"Reverse Typing",       icon:"⌨️", desc:"Type a paragraph with the word order completely reversed — last word first.", dur:"~2 min"},
+  rubik:   {name:"Rubik's Cube",         icon:"🟥", desc:"Solve the physical cube provided (your chosen challenge). Just a timer.", dur:"~3 min"},
+  dots:    {name:"Dot Memory Puzzle",    icon:"🟣", desc:"Memorise 7 dot positions in 6 seconds, then reproduce them on the grid.", dur:"~2 min"},
+  symmetry:{name:"Symmetry Test",        icon:"🔄", desc:"2 minutes — for each shape, say if it is left-right symmetric or not.", dur:"2 min"},
+  rotation:{name:"Rotated Image Test",   icon:"🔃", desc:"2 minutes — is Shape B a rotation of A, or a mirrored version?", dur:"2 min"},
+  numseq:  {name:"Number Sequence",      icon:"🔢", desc:"10 numbered circles appear for 8 s. Memorise positions, then click 0→9 in order after they vanish.", dur:"~2 min"},
+  alphabet:{name:"Alphabet Speed Typing",icon:"🔤", desc:"Type A–Z as fast as you can. Timer starts on first keypress. Wrong keys are silently ignored.", dur:"~1 min"},
 };
 
 const MUSIC=[
@@ -584,7 +633,7 @@ function showIntro(){
 
 function launchTask(){
   const t=S.taskOrder[S.round];
-  const fn={reading:startReading,typing:startTyping,rubik:startRubik,dots:startDots,symmetry:startSym,rotation:startRot};
+  const fn={reading:startReading,typing:startTyping,rubik:startRubik,dots:startDots,symmetry:startSym,rotation:startRot,numseq:startNumSeq,alphabet:startAlphabet};
   fn[t]();
 }
 
@@ -974,7 +1023,200 @@ document.addEventListener('keydown',e=>{
   if(!document.getElementById('sc-rubik').classList.contains('hidden')&&e.key===' '){
     e.preventDefault();rkToggle();
   }
+  // Alphabet task — handled inside task itself via alphaKey()
+  if(!document.getElementById('sc-alpha').classList.contains('hidden')){
+    alphaKey(e.key);
+  }
 });
+
+// ─────────────────────────────────────────
+// TASK: NUMBER SEQUENCE
+// ─────────────────────────────────────────
+let NS={circles:[],order:[],next:0,hits:0,phase:'memo',t0:0,iv:null};
+
+function startNumSeq(){
+  clearIv();
+  NS={circles:[],order:shuffle([0,1,2,3,4,5,6,7,8,9]),next:0,hits:0,phase:'memo',t0:0,iv:null};
+
+  const arena=document.getElementById('ns-arena');
+  arena.innerHTML='';
+  arena.style.pointerEvents='none';
+
+  // Place 10 circles randomly (with padding so they don't overflow)
+  const W=arena.offsetWidth||620, H=340, R=36;
+  const placed=[];
+  NS.order.forEach((digit,i)=>{
+    let x,y,tries=0;
+    do{
+      x=R+Math.random()*(W-2*R);
+      y=R+Math.random()*(H-2*R);
+      tries++;
+    }while(tries<200&&placed.some(p=>Math.hypot(p.x-x,p.y-y)<R*2.4));
+    placed.push({x,y});
+
+    const c=document.createElement('div');
+    c.className='ns-circle';
+    c.dataset.digit=digit;
+    c.style.cssText=`position:absolute;left:${x-R}px;top:${y-R}px;width:${R*2}px;height:${R*2}px;
+      border-radius:50%;background:rgba(232,163,23,0.15);border:2.5px solid #e8a317;
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.6rem;font-weight:900;color:#fff;cursor:pointer;
+      transition:transform 0.12s,background 0.12s;user-select:none;`;
+    c.textContent=digit;
+    c.addEventListener('click',()=>nsClick(c,digit));
+    arena.appendChild(c);
+    NS.circles.push(c);
+  });
+
+  // UI reset
+  document.getElementById('ns-phase-lbl').textContent='MEMORISE';
+  document.getElementById('ns-instr').textContent='Remember the position of each number';
+  document.getElementById('ns-timer-lbl').textContent='Visible for';
+  document.getElementById('ns-next').textContent='—';
+  document.getElementById('ns-hits').textContent='0';
+  nav('sc-numseq');
+
+  // Countdown 8 s → hide digits
+  let cd=8;
+  document.getElementById('ns-timer').textContent=cd;
+  document.getElementById('ns-bar').style.width='100%';
+  const iv=setInterval(()=>{
+    cd--;
+    document.getElementById('ns-timer').textContent=cd;
+    document.getElementById('ns-bar').style.width=(cd/8*100)+'%';
+    document.getElementById('ns-timer').classList.toggle('warn',cd<=3);
+    if(cd<=0){
+      clearInterval(iv);
+      nsStartRecall();
+    }
+  },1000);
+  S._iv.push(iv);
+}
+
+function nsStartRecall(){
+  NS.phase='recall';
+  NS.t0=Date.now();
+  NS.next=0;NS.hits=0;
+
+  // Hide digits (keep circles)
+  NS.circles.forEach(c=>{c.textContent='';});
+  document.getElementById('ns-arena').style.pointerEvents='auto';
+
+  document.getElementById('ns-phase-lbl').textContent='RECALL';
+  document.getElementById('ns-instr').textContent='Click circles in order: 0 → 1 → 2 … → 9';
+  document.getElementById('ns-timer-lbl').textContent='Time';
+  document.getElementById('ns-next').textContent=NS.next;
+  document.getElementById('ns-timer').classList.remove('warn');
+
+  // Start elapsed timer
+  const iv=setInterval(()=>{
+    const s=(Date.now()-NS.t0)/1000;
+    document.getElementById('ns-timer').textContent=s.toFixed(1);
+  },100);
+  S._iv.push(iv);
+}
+
+function nsClick(el,digit){
+  if(NS.phase!=='recall')return;
+  if(digit===NS.next){
+    // Correct
+    el.style.background='rgba(34,197,94,0.3)';
+    el.style.borderColor='#22c55e';
+    el.style.color='#22c55e';
+    el.style.pointerEvents='none';
+    NS.hits++;
+    NS.next++;
+    document.getElementById('ns-hits').textContent=NS.hits;
+    document.getElementById('ns-next').textContent=NS.next<10?NS.next:'✓ Done!';
+    if(NS.next>=10){
+      clearIv();
+      const elapsed=((Date.now()-NS.t0)/1000).toFixed(2);
+      setTimeout(()=>{
+        record('numseq',{time:elapsed,correct:NS.hits,total:10},`${NS.hits}/10 correct in ${elapsed}s`);
+      },400);
+    }
+  } else {
+    // Wrong — flash red but do nothing
+    el.style.background='rgba(239,68,68,0.25)';
+    el.style.borderColor='#ef4444';
+    setTimeout(()=>{
+      el.style.background='rgba(232,163,23,0.15)';
+      el.style.borderColor='#e8a317';
+    },300);
+  }
+}
+
+// ─────────────────────────────────────────
+// TASK: ALPHABET SPEED TYPING
+// ─────────────────────────────────────────
+let AL={idx:0,started:false,t0:0,iv:null};
+const ALPHA='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+function startAlphabet(){
+  clearIv();
+  AL={idx:0,started:false,t0:0,iv:null};
+  renderAlpha();
+  document.getElementById('al-timer').textContent='0.000s';
+  document.getElementById('al-timer').classList.remove('warn');
+  // Personal best from localStorage
+  const pb=localStorage.getItem('alpha_pb');
+  document.getElementById('al-pb').textContent=pb?`Personal best: ${pb}s`:'';
+  nav('sc-alpha');
+}
+
+function renderAlpha(){
+  const el=document.getElementById('al-letters');
+  el.innerHTML=ALPHA.map((ch,i)=>{
+    let style='';
+    if(i<AL.idx)        style='color:#22c55e;';        // done
+    else if(i===AL.idx) style='color:#e8a317;font-size:2.8rem;text-shadow:0 0 18px rgba(232,163,23,0.7);'; // current
+    else                style='color:rgba(255,255,255,0.18);'; // pending
+    return `<span style="${style}">${ch}</span>`;
+  }).join('');
+}
+
+function alphaKey(key){
+  if(AL.idx>=26)return; // already done
+  const expected=ALPHA[AL.idx];
+  if(key.toUpperCase()!==expected)return; // wrong key — silently ignore
+
+  // Correct key
+  if(!AL.started){
+    AL.started=true;
+    AL.t0=Date.now();
+    const iv=setInterval(()=>{
+      const s=(Date.now()-AL.t0)/1000;
+      document.getElementById('al-timer').textContent=s.toFixed(3)+'s';
+      document.getElementById('al-timer').classList.toggle('warn',s>30);
+    },50);
+    S._iv.push(iv);
+  }
+
+  AL.idx++;
+  renderAlpha();
+
+  if(AL.idx>=26){
+    // Finished!
+    clearIv();
+    const elapsed=((Date.now()-AL.t0)/1000).toFixed(3);
+    document.getElementById('al-timer').textContent=elapsed+'s';
+    document.getElementById('al-timer').classList.remove('warn');
+
+    // Update personal best
+    const pb=localStorage.getItem('alpha_pb');
+    if(!pb||parseFloat(elapsed)<parseFloat(pb)){
+      localStorage.setItem('alpha_pb',elapsed);
+      document.getElementById('al-pb').textContent=`🏆 New best: ${elapsed}s!`;
+    } else {
+      document.getElementById('al-pb').textContent=`Personal best: ${pb}s`;
+    }
+
+    setTimeout(()=>{
+      record('alphabet',{time:elapsed},`Completed in ${elapsed}s`);
+    },600);
+  }
+}
 </script>
 </body>
 </html>
+
