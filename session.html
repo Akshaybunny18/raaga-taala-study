@@ -395,18 +395,25 @@
 <div id="sc-done" class="session-screen hidden">
   <div class="s-card" style="max-width:740px;">
     <div class="big-emoji">🎉</div>
-    <h2 style="text-align:center;">Session Complete!</h2>
-    <p style="color:rgba(255,255,255,0.55);text-align:center;margin-bottom:18px;">All 5 rounds done. Here's the summary:</p>
+    <h2 style="text-align:center;">All 5 Rounds Complete!</h2>
+    <p style="color:rgba(255,255,255,0.55);text-align:center;margin-bottom:18px;">Great job! Here's your performance summary:</p>
     <table class="res-table">
       <thead><tr><th>Round</th><th>Task</th><th>Music Condition</th><th>Result</th></tr></thead>
       <tbody id="res-tbody"></tbody>
     </table>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px;">
-      <button class="btn-go" onclick="dlResults()">⬇ Download Results (JSON)</button>
-      <a href="post-survey.html" class="btn-go" style="text-decoration:none;">📋 Post-Session Survey →</a>
+
+    <div style="background:rgba(232,163,23,0.1);border:1px solid rgba(232,163,23,0.4);border-radius:14px;padding:20px 24px;margin-top:24px;text-align:center;">
+      <p style="color:#e8a317;font-weight:700;font-size:1rem;margin-bottom:6px;">📋 One last step — Post-Session Reflection</p>
+      <p style="color:rgba(255,255,255,0.6);font-size:0.88rem;margin-bottom:18px;">Tell us about your experience, which round felt best, and fill in your details. Takes ~3 minutes.</p>
+      <a href="post-survey.html" class="btn-go" style="text-decoration:none;font-size:1rem;">Continue to Post-Session Survey →</a>
+    </div>
+
+    <div style="text-align:center;margin-top:16px;">
+      <button onclick="dlResults()" style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:0.8rem;cursor:pointer;text-decoration:underline;">⬇ Download raw results (JSON)</button>
     </div>
   </div>
 </div>
+
 
 <script>
 // ─────────────────────────────────────────
