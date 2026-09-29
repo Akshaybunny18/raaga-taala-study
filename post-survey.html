@@ -188,48 +188,13 @@
           <textarea name="open_feedback" placeholder="Anything about the tasks, music choice, session structure..."></textarea>
         </div>
 
-        <!-- ═══ IDENTITY SECTION ═══ -->
-        <div style="background:linear-gradient(135deg,rgba(26,16,64,0.08),rgba(45,31,110,0.1));border:1.5px solid rgba(61,42,154,0.25);border-radius:14px;padding:24px 24px;margin-top:28px;">
-          <h3 style="color:#1a1040;font-size:1rem;font-weight:700;margin-bottom:4px;letter-spacing:0.03em;">👤 About You</h3>
-          <p style="color:#8a8aaa;font-size:0.82rem;margin-bottom:20px;">This info is stored securely and used only to link your three responses together. It will not be made public.</p>
-
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-            <div class="form-group" style="margin-bottom:0;">
-              <label>Full Name <span style="color:#ef4444">*</span></label>
-              <input type="text" name="full_name" placeholder="e.g. Chanda Akshay Kumar" required
-                style="width:100%;padding:11px 14px;border:1.5px solid #e0ddf0;border-radius:10px;font-family:inherit;font-size:0.9rem;color:#1a1040;background:#fafafe;outline:none;" />
-            </div>
-            <div class="form-group" style="margin-bottom:0;">
-              <label>Age <span style="color:#ef4444">*</span></label>
-              <input type="number" name="age" placeholder="e.g. 20" min="10" max="80" required
-                style="width:100%;padding:11px 14px;border:1.5px solid #e0ddf0;border-radius:10px;font-family:inherit;font-size:0.9rem;color:#1a1040;background:#fafafe;outline:none;" />
-            </div>
-          </div>
-
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
-            <div class="form-group" style="margin-bottom:0;">
-              <label>Roll Number / Student ID <span style="color:#ef4444">*</span></label>
-              <input type="text" name="roll_no" placeholder="e.g. 2024102014" required
-                style="width:100%;padding:11px 14px;border:1.5px solid #e0ddf0;border-radius:10px;font-family:inherit;font-size:0.9rem;color:#1a1040;background:#fafafe;outline:none;" />
-            </div>
-            <div class="form-group" style="margin-bottom:0;">
-              <label>Email <span style="color:#ef4444">*</span></label>
-              <input type="email" name="email" placeholder="e.g. you@students.iiit.ac.in" required
-                style="width:100%;padding:11px 14px;border:1.5px solid #e0ddf0;border-radius:10px;font-family:inherit;font-size:0.9rem;color:#1a1040;background:#fafafe;outline:none;" />
-            </div>
-          </div>
+        <div class="form-submit">
+          <button type="submit" class="btn-submit">Submit Reflection →</button>
         </div>
 
-        <div class="form-submit" style="margin-top:28px;">
-          <button type="submit" class="btn-submit">Submit & Complete Study ✓</button>
-        </div>
-
-        <div id="successMsg" style="display:none;margin-top:24px;background:linear-gradient(135deg,#1a1040,#2d1f6e);border-radius:16px;padding:36px 28px;text-align:center;color:white;">
-          <div style="font-size:3rem;margin-bottom:14px;">🎊</div>
-          <h3 style="color:#e8a317;font-size:1.3rem;margin-bottom:10px;">You're all done!</h3>
-          <p style="color:rgba(255,255,255,0.7);font-size:0.9rem;margin-bottom:6px;">All three parts of the study are complete. Thank you for contributing to this research!</p>
-          <p style="color:rgba(255,255,255,0.45);font-size:0.8rem;margin-bottom:24px;">Part 1 (Habits Survey) → Part 2 (Cognitive Session) → Part 3 (Reflection) ✓</p>
-          <a href="index.html" style="display:inline-block;background:#e8a317;color:#1a1040;padding:12px 28px;border-radius:40px;font-weight:700;text-decoration:none;font-size:0.9rem;">← Back to Project Homepage</a>
+        <div class="success-msg" id="successMsg">
+          ✅ Reflection submitted! Thank you for your time and for contributing to this research.<br>
+          <a href="index.html" style="color:#15803d;margin-top:8px;display:inline-block;">← Back to project homepage</a>
         </div>
       </form>
     </div>
