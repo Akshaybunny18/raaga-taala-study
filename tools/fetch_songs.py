@@ -31,7 +31,7 @@ def api_get(api, params):
 def api_post(api, body):
     # Apps Script answers POST with a redirect; urllib follows it as a GET, which is what it expects
     req = urllib.request.Request(api, data=json.dumps(body).encode(), headers={'Content-Type': 'text/plain'})
-    with urllib.request.urlopen(req, timeout=180) as r:
+    with urllib.request.urlopen(req, timeout=420) as r:   # uploads of long songs through Apps Script can be slow
         return json.load(r)
 
 
@@ -59,7 +59,7 @@ def download(link, workdir):
 
 def normalize(src, dst):
     run(['ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-i', str(src), '-t', str(MAX_SECONDS),
-         '-af', f'loudnorm=I={TARGET_LUFS}:TP=-1.5:LRA=11', '-ar', '44100', '-ac', '2', '-b:a', '128k', str(dst)])
+         '-af', f'loudnorm=I={TARGET_LUFS}:TP=-1.5:LRA=11', '-ar', '44100', '-ac', '2', '-b:a', '96k', str(dst)])
 
 
 def process(api, key, song):
@@ -93,11 +93,16 @@ def main():
         ap.error('--api and --key are required (or set STUDY_API_URL / STUDY_WORKER_KEY)')
 
     print('Song worker running — Ctrl+C to stop.', flush=True)
+    retry_failed = True  # each (re)start retries failed songs once; later polls only take new ones
     while True:
         try:
-            res = api_get(a.api, {'action': 'pendingSongs', 'key': a.key})
+            params = {'action': 'pendingSongs', 'key': a.key}
+            if retry_failed:
+                params['retryFailed'] = '1'
+            res = api_get(a.api, params)
             if not res.get('ok'):
                 sys.exit('Server refused: ' + str(res.get('error')))
+            retry_failed = False
             for song in res['songs']:
                 process(a.api, a.key, song)
         except (OSError, ValueError) as e:  # network hiccup / bad response — try again next poll

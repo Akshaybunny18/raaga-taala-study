@@ -56,7 +56,7 @@ function profile_(p) {
   const songs = [1, 2, 3].map(i => ({
     title : rec['song' + i + '_title'],
     artist: rec['song' + i + '_artist'],
-    status: rec['song' + i + '_status'] || 'pending',
+    status: rec['song' + i + '_audio'] ? 'ready' : (rec['song' + i + '_status'] || 'pending'), // a Drive link means it succeeded
     audio : rec['song' + i + '_audio'],
   }));
 
@@ -101,14 +101,17 @@ function submit_(p) {
 
 // ── Worker actions (tools/fetch_songs.py) ────────────────
 
-function pendingSongs_() {
+// p.retryFailed: also return failed songs (the worker asks for this once per start)
+function pendingSongs_(p) {
   const sh = sheet_(P_SHEET, P_BASE);
   const vals = sh.getDataRange().getValues(), h = vals[0], out = [];
-  vals.slice(1).forEach(r => {
+  vals.slice(1).forEach((r, n) => {
     const rec = {}; h.forEach((k, i) => { rec[k] = r[i]; });
     [1, 2, 3].forEach(i => {
-      const st = rec['song' + i + '_status'];
-      if (st === 'pending' || st === 'downloading') out.push({ roll: norm_(rec.roll), idx: i, link: rec['song' + i + '_link'] });
+      const st = String(rec['song' + i + '_status'] || '').trim().toLowerCase(); // blank = pending (as the site assumes)
+      if (rec['song' + i + '_audio']) {
+        if (st !== 'ready') markReady_(sh, n + 2, i); // has a Drive link → tidy a stale status
+      } else if (rec['song' + i + '_link'] && (st === '' || st === 'pending' || st === 'downloading' || (st === 'failed' && p.retryFailed))) out.push({ roll: norm_(rec.roll), idx: i, link: rec['song' + i + '_link'] });
     });
   });
   return { ok: true, songs: out };
@@ -117,6 +120,7 @@ function pendingSongs_() {
 function setSongStatus_(p) {
   const sh = sheet_(P_SHEET, P_BASE), row = findRow_(sh, norm_(p.roll));
   if (!row) return { ok: false, error: 'not_found' };
+  if (readRow_(sh, row)['song' + p.idx + '_audio']) { markReady_(sh, row, p.idx); return { ok: true, kept: 'ready' }; } // upload already succeeded
   writeCell_(sh, row, 'song' + p.idx + '_status', p.status);
   writeCell_(sh, row, 'song' + p.idx + '_error', p.error || '');
   return { ok: true };
@@ -132,6 +136,11 @@ function uploadAudio_(p) {
   writeCell_(sh, row, 'song' + p.idx + '_status', 'ready');
   writeCell_(sh, row, 'song' + p.idx + '_error', '');
   return { ok: true };
+}
+
+function markReady_(sh, row, idx) {
+  writeCell_(sh, row, 'song' + idx + '_status', 'ready');
+  writeCell_(sh, row, 'song' + idx + '_error', '');
 }
 
 function audioFolder_() {
