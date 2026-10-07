@@ -64,11 +64,9 @@ function profile_(p) {
   let tasks = [rec.p1_task_round1, rec.p1_task_round2].filter(String);
   const pool = String(p.pool || '').split(',').filter(String);
   if (tasks.length < 2 && pool.length >= 2) {
-    const a = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
-    const b = pool[Math.floor(Math.random() * pool.length)];
-    tasks = [a, b];
-    writeCell_(sh, row, 'p1_task_round1', a);
-    writeCell_(sh, row, 'p1_task_round2', b);
+    tasks = pickBalanced_(sh, pool);
+    writeCell_(sh, row, 'p1_task_round1', tasks[0]);
+    writeCell_(sh, row, 'p1_task_round2', tasks[1]);
   }
 
   const seen = Number(PropertiesService.getScriptProperties().getProperty('WORKER_SEEN') || 0);
@@ -146,6 +144,24 @@ function audioFolder_() {
 }
 
 // ── Helpers ──────────────────────────────────────────────
+
+// Balanced random assignment: the two tests used least so far (ties broken at random), and
+// the one that has been in round 1 less often goes first. So every test ends up with about
+// the same number of participants, split evenly between round 1 and round 2.
+function pickBalanced_(sh, pool) {
+  const vals = sh.getDataRange().getValues(), h = vals[0];
+  const c1 = h.indexOf('p1_task_round1'), c2 = h.indexOf('p1_task_round2');
+  const used = {}, first = {};
+  pool.forEach(t => { used[t] = 0; first[t] = 0; });
+  vals.slice(1).forEach(r => {
+    if (used.hasOwnProperty(r[c1])) { used[r[c1]]++; first[r[c1]]++; }
+    if (used.hasOwnProperty(r[c2])) used[r[c2]]++;
+  });
+  const [a, b] = pool.map(t => [used[t], Math.random(), t])
+                     .sort((x, y) => x[0] - y[0] || x[1] - y[1]).slice(0, 2).map(x => x[2]);
+  if (first[a] !== first[b]) return first[a] < first[b] ? [a, b] : [b, a];
+  return Math.random() < 0.5 ? [a, b] : [b, a];
+}
 
 function doneKeys_(roll, phase) {
   const vals = sheet_(R_SHEET, R_BASE).getDataRange().getValues();
