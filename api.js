@@ -2,7 +2,7 @@
 // Paste the Apps Script web-app URL (ends in /exec) here — see apps-script/SETUP.md.
 // Demo mode (nothing is sent anywhere, data stays in this browser) is used when
 // API_URL is empty, or for the roll number DEMO.
-const API_URL = '';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyAublk9f2VS90b9nM878e7VzAUFVQfNAQkH81Fa287LXp2j_p6fC0o8qQXLe1-X2gl/exec';
 
 const API = (() => {
   const isDemo = roll => !API_URL || String(roll || '').trim().toUpperCase() === 'DEMO';
