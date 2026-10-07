@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Study Session — Raaga &amp; Taala Study</title>
+  <title>Phase 1 Session — Raaga &amp; Taala Study</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet" />
   <style>
@@ -12,16 +12,6 @@
     .s-card { background:rgba(255,255,255,0.06); border:1px solid rgba(232,163,23,0.3); border-radius:20px; padding:36px 40px; width:100%; max-width:700px; }
     .s-card h2 { font-family:'Playfair Display',serif; color:#fff; margin-bottom:6px; }
     .s-card .sub { color:rgba(255,255,255,0.55); font-size:0.88rem; margin-bottom:24px; }
-    /* Task picker */
-    .task-list { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
-    .task-opt { display:flex; align-items:center; gap:12px; padding:13px 16px; background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.13); border-radius:12px; cursor:pointer; transition:all 0.18s; position:relative; user-select:none; }
-    .task-opt:hover { border-color:rgba(232,163,23,0.45); background:rgba(232,163,23,0.05); }
-    .task-opt.sel { border-color:#e8a317; background:rgba(232,163,23,0.1); }
-    .task-opt input { accent-color:#e8a317; width:17px; height:17px; pointer-events:none; }
-    .task-opt .oi { font-size:1.4rem; }
-    .task-opt h4 { color:#fff; font-size:0.92rem; font-weight:600; margin:0 0 2px; }
-    .task-opt p { color:rgba(255,255,255,0.45); font-size:0.78rem; margin:0; }
-    .task-dur { position:absolute; right:14px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.35); font-size:0.75rem; }
     /* Buttons */
     .btn-go { background:#e8a317; color:#1a1040; border:none; padding:13px 34px; border-radius:40px; font-family:inherit; font-size:0.97rem; font-weight:700; cursor:pointer; transition:all 0.18s; }
     .btn-go:hover { background:#f5c842; transform:translateY(-2px); }
@@ -65,15 +55,6 @@
     .s-ta::placeholder { color:rgba(255,255,255,0.28); }
     /* Typing */
     .orig-text { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.13); border-radius:11px; padding:15px 18px; font-size:0.96rem; line-height:1.7; color:rgba(255,255,255,0.84); margin:10px 0; font-family:'SF Mono','Fira Code',monospace; }
-    /* Rubik */
-    .rubik-clock { font-size:5.5rem; font-weight:900; font-family:'SF Mono','Fira Code',monospace; color:#e8a317; text-align:center; letter-spacing:0.04em; margin:18px 0; }
-    .rubik-badge { display:inline-flex; gap:14px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.13); border-radius:12px; padding:9px 20px; margin-bottom:18px; }
-    .rubik-badge span { color:rgba(255,255,255,0.65); font-size:0.87rem; }
-    .rubik-badge strong { color:#fff; }
-    .rubik-radio-g { display:flex; flex-direction:column; gap:8px; margin-bottom:18px; }
-    .rubik-radio-g label { display:flex; align-items:center; gap:10px; padding:9px 13px; background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.12); border-radius:10px; cursor:pointer; color:rgba(255,255,255,0.78); font-size:0.88rem; transition:all 0.18s; }
-    .rubik-radio-g label:hover { border-color:rgba(232,163,23,0.38); }
-    .rubik-radio-g input { accent-color:#e8a317; }
     /* Score strip */
     .score-strip { display:flex; gap:18px; justify-content:center; background:rgba(255,255,255,0.05); border-radius:12px; padding:11px 18px; margin-bottom:12px; }
     .sc-item .v { font-size:1.5rem; font-weight:800; color:#e8a317; text-align:center; }
@@ -97,13 +78,6 @@
     /* Grid 2 col */
     .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
     @media(max-width:520px){ .grid2{grid-template-columns:1fr;} }
-    /* Break */
-    .break-summary { background:rgba(255,255,255,0.06); border-radius:12px; padding:15px 18px; margin-bottom:18px; }
-    /* Results table */
-    .res-table { width:100%; border-collapse:collapse; margin:14px 0; font-size:0.88rem; }
-    .res-table th { text-align:left; padding:9px 11px; border-bottom:1px solid rgba(255,255,255,0.13); color:rgba(255,255,255,0.45); font-size:0.78rem; text-transform:uppercase; font-weight:600; }
-    .res-table td { padding:11px 11px; border-bottom:1px solid rgba(255,255,255,0.07); color:rgba(255,255,255,0.82); }
-    .res-table .sc { color:#e8a317; font-weight:700; }
     /* Keyboard hint */
     .kbd-hint { color:rgba(255,255,255,0.28); font-size:0.72rem; margin-top:6px; }
     .kbd { display:inline-block; border:1px solid rgba(255,255,255,0.25); border-radius:4px; padding:1px 6px; font-family:monospace; }
@@ -114,8 +88,42 @@
     .big-emoji { font-size:3.6rem; text-align:center; margin-bottom:10px; }
     .progress-info { color:rgba(255,255,255,0.5); font-size:0.82rem; margin-bottom:4px; }
     .progress-info span { color:#e8a317; font-weight:700; }
-    .task-selected-count { font-size:0.85rem; color:rgba(255,255,255,0.55); margin-bottom:14px; }
-    .task-selected-count span { color:#e8a317; font-weight:700; }
+    /* Forms (mood checks, round-end, phase-end) */
+    .q-block { margin-bottom:22px; }
+    .q-block.missing .s-lbl { color:#f87171; }
+    .q-sec { color:#e8a317; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; margin:6px 0 14px; }
+    .scale-row { display:flex; gap:6px; flex-wrap:wrap; }
+    .scale-btn, .choice-btn { flex:1; min-width:38px; padding:10px 6px; border-radius:10px; border:1.5px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.05); color:#fff; font-family:inherit; font-size:0.92rem; font-weight:600; cursor:pointer; transition:all 0.15s; }
+    .choice-btn { flex:1 1 auto; padding:10px 14px; font-weight:500; font-size:0.86rem; }
+    .scale-btn:hover, .choice-btn:hover { border-color:rgba(232,163,23,0.5); }
+    .scale-btn.sel, .choice-btn.sel { background:#e8a317; border-color:#e8a317; color:#1a1040; }
+    .scale-ends { display:flex; justify-content:space-between; color:rgba(255,255,255,0.42); font-size:0.74rem; margin-top:5px; gap:10px; }
+    .ta-count { color:rgba(255,255,255,0.35); font-size:0.72rem; text-align:right; margin-top:3px; }
+    /* Checklists */
+    .check-list { display:flex; flex-direction:column; gap:9px; margin:16px 0 20px; }
+    .check-list label { display:flex; align-items:center; gap:10px; padding:10px 14px; background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.12); border-radius:10px; cursor:pointer; color:rgba(255,255,255,0.8); font-size:0.88rem; }
+    .check-list input { accent-color:#e8a317; width:17px; height:17px; }
+    .howto-list { color:rgba(255,255,255,0.75); font-size:0.9rem; line-height:1.7; padding-left:20px; margin:10px 0 6px; }
+    .howto-list strong { color:#e8a317; }
+    /* Break: song cards */
+    .song-card { display:flex; align-items:center; gap:12px; padding:13px 15px; background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.13); border-radius:12px; margin-bottom:10px; text-align:left; }
+    .song-card.sel { border-color:#e8a317; background:rgba(232,163,23,0.1); }
+    .song-card input[type=radio] { accent-color:#e8a317; width:18px; height:18px; flex-shrink:0; }
+    .song-card .info { flex:1; min-width:0; }
+    .song-card .t { color:#fff; font-weight:600; font-size:0.92rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .song-card .st { font-size:0.74rem; margin-top:2px; }
+    .song-card .acts { display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+    .btn-mini { background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.25); padding:6px 12px; border-radius:20px; font-family:inherit; font-size:0.76rem; font-weight:600; cursor:pointer; white-space:nowrap; }
+    .btn-mini:hover { border-color:#e8a317; }
+    .st-ready { color:#22c55e; } .st-wait { color:#fbbf24; } .st-bad { color:#f87171; }
+    .warn-box { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.4); color:#fca5a5; border-radius:12px; padding:12px 15px; font-size:0.85rem; margin:12px 0; }
+    /* Now-playing bar */
+    .np { position:fixed; left:50%; bottom:16px; transform:translateX(-50%); z-index:900; background:rgba(26,16,64,0.95); border:1px solid rgba(232,163,23,0.45); border-radius:30px; padding:8px 18px; color:#fff; font-size:0.82rem; display:flex; align-items:center; gap:10px; box-shadow:0 6px 24px rgba(0,0,0,0.4); max-width:calc(100% - 32px); }
+    .np #np-text { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .eq { display:flex; gap:2px; align-items:flex-end; height:14px; }
+    .eq i { width:3px; background:#e8a317; animation:eq 0.9s ease-in-out infinite; }
+    .eq i:nth-child(2){animation-delay:0.2s} .eq i:nth-child(3){animation-delay:0.4s}
+    @keyframes eq { 0%,100%{height:3px} 50%{height:14px} }
   </style>
 </head>
 <body>
@@ -126,83 +134,93 @@
   </div>
 </nav>
 
-<!-- ══════════════════════ SETUP ══════════════════════ -->
-<div id="sc-setup" class="session-screen">
-  <div class="s-card">
-    <h2>🎧 Session Setup</h2>
-    <p class="sub">The researcher will guide you. Choose your 5 tasks and begin.</p>
-
-    <div style="margin-bottom:18px;">
-      <label class="s-lbl">Participant ID <span style="color:rgba(255,255,255,0.35)">(given by researcher)</span></label>
-      <input type="text" id="pid-inp" class="s-inp" placeholder="e.g. P-001" maxlength="10" />
-    </div>
-    <hr class="div" />
-
-    <p class="task-selected-count">Select exactly <span>5</span> tasks you'd like to do:</p>
-    <div class="task-list" id="task-list"></div>
-    <div class="task-selected-count" id="count-badge">Selected: <span id="sel-count">0</span> / 5</div>
-
-    <div style="text-align:center;margin-top:18px;">
-      <button class="btn-go" id="btn-begin" disabled onclick="beginSession()">Begin Session →</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════ RUBIK PRE ══════════════════════ -->
-<div id="sc-rubik-pre" class="session-screen hidden">
-  <div class="s-card">
-    <h2>🟥 Rubik's Cube — Quick Setup</h2>
-    <p class="sub">Answer once. This helps us put your times in context.</p>
-
-    <label class="s-lbl">How familiar are you with the Rubik's Cube?</label>
-    <div class="rubik-radio-g" id="rk-fam-g">
-      <label><input type="radio" name="rk_fam" value="never" /> I've never solved one</label>
-      <label><input type="radio" name="rk_fam" value="beginner" /> Beginner — I've tried but rarely finish</label>
-      <label><input type="radio" name="rk_fam" value="intermediate" /> Intermediate — I can solve it sometimes</label>
-      <label><input type="radio" name="rk_fam" value="advanced" /> Advanced — I solve it regularly</label>
-      <label><input type="radio" name="rk_fam" value="expert" /> Expert / Speedcuber</label>
-    </div>
-
-    <div id="rk-best-wrap" class="hidden" style="margin-bottom:18px;">
-      <label class="s-lbl">Your personal best time <span style="color:rgba(255,255,255,0.35)">(optional)</span></label>
-      <input type="text" id="rk-best" class="s-inp" placeholder="e.g. 45 seconds, 2 min 10 sec…" />
-    </div>
-
-    <hr class="div" />
-
-    <div class="grid2">
-      <div>
-        <label class="s-lbl">Cube type</label>
-        <div class="rubik-radio-g">
-          <label><input type="radio" name="rk_size" value="3x3" checked /> 3×3 Cube</label>
-          <label><input type="radio" name="rk_size" value="4x4" /> 4×4 Cube</label>
-        </div>
-      </div>
-      <div>
-        <label class="s-lbl">Challenge</label>
-        <div class="rubik-radio-g">
-          <label><input type="radio" name="rk_ch" value="1_side" checked /> 1 Side only</label>
-          <label><input type="radio" name="rk_ch" value="full" /> Full Cube</label>
-        </div>
-      </div>
-    </div>
-
+<!-- ══════════════════════ LOGIN ══════════════════════ -->
+<div id="sc-login" class="session-screen">
+  <div class="s-card" style="max-width:480px;">
+    <h2>🎧 Phase 1 — Log In</h2>
+    <p class="sub">Enter the roll number you used in the intake form.</p>
+    <label class="s-lbl">Roll number</label>
+    <input type="text" id="roll-inp" class="s-inp" placeholder="e.g. 2024111033" maxlength="20" onkeydown="if(event.key==='Enter')login()" />
     <div style="text-align:center;margin-top:20px;">
-      <button class="btn-go" onclick="saveRubikPre()">Continue →</button>
+      <button class="btn-go" id="btn-login" onclick="login()">Continue →</button>
     </div>
+    <p style="color:rgba(255,255,255,0.4);font-size:0.8rem;text-align:center;margin-top:18px;">Not registered yet? <a href="intake.html" style="color:#e8a317;">Fill the intake form first</a></p>
   </div>
 </div>
 
-<!-- ══════════════════════ ROUND INTRO ══════════════════════ -->
+<!-- ══════════════════════ MESSAGE ══════════════════════ -->
+<div id="sc-msg" class="session-screen hidden">
+  <div class="s-card" style="max-width:520px;text-align:center;">
+    <div class="big-emoji" id="msg-emoji">ℹ️</div>
+    <h2 id="msg-title">—</h2>
+    <p id="msg-text" style="color:rgba(255,255,255,0.65);margin:10px 0 20px;line-height:1.6;"></p>
+    <div id="msg-actions"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════ HEADPHONE CHECK ══════════════════════ -->
+<div id="sc-check" class="session-screen hidden">
+  <div class="s-card" style="max-width:560px;">
+    <h2>🎧 Audio Check</h2>
+    <p class="sub">This study plays audio during the tests. Let's make sure you can hear it properly.</p>
+    <div style="text-align:center;">
+      <button class="btn-ghost" id="btn-testsound" onclick="toggleTestSound()">▶ Play test sound</button>
+      <p style="color:rgba(255,255,255,0.45);font-size:0.8rem;margin-top:8px;">This is the white noise you'll hear in the test. Set your volume so it's clearly audible but comfortable.</p>
+    </div>
+    <div class="check-list" id="check-list">
+      <label><input type="checkbox" onchange="updCheck()" /> I'm wearing headphones / earphones</label>
+      <label><input type="checkbox" onchange="updCheck()" /> I'm in a quiet place and won't be interrupted for ~30 minutes</label>
+      <label><input type="checkbox" onchange="updCheck()" /> The volume is comfortable — I won't change it during the session</label>
+      <label><input type="checkbox" onchange="updCheck()" /> I'm on a computer with a physical keyboard and other tabs/notifications are closed</label>
+    </div>
+    <div style="text-align:center;"><button class="btn-go" id="btn-check" disabled onclick="afterCheck()">Continue →</button></div>
+  </div>
+</div>
+
+<!-- ══════════════════════ HOW IT WORKS ══════════════════════ -->
+<div id="sc-howto" class="session-screen hidden">
+  <div class="s-card" style="max-width:620px;">
+    <h2>📋 How Phase 1 Works</h2>
+    <p class="sub">About 25–30 minutes in one sitting. Please don't switch tabs during the tests.</p>
+    <ol class="howto-list">
+      <li>A short <strong>mood check</strong> (under a minute).</li>
+      <li><strong>Round 1</strong> — a test, done twice:
+        <ul>
+          <li>first with <strong>white noise</strong>, followed by 2 quick questions,</li>
+          <li>a <strong>5-minute break</strong> where you preview and pick one of your 3 songs,</li>
+          <li>then a different version of the same test with <strong>your song</strong>, followed by a short form.</li>
+        </ul>
+      </li>
+      <li><strong>Round 2</strong> — the same process with a different test.</li>
+      <li>A few <strong>final questions</strong> about your experience.</li>
+    </ol>
+    <p style="color:rgba(255,255,255,0.5);font-size:0.82rem;margin-bottom:10px;">Audio starts when you press Start and stops when the test ends. Your progress is saved after every step — if something goes wrong, log in again with your roll number to continue.</p>
+    <div class="check-list"><label><input type="checkbox" id="howto-ok" onchange="document.getElementById('btn-howto').disabled=!this.checked" /> I understand</label></div>
+    <div style="text-align:center;"><button class="btn-go" id="btn-howto" disabled onclick="go()">Begin →</button></div>
+  </div>
+</div>
+
+<!-- ══════════════════════ FORM (mood / round-end / final) ══════════════════════ -->
+<div id="sc-form" class="session-screen hidden">
+  <div class="s-card" style="max-width:640px;">
+    <div class="round-badge" id="form-badge" style="display:none;"></div>
+    <h2 id="form-title">—</h2>
+    <p class="sub" id="form-sub"></p>
+    <div id="form-box"></div>
+    <div style="text-align:center;margin-top:10px;"><button class="btn-go" id="btn-form" onclick="submitForm()">Continue →</button></div>
+  </div>
+</div>
+
+<!-- ══════════════════════ RUN INTRO ══════════════════════ -->
 <div id="sc-intro" class="session-screen hidden" style="text-align:center;">
   <div class="s-card" style="text-align:center;">
     <div class="prog-dots" id="prog-dots"></div>
-    <div class="round-badge" id="intro-badge">Round 1 of 5</div>
+    <div class="round-badge" id="intro-badge">Round 1 of 2</div>
 
     <div class="music-box">
-      <div class="lbl">🎵 Music condition for this round</div>
+      <div class="lbl">🎵 Audio for this run</div>
       <div class="val" id="intro-music">—</div>
-      <div class="hint">Please start the music before pressing Start</div>
+      <div class="hint">Starts when you press Start and plays until the test ends. Don't change your volume.</div>
     </div>
 
     <div class="task-prev">
@@ -211,9 +229,10 @@
       <p id="intro-desc">Description</p>
     </div>
 
-    <button class="btn-go" onclick="launchTask()">▶ Start Task</button>
+    <button class="btn-go" onclick="startRun()">▶ Start</button>
   </div>
 </div>
+
 
 <!-- ══════════════════════ TASK: READING ══════════════════════ -->
 <div id="sc-reading" class="session-screen hidden">
@@ -265,25 +284,6 @@
     <div style="text-align:center;margin-top:14px;">
       <button class="btn-go" onclick="submitTyping()">Submit →</button>
     </div>
-  </div>
-</div>
-
-<!-- ══════════════════════ TASK: RUBIK ══════════════════════ -->
-<div id="sc-rubik" class="session-screen hidden">
-  <div class="s-card" style="text-align:center;">
-    <h3 style="color:#e8a317;">🟥 Rubik's Cube Timer</h3>
-    <p style="color:rgba(255,255,255,0.55);font-size:0.83rem;margin:6px 0 16px;">Physical cube is provided. Press <kbd>Space</kbd> or the button to start/stop.</p>
-    <div class="rubik-badge">
-      <span>Cube: <strong id="rk-size-show">3×3</strong></span>
-      <span>|</span>
-      <span>Challenge: <strong id="rk-ch-show">1 Side</strong></span>
-    </div>
-    <div class="rubik-clock" id="rk-clock">0:00.0</div>
-    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;">
-      <button class="btn-go" id="rk-btn" onclick="rkToggle()">▶ Start Timer</button>
-      <button class="btn-ghost" onclick="rkReset()">↺ Reset</button>
-    </div>
-    <button class="btn-go" id="rk-rec-btn" onclick="submitRubik()" style="background:rgba(34,197,94,0.85);color:#fff;" disabled>✓ Record This Time</button>
   </div>
 </div>
 
@@ -424,37 +424,37 @@
   </div>
 </div>
 
-<!-- ══════════════════════ BREAK ══════════════════════ -->
+<!-- ══════════════════════ BREAK + SONG CHOICE ══════════════════════ -->
 <div id="sc-break" class="session-screen hidden">
-  <div class="s-card" style="text-align:center;max-width:480px;">
-    <div class="big-emoji">☕</div>
-    <h2>Break Time</h2>
-    <p style="color:rgba(255,255,255,0.55);margin-bottom:18px;">Take 2–3 minutes to rest. Continue when you're ready.</p>
-    <div class="break-summary">
-      <p style="color:rgba(255,255,255,0.42);font-size:0.8rem;margin-bottom:6px;">Round just completed:</p>
-      <p id="brk-text" style="color:#fff;font-size:0.92rem;"></p>
-    </div>
-    <button class="btn-go" onclick="nextRound()">Continue →</button>
+  <div class="s-card" style="text-align:center;max-width:600px;">
+    <div class="round-badge" id="brk-badge">Round 1 of 2 · Break</div>
+    <h2>☕ 5-Minute Break</h2>
+    <p style="color:rgba(255,255,255,0.55);margin-bottom:6px;">Relax, and pick the song you want for the next run. You can preview each for 20 seconds.</p>
+    <div class="timer" id="brk-timer" style="margin:10px 0 16px;">5:00</div>
+    <div id="song-cards"></div>
+    <input type="file" id="song-file" accept="audio/*" style="display:none;" onchange="onUpload(this)" />
+    <div id="brk-note"></div>
+    <button class="btn-go" id="btn-brk" disabled onclick="endBreak()" style="margin-top:10px;">Continue →</button>
+    <p id="brk-hint" style="color:rgba(255,255,255,0.4);font-size:0.78rem;margin-top:8px;"></p>
   </div>
 </div>
 
 <!-- ══════════════════════ DONE ══════════════════════ -->
 <div id="sc-done" class="session-screen hidden">
-  <div class="s-card" style="max-width:740px;">
+  <div class="s-card" style="max-width:560px;text-align:center;">
     <div class="big-emoji">🎉</div>
-    <h2 style="text-align:center;">Session Complete!</h2>
-    <p style="color:rgba(255,255,255,0.55);text-align:center;margin-bottom:18px;">All 5 rounds done. Here's the summary:</p>
-    <table class="res-table">
-      <thead><tr><th>Round</th><th>Task</th><th>Music Condition</th><th>Result</th></tr></thead>
-      <tbody id="res-tbody"></tbody>
-    </table>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px;">
-      <button class="btn-go" onclick="dlResults()">⬇ Download Results (JSON)</button>
-      <a href="post-survey.html" class="btn-go" style="text-decoration:none;">📋 Post-Session Survey →</a>
-    </div>
+    <h2>Phase 1 Complete!</h2>
+    <p style="color:rgba(255,255,255,0.6);margin:10px 0 18px;line-height:1.6;">Thank you for taking part. Your responses have been recorded.<br>Phase 2 is coming soon — we'll reach out to you.</p>
+    <div id="done-unsent"></div>
+    <a href="index.html" class="btn-ghost" style="text-decoration:none;display:inline-block;">← Back to homepage</a>
   </div>
 </div>
 
+<!-- Now-playing bar (visible during runs) -->
+<div id="np-bar" class="np hidden"><span class="eq"><i></i><i></i><i></i></span><span id="np-text">—</span></div>
+
+
+<script src="api.js"></script>
 <script>
 // ─────────────────────────────────────────
 // ESSAYS (5 × ~220 words)
@@ -479,46 +479,11 @@ const TY_PARAS=[
 ];
 
 // ─────────────────────────────────────────
-// SYMMETRY SHAPES  (rows of 'X' and ' ')
-// ─────────────────────────────────────────
-const SYM_ITEMS=[
-  {r:["  XXXX  ","  XXXX  "," XXXXXX ","XXXXXXXX"," XXXXXX ","  XXXX  ","  XXXX  "],sym:true},
-  {r:["XXXXXXXX","   XX   ","   XX   ","   XX   ","   XX   ","   XX   "],sym:true},
-  {r:["XX    XX","XX    XX","XXXXXXXX","XX    XX","XX    XX"],sym:true},
-  {r:[" XXXXXX ","X      X","X  XX  X","X  XX  X","X      X"," XXXXXX "],sym:true},
-  {r:["   XX   ","  XXXX  "," XXXXXX ","XXXXXXXX"," XXXXXX ","  XXXX  ","   XX   "],sym:true},
-  {r:["XXXXXXXX","X      X","X      X","X      X","XXXXXXXX"],sym:true},
-  {r:["XX    XX"," XX  XX ","  XXXX  ","  XXXX  "," XX  XX ","XX    XX"],sym:true},
-  {r:["   XX   ","   XX   ","XXXXXXXX","   XX   ","   XX   "],sym:true},
-  // Asymmetric
-  {r:["XX      ","XX      ","XX      ","XX      ","XXXXXXXX"],sym:false},
-  {r:["XXXX    ","   X    ","   XXXXX","       X"],sym:false},
-  {r:["XXXXX   ","X       ","XXXXX   ","    X   ","    XXXX"],sym:false},
-  {r:[" XXXXXX ","X      X","X    XX ","X   X   ","X  X    ","XXXXXXXX"],sym:false},
-  {r:["   XXXXX","      XX","   XXXXX","   X    ","   XXXXX"],sym:false},
-  {r:["X       ","X X     ","X  X    ","X   XXXX"],sym:false},
-  {r:["  XXXXXX","  X     ","  XXXXX ","      X ","  XXXXX "],sym:false},
-  {r:["XXXXXXXX","      X ","    X   ","  X     ","X       "],sym:false},
-];
-
-// ─────────────────────────────────────────
-// ROTATION SHAPES  (polygon points on 0-10 grid, all asymmetric)
-// ─────────────────────────────────────────
-const ROT_SHAPES=[
-  [[1,1],[3,1],[3,7],[8,7],[8,9],[1,9]],           // L-shape
-  [[1,0],[1,9],[3,9],[3,5],[9,3],[9,0]],           // Flag
-  [[0,2],[6,2],[6,0],[10,4],[6,8],[6,6],[0,6]],    // Arrow
-  [[0,0],[6,0],[6,4],[10,4],[10,8],[4,8],[4,4],[0,4]], // Z-step
-  [[0,0],[4,0],[4,3],[7,3],[7,6],[10,6],[10,10],[0,10]], // Staircase
-];
-
-// ─────────────────────────────────────────
 // TASKS METADATA
 // ─────────────────────────────────────────
 const TASKS={
   reading: {name:"Reading + Summary",    icon:"📖", desc:"Read a short essay (3 min), then write a summary (1.5 min) from memory.", dur:"~4.5 min"},
   typing:  {name:"Reverse Typing",       icon:"⌨️", desc:"Type a paragraph with the word order completely reversed — last word first.", dur:"~2 min"},
-  rubik:   {name:"Rubik's Cube",         icon:"🟥", desc:"Solve the physical cube provided (your chosen challenge). Just a timer.", dur:"~3 min"},
   dots:    {name:"Dot Memory Puzzle",    icon:"🟣", desc:"Memorise 7 dot positions in 6 seconds, then reproduce them on the grid.", dur:"~2 min"},
   symmetry:{name:"Symmetry Test",        icon:"🔄", desc:"2 minutes — for each shape, say if it is left-right symmetric or not.", dur:"2 min"},
   rotation:{name:"Rotated Image Test",   icon:"🔃", desc:"2 minutes — is Shape B a rotation of A, or a mirrored version?", dur:"2 min"},
@@ -526,22 +491,26 @@ const TASKS={
   alphabet:{name:"Alphabet Speed Typing",icon:"🔤", desc:"Type A–Z as fast as you can. Timer starts on first keypress. Wrong keys are silently ignored.", dur:"~1 min"},
 };
 
-const MUSIC=[
-  {id:"indian_instrumental",lbl:"🎻 Indian Classical — Instrumental"},
-  {id:"indian_lyrical",     lbl:"🎤 Indian Classical — Lyrical"},
-  {id:"film_music",         lbl:"🎬 Indian Film Music"},
-  {id:"western",            lbl:"🎸 Western Music"},
-  {id:"silence",            lbl:"🔇 Silence / White Noise"},
-];
+// ─────────────────────────────────────────
+// PHASE 1 CONFIG
+// ─────────────────────────────────────────
+const POOL=Object.keys(TASKS);
+const NOISE_AMP=0.108;   // uniform white noise ±0.108, played dual-mono ≈ −18 LUFS (same target as tools/fetch_songs.py)
+const TARGET_LUFS=-18;   // uploaded song files are gain-matched to this in the browser
+const BREAK_SECS=300, PREVIEW_SECS=20, UPLOAD_AFTER=120;
+const STEPS=['start','r1A','r1quick','r1B','r1end','r2A','r2quick','r2B','r2end','final'];
 
 // ─────────────────────────────────────────
 // STATE
 // ─────────────────────────────────────────
 let S={
-  pid:'', tasks:[], taskOrder:[], musicOrder:[],
-  rubikPre:{}, results:[], round:0,
+  roll:'', name:'', songs:[], tasks:[], done:new Set(), workerAlive:true, variantBase:0,
+  round:1, run:'A', song:null,                      // song = {idx} chosen for run B
+  pick:null, previewing:null, uploads:{}, songErr:{}, processing:{}, upIdx:0, brkT0:0, brkLeft:0, upShown:false,
+  inRun:false, runT0:0, blur:0, audioErr:0,
+  form:{}, formKey:'',
   essayIdx:0, tyIdx:0,
-  _iv:[],
+  _iv:[], _brk:[],
 };
 
 // ─────────────────────────────────────────
@@ -561,81 +530,420 @@ if(!CanvasRenderingContext2D.prototype.roundRect){
   };
 }
 
-// ─────────────────────────────────────────
-// SETUP SCREEN
-// ─────────────────────────────────────────
-(()=>{
-  const el=document.getElementById('task-list');
-  Object.entries(TASKS).forEach(([k,m])=>{
-    const d=document.createElement('div');
-    d.className='task-opt';d.dataset.k=k;
-    d.innerHTML=`<input type="checkbox" id="t_${k}" value="${k}" onchange="onTkCh()" /><span class="oi">${m.icon}</span><div><h4>${m.name}</h4><p>${m.desc}</p></div><span class="task-dur">${m.dur}</span>`;
-    d.onclick=e=>{if(e.target.tagName!=='INPUT'){const c=d.querySelector('input');c.checked=!c.checked;onTkCh();}};
-    el.appendChild(d);
-  });
-})();
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const songLabel=i=>{const s=S.songs[i]||{};return s.title+(s.artist?' — '+s.artist:'');};
+const nextStep=()=>STEPS.find(k=>!S.done.has(k))||'complete';
 
-function onTkCh(){
-  const checked=[...document.querySelectorAll('#task-list input:checked')].map(i=>i.value);
-  document.getElementById('sel-count').textContent=checked.length;
-  document.querySelectorAll('.task-opt').forEach(o=>o.classList.toggle('sel',o.querySelector('input').checked));
-  if(checked.length>=5) document.querySelectorAll('#task-list input:not(:checked)').forEach(c=>c.disabled=true);
-  else document.querySelectorAll('#task-list input').forEach(c=>c.disabled=false);
-  document.getElementById('btn-begin').disabled=checked.length!==5;
+// ─────────────────────────────────────────
+// AUDIO  (white noise + songs, one source at a time)
+// ─────────────────────────────────────────
+const AU={ctx:null,src:null,el:null,noise:null};
+function ac(){
+  if(!AU.ctx)AU.ctx=new (window.AudioContext||window.webkitAudioContext)();
+  if(AU.ctx.state==='suspended')AU.ctx.resume();
+  return AU.ctx;
+}
+function noiseBuf(){
+  if(!AU.noise){
+    const c=ac(),n=c.sampleRate*10,b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);
+    for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*NOISE_AMP;
+    AU.noise=b;
+  }
+  return AU.noise;
+}
+function playBuffer(buf,gain=1){
+  stopAudio();
+  const c=ac(),s=c.createBufferSource(),g=c.createGain();
+  s.buffer=buf;s.loop=true;g.gain.value=gain;
+  s.connect(g).connect(c.destination);s.start();
+  AU.src=s;
+}
+function playUrl(url,onErr){
+  stopAudio();
+  const a=new Audio(url);a.loop=true;
+  a.onerror=()=>onErr&&onErr();
+  a.play().catch(()=>onErr&&onErr());
+  AU.el=a;
+}
+function stopAudio(){
+  if(AU.src){try{AU.src.stop();}catch(_){}AU.src=null;}
+  if(AU.el){AU.el.onerror=null;AU.el.pause();AU.el.removeAttribute('src');AU.el.load();AU.el=null;}
+}
+// Plays song i — the participant's uploaded file if any, otherwise the prepared (downloaded) file
+function playSong(i,onErr){
+  if(S.uploads[i])playBuffer(S.uploads[i].buf,S.uploads[i].gain);
+  else playUrl(S.songs[i].audio,onErr);
+}
+const playable=i=>!!S.uploads[i]||(S.songs[i].status==='ready'&&!!S.songs[i].audio&&!S.songErr[i]);
+
+// Integrated loudness (EBU R128 / BS.1770: K-weighting, 400 ms blocks, −70 LUFS + relative gating)
+async function measureLoudness(buf){
+  const ch=Math.min(buf.numberOfChannels,2),sr=buf.sampleRate;
+  const off=new OfflineAudioContext(ch,buf.length,sr);
+  const src=off.createBufferSource();src.buffer=buf;
+  const shelf=off.createBiquadFilter();shelf.type='highshelf';shelf.frequency.value=1681.97;shelf.gain.value=4;
+  const hp=off.createBiquadFilter();hp.type='highpass';hp.frequency.value=38.14;hp.Q.value=-6.02; // Web Audio highpass Q is in dB (= 0.5 linear)
+  src.connect(shelf).connect(hp).connect(off.destination);src.start();
+  const out=await off.startRendering();
+  const data=[...Array(out.numberOfChannels)].map((_,c)=>out.getChannelData(c));
+  const hop=Math.round(sr*0.1),nHops=Math.floor(out.length/hop),hs=new Float64Array(nHops);
+  for(let h=0;h<nHops;h++){let s=0;for(const d of data)for(let i=h*hop;i<(h+1)*hop;i++)s+=d[i]*d[i];hs[h]=s;}
+  const mult=data.length===1?2:1; // mono is played on both ears
+  const blocks=[];for(let h=0;h+4<=nHops;h++)blocks.push(mult*(hs[h]+hs[h+1]+hs[h+2]+hs[h+3])/(4*hop));
+  const L=z=>-0.691+10*Math.log10(z),mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
+  let g=blocks.filter(z=>z>0&&L(z)>-70);
+  if(!g.length)return{lufs:-70,peak:0};
+  const rel=L(mean(g))-10;g=g.filter(z=>L(z)>rel);
+  let peak=0;for(let c=0;c<buf.numberOfChannels;c++){const d=buf.getChannelData(c);for(let i=0;i<d.length;i++){const v=Math.abs(d[i]);if(v>peak)peak=v;}}
+  return{lufs:L(mean(g)),peak};
 }
 
-function beginSession(){
-  const pid=document.getElementById('pid-inp').value.trim();
-  if(!pid){alert('Enter a Participant ID.');return;}
-  const checked=[...document.querySelectorAll('#task-list input:checked')].map(i=>i.value);
-  if(checked.length!==5)return;
-  S.pid=pid;S.tasks=checked;S.taskOrder=shuffle([...checked]);
-  S.musicOrder=shuffle([...MUSIC]);
-  S.essayIdx=0|Math.random()*ESSAYS.length;
-  S.tyIdx=0|Math.random()*TY_PARAS.length;
-  if(checked.includes('rubik')) nav('sc-rubik-pre');
-  else showIntro();
+// Now-playing bar
+const setNP=t=>{document.getElementById('np-text').textContent=t;document.getElementById('np-bar').classList.remove('hidden');};
+const hideNP=()=>document.getElementById('np-bar').classList.add('hidden');
+
+window.addEventListener('blur',()=>{if(S.inRun)S.blur++;});
+window.addEventListener('beforeunload',e=>{if(S.inRun){e.preventDefault();e.returnValue='';}});
+
+// ─────────────────────────────────────────
+// LOGIN
+// ─────────────────────────────────────────
+async function login(){
+  const roll=document.getElementById('roll-inp').value.trim().toUpperCase();
+  if(!roll){alert('Enter your roll number.');return;}
+  const btn=document.getElementById('btn-login');
+  btn.disabled=true;btn.textContent='Checking…';
+  try{
+    const p=await API.profile(roll,POOL);
+    if(!p.ok)throw new Error(p.error);
+    if(!p.registered){
+      showMsg('📝','Not registered yet',`We couldn't find roll number <strong>${esc(roll)}</strong>. Please fill the intake form first.`,
+        `<a href="intake.html" class="btn-go" style="text-decoration:none;display:inline-block;">Go to intake form →</a>`);
+      return;
+    }
+    if(!p.tasks||p.tasks.length<2)throw new Error('no tests assigned');
+    Object.assign(S,{roll,name:p.name,songs:p.songs,tasks:p.tasks,done:new Set(p.done),workerAlive:p.workerAlive});
+    S.variantBase=[...roll].reduce((a,c)=>a+c.charCodeAt(0),0);
+    if(nextStep()==='complete'){showDone();return;}
+    nav('sc-check');
+  }catch(err){
+    alert('⚠️ Could not reach the study server. Check your connection and try again.\n\n('+err.message+')');
+  }finally{
+    btn.disabled=false;btn.textContent='Continue →';
+  }
+}
+
+function showMsg(emoji,title,html,actions=''){
+  document.getElementById('msg-emoji').textContent=emoji;
+  document.getElementById('msg-title').textContent=title;
+  document.getElementById('msg-text').innerHTML=html;
+  document.getElementById('msg-actions').innerHTML=actions;
+  nav('sc-msg');
 }
 
 // ─────────────────────────────────────────
-// RUBIK PRE
+// AUDIO CHECK
 // ─────────────────────────────────────────
-document.querySelectorAll('input[name="rk_fam"]').forEach(r=>{
-  r.addEventListener('change',()=>{
-    document.getElementById('rk-best-wrap').classList.toggle('hidden',!['advanced','expert'].includes(r.value));
-  });
-});
-
-function saveRubikPre(){
-  const fam=document.querySelector('input[name="rk_fam"]:checked');
-  const sz=document.querySelector('input[name="rk_size"]:checked');
-  const ch=document.querySelector('input[name="rk_ch"]:checked');
-  if(!fam){alert('Please select your familiarity level.');return;}
-  S.rubikPre={fam:fam.value,best:document.getElementById('rk-best').value,size:sz.value,challenge:ch.value};
-  showIntro();
+let testOn=false,testPlayed=false;
+function toggleTestSound(){
+  const b=document.getElementById('btn-testsound');
+  if(testOn){stopAudio();b.textContent='▶ Play test sound';}
+  else{playBuffer(noiseBuf());testPlayed=true;b.textContent='⏹ Stop test sound';}
+  testOn=!testOn;updCheck();
+}
+function updCheck(){
+  const all=[...document.querySelectorAll('#check-list input')].every(c=>c.checked);
+  document.getElementById('btn-check').disabled=!(all&&testPlayed);
+}
+function afterCheck(){
+  stopAudio();testOn=false;
+  document.getElementById('btn-testsound').textContent='▶ Play test sound';
+  if(S.done.has('start'))go();   // resuming — skip the instructions
+  else nav('sc-howto');
 }
 
 // ─────────────────────────────────────────
-// ROUND INTRO
+// FLOW  (resumes at the first step not yet saved)
+// ─────────────────────────────────────────
+function go(){
+  window.scrollTo(0,0);
+  const k=nextStep();
+  if(k==='complete')return showDone();
+  if(k==='start'||k==='final')return showForm(k);
+  const [,r,t]=k.match(/^r(\d)(A|quick|B|end)$/);
+  S.round=+r;
+  if(t==='A'){S.run='A';return showIntro();}
+  if(t==='quick')return showForm('quick');
+  if(t==='B')return showBreak();
+  return showForm('end');
+}
+
+async function save(rec){
+  S.done.add(rec.step_key);
+  const full=Object.assign({roll:S.roll,name:S.name,phase:1,client_ts:new Date().toISOString()},rec);
+  try{await API.submit(full);}catch(_){} // failures are queued in localStorage and retried on the next save
+}
+
+// ─────────────────────────────────────────
+// RUN INTRO + RUN
 // ─────────────────────────────────────────
 function showIntro(){
-  const r=S.round, task=S.taskOrder[r], music=S.musicOrder[r], m=TASKS[task];
-  const dots=document.getElementById('prog-dots');
-  dots.innerHTML='';
-  for(let i=0;i<5;i++){const d=document.createElement('div');d.className='prog-dot'+(i<r?' done':i===r?' active':'');dots.appendChild(d);}
-  document.getElementById('intro-badge').textContent=`Round ${r+1} of 5`;
-  document.getElementById('intro-music').textContent=music.lbl;
+  const task=S.tasks[S.round-1],m=TASKS[task],idx=(S.round-1)*2+(S.run==='B'?1:0);
+  const dots=document.getElementById('prog-dots');dots.innerHTML='';
+  for(let i=0;i<4;i++){const d=document.createElement('div');d.className='prog-dot'+(i<idx?' done':i===idx?' active':'');dots.appendChild(d);}
+  document.getElementById('intro-badge').textContent=`Round ${S.round} of 2 · Run ${S.run==='A'?1:2} of 2`;
+  document.getElementById('intro-music').textContent=S.run==='A'?'🌫️ White noise':'🎵 '+songLabel(S.song.idx);
   document.getElementById('intro-icon').textContent=m.icon;
   document.getElementById('intro-name').textContent=m.name;
   document.getElementById('intro-desc').textContent=m.desc;
   nav('sc-intro');
 }
 
-function launchTask(){
-  const t=S.taskOrder[S.round];
-  const fn={reading:startReading,typing:startTyping,rubik:startRubik,dots:startDots,symmetry:startSym,rotation:startRot,numseq:startNumSeq,alphabet:startAlphabet};
-  fn[t]();
+function startRun(){
+  Object.assign(S,{inRun:true,runT0:Date.now(),blur:0,audioErr:0});
+  if(S.run==='A'){playBuffer(noiseBuf());setNP('🌫️ White noise');}
+  else{
+    playSong(S.song.idx,()=>{S.audioErr++;setNP('⚠️ Audio problem — please carry on with the test');});
+    setNP('🎵 '+songLabel(S.song.idx));
+  }
+  // Run A and run B always get a different essay / paragraph; other tasks are randomised anyway
+  S.essayIdx=S.tyIdx=S.variantBase+(S.run==='B'?1:0);
+  const fn={reading:startReading,typing:startTyping,dots:startDots,symmetry:startSym,rotation:startRot,numseq:startNumSeq,alphabet:startAlphabet};
+  fn[S.tasks[S.round-1]]();
 }
+
+// Called by every task when it finishes
+async function record(tk,data,summary){
+  if(!S.inRun)return;
+  S.inRun=false;stopAudio();hideNP();clearIv();
+  showMsg('💾','Saving…','');
+  const rec={step_key:`r${S.round}${S.run}`,step:'run',round:S.round,run:S.run,
+    condition:S.run==='A'?'white_noise':'song',task:tk,task_name:TASKS[tk].name,
+    duration_s:Math.round((Date.now()-S.runT0)/1000),blur_count:S.blur,audio_errors:S.audioErr,summary};
+  if(S.run==='B'){
+    const i=S.song.idx,up=S.uploads[i];
+    Object.assign(rec,{song_idx:i+1,song_title:songLabel(i),song_source:up?'upload':'download'},
+      up?{upload_file:up.name,upload_lufs:up.lufs,upload_gain:+up.gain.toFixed(3)}:{});
+  }
+  Object.entries(data).forEach(([k,v])=>{rec['res_'+k]=v;});
+  await save(rec);
+  go();
+}
+
+// ─────────────────────────────────────────
+// FORMS  (mood checks, end of round, end of phase)
+// ─────────────────────────────────────────
+const Q={
+  valence:       {t:'scale',q:'How pleasant or unpleasant do you feel right now?',min:1,max:9,lo:'Very unpleasant 😞',hi:'Very pleasant 😊'},
+  arousal:       {t:'scale',q:'How calm or excited / energised do you feel right now?',min:1,max:9,lo:'Very calm 😌',hi:'Very excited ⚡'},
+  sleepiness:    {t:'scale',q:'How sleepy do you feel right now?',min:1,max:9,lo:'Extremely alert',hi:'Very sleepy, fighting sleep'},
+  stress:        {t:'scale',q:'How stressed do you feel right now?',min:1,max:5,lo:'Not at all',hi:'Extremely'},
+  sleep_hours:   {t:'number',q:'How many hours did you sleep last night?',min:0,max:16,step:0.5},
+  caffeine:      {t:'choice',q:'Have you had caffeine (coffee, tea, energy drink) in the last 3 hours?',opts:[['yes','Yes'],['no','No']]},
+  conc_noise:    {t:'scale',q:'How well could you concentrate during the white-noise run?',min:1,max:5,lo:'Very poorly',hi:'Very well'},
+  conc_song:     {t:'scale',q:'How well could you concentrate during the song run?',min:1,max:5,lo:'Very poorly',hi:'Very well'},
+  distract_noise:{t:'scale',q:'How distracting was the white noise?',min:1,max:5,lo:'Not at all',hi:'Extremely'},
+  distract_song: {t:'scale',q:'How distracting was your song?',min:1,max:5,lo:'Not at all',hi:'Extremely'},
+  a1:            {t:'text', q:'How did you feel during the white-noise runs?'},
+  a2:            {t:'text', q:'How did you feel during the song runs?'},
+  b:             {t:'text', q:'Compare white noise and your song: how did each affect your performance and concentration?'},
+  c:             {t:'choice',q:'Which do you think actually worked better for you?',opts:[['white_noise','White noise'],['song','My song'],['no_difference','No real difference']]},
+  c_why:         {t:'text', q:'Why do you think so?'},
+  d:             {t:'choice',q:'What do you usually choose when you need to concentrate?',opts:[['silence','Silence'],['white_noise','White / ambient noise'],['instrumental','Instrumental music'],['lyrics','Songs with lyrics'],['depends','Depends on the task']]},
+  e:             {t:'text', q:'Why did you pick the song(s) you chose, and did the lyrics distract you?'},
+};
+const FORMS={
+  start:{title:'🙂 How are you feeling?',sub:'Answer based on how you feel right now — there are no right or wrong answers.',
+         sections:[[null,['valence','arousal','sleepiness','stress','sleep_hours','caffeine']]]},
+  quick:{title:'⏱️ Quick Check',sub:'Two quick questions before your break.',sections:[[null,['valence','arousal']]]},
+  end:  {title:'📝 End of Round',sub:'Part A is about how you feel now; Part B is about this round.',
+         sections:[['Part A — How you feel now',['valence','arousal','sleepiness','stress']],
+                   ['Part B — This round',['conc_noise','conc_song','distract_noise','distract_song']]]},
+  final:{title:'💬 Final Questions',sub:'Tell us about your experience in your own words. Each written answer needs at least 10 characters — write as much as you like.',
+         sections:[['Part C — In your own words',['a1','a2','b','c','c_why','d','e']]]},
+};
+
+function showForm(key){
+  S.formKey=key;S.form={};
+  const f=FORMS[key],box=document.getElementById('form-box'),badge=document.getElementById('form-badge');
+  document.getElementById('form-title').textContent=key==='end'?`📝 End of Round ${S.round}`:f.title;
+  document.getElementById('form-sub').textContent=f.sub;
+  badge.style.display=key==='quick'||key==='end'?'inline-block':'none';
+  badge.textContent=`Round ${S.round} of 2`;
+  box.innerHTML='';
+  f.sections.forEach(([h,ids])=>{
+    if(h)box.insertAdjacentHTML('beforeend',`<div class="q-sec">${h}</div>`);
+    ids.forEach(id=>box.appendChild(qEl(id)));
+  });
+  nav('sc-form');
+}
+
+function qEl(id){
+  const q=Q[id],d=document.createElement('div');
+  d.className='q-block';d.id='q_'+id;
+  d.innerHTML=`<label class="s-lbl">${q.q}</label>`;
+  if(q.t==='scale'||q.t==='choice'){
+    const row=document.createElement('div');row.className='scale-row';
+    const opts=q.t==='scale'?Array.from({length:q.max-q.min+1},(_,k)=>[q.min+k,String(q.min+k)]):q.opts;
+    opts.forEach(([v,l])=>{
+      const b=document.createElement('button');
+      b.type='button';b.className=q.t==='scale'?'scale-btn':'choice-btn';b.textContent=l;
+      b.onclick=()=>{S.form[id]=v;row.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b));d.classList.remove('missing');};
+      row.appendChild(b);
+    });
+    d.appendChild(row);
+    if(q.t==='scale')d.insertAdjacentHTML('beforeend',`<div class="scale-ends"><span>${q.min} = ${q.lo}</span><span>${q.max} = ${q.hi}</span></div>`);
+  }else if(q.t==='number'){
+    const i=document.createElement('input');
+    Object.assign(i,{type:'number',className:'s-inp',min:q.min,max:q.max,step:q.step});i.style.maxWidth='140px';
+    i.oninput=()=>{S.form[id]=i.value;};
+    d.appendChild(i);
+  }else{
+    const t=document.createElement('textarea'),c=document.createElement('div');
+    t.className='s-ta';t.placeholder='Write in your own words…';
+    c.className='ta-count';c.textContent='0 characters (min 10)';
+    t.oninput=()=>{const n=(S.form[id]=t.value.trim()).length;c.textContent=`${n} characters${n<10?' (min 10)':''}`;};
+    d.append(t,c);
+  }
+  return d;
+}
+
+function validQ(id){
+  const q=Q[id],v=S.form[id];
+  if(q.t==='text')return(v||'').length>=10;
+  if(q.t==='number')return v!==undefined&&v!==''&&+v>=q.min&&+v<=q.max;
+  return v!==undefined;
+}
+
+async function submitForm(){
+  const key=S.formKey,ids=FORMS[key].sections.flatMap(s=>s[1]);
+  let first=null;
+  ids.forEach(id=>{const ok=validQ(id),el=document.getElementById('q_'+id);el.classList.toggle('missing',!ok);if(!ok&&!first)first=el;});
+  if(first){first.scrollIntoView({behavior:'smooth',block:'center'});return;}
+  const btn=document.getElementById('btn-form');
+  btn.disabled=true;btn.textContent='Saving…';
+  const step_key=key==='start'||key==='final'?key:`r${S.round}${key}`;
+  await save(Object.assign({step_key,step:key,round:key==='quick'||key==='end'?S.round:''},S.form));
+  btn.disabled=false;btn.textContent='Continue →';
+  go();
+}
+
+// ─────────────────────────────────────────
+// BREAK + SONG CHOICE
+// ─────────────────────────────────────────
+function showBreak(){
+  Object.assign(S,{run:'B',pick:null,previewing:null,brkT0:Date.now(),brkLeft:BREAK_SECS,upShown:false});
+  document.getElementById('brk-badge').textContent=`Round ${S.round} of 2 · Break`;
+  renderSongs();updBreak();
+  nav('sc-break');
+  S._brk.push(setInterval(()=>{
+    S.brkLeft=Math.max(0,BREAK_SECS-Math.floor((Date.now()-S.brkT0)/1000));
+    if(!S.upShown&&BREAK_SECS-S.brkLeft>=UPLOAD_AFTER){S.upShown=true;renderSongs();}
+    updBreak();
+  },1000));
+  S._brk.push(setInterval(refreshSongs,10000));
+  refreshSongs();
+}
+
+async function refreshSongs(){
+  if(S.songs.every((s,i)=>s.status==='ready'||S.uploads[i]))return;
+  try{
+    const p=await API.profile(S.roll,POOL);
+    if(!p.ok||!p.registered)return;
+    const changed=JSON.stringify(p.songs)!==JSON.stringify(S.songs)||p.workerAlive!==S.workerAlive;
+    S.songs=p.songs;S.workerAlive=p.workerAlive;
+    if(changed){renderSongs();updBreak();}
+  }catch(_){}
+}
+
+function renderSongs(){
+  const box=document.getElementById('song-cards');box.innerHTML='';
+  S.songs.forEach((s,i)=>{
+    const ok=playable(i);
+    let st,cls;
+    if(S.processing[i]){st='⏳ Processing your file…';cls='st-wait';}
+    else if(S.uploads[i]){st='✓ Ready (your file)';cls='st-ready';}
+    else if(S.songErr[i]){st='✗ Couldn\'t play this song';cls='st-bad';}
+    else if(s.status==='ready'){st='✓ Ready';cls='st-ready';}
+    else if(s.status==='failed'){st='✗ Couldn\'t get this song';cls='st-bad';}
+    else{st='⏳ Getting your song ready…';cls='st-wait';}
+    const canUpload=!ok&&!S.processing[i]&&(s.status==='failed'||S.songErr[i]||!S.workerAlive||S.upShown);
+    const c=document.createElement('div');
+    c.className='song-card'+(S.pick===i?' sel':'');
+    c.innerHTML=`<input type="radio" name="song-pick" ${S.pick===i?'checked':''} ${ok?'':'disabled'} />
+      <div class="info"><div class="t">${esc(songLabel(i))}</div><div class="st ${cls}">${st}</div></div>
+      <div class="acts">
+        ${ok?`<button class="btn-mini" data-act="pv">${S.previewing===i?'⏹ Stop':'▶ Preview'}</button>`:''}
+        ${canUpload?`<button class="btn-mini" data-act="up">⬆ Upload audio file</button>`:''}
+      </div>`;
+    c.querySelector('input').onchange=()=>{S.pick=i;renderSongs();updBreak();};
+    c.querySelector('[data-act=pv]')?.addEventListener('click',()=>preview(i));
+    c.querySelector('[data-act=up]')?.addEventListener('click',()=>{S.upIdx=i;document.getElementById('song-file').click();});
+    box.appendChild(c);
+  });
+}
+
+function updBreak(){
+  document.getElementById('brk-timer').textContent=fmt(S.brkLeft);
+  const ready=S.pick!==null&&playable(S.pick),over=S.brkLeft<=0;
+  document.getElementById('btn-brk').disabled=!(over&&ready);
+  document.getElementById('brk-hint').textContent=!ready?'Select a song to continue.':over?'':'You can continue when the break ends.';
+  const none=!S.songs.some((_,i)=>playable(i));
+  document.getElementById('brk-note').innerHTML=over&&none
+    ?`<div class="warn-box">None of your songs is available yet. Upload an audio file of one of your songs above, or contact the research team — your progress is saved, and you can log in later with your roll number to continue from here.</div>`:'';
+}
+
+function preview(i){
+  clearTimeout(S.pvT);
+  if(S.previewing===i){stopAudio();S.previewing=null;renderSongs();return;}
+  S.previewing=i;
+  playSong(i,()=>{S.songErr[i]=true;S.previewing=null;if(S.pick===i)S.pick=null;renderSongs();updBreak();});
+  S.pvT=setTimeout(()=>{if(S.previewing===i){stopAudio();S.previewing=null;renderSongs();}},PREVIEW_SECS*1000);
+  renderSongs();
+}
+
+// Fallback: the participant's own audio file, played locally and gain-matched to TARGET_LUFS
+async function onUpload(inp){
+  const f=inp.files[0],i=S.upIdx;inp.value='';
+  if(!f)return;
+  if(f.size>60*1024*1024){alert('That file is too large (max 60 MB).');return;}
+  S.processing[i]=true;renderSongs();
+  try{
+    const buf=await ac().decodeAudioData(await f.arrayBuffer());
+    const {lufs,peak}=await measureLoudness(buf);
+    const gain=Math.min(10**((TARGET_LUFS-lufs)/20),0.99/Math.max(peak,1e-4)); // never push peaks into clipping
+    S.uploads[i]={buf,gain,name:f.name,lufs:+lufs.toFixed(1)};
+    S.songErr[i]=false;
+    if(S.pick===null)S.pick=i;
+  }catch(_){
+    alert('Couldn\'t read that file. Please upload an MP3, M4A, WAV or OGG audio file.');
+  }
+  S.processing[i]=false;renderSongs();updBreak();
+}
+
+function endBreak(){
+  S._brk.forEach(t=>clearInterval(t));S._brk=[];
+  clearTimeout(S.pvT);stopAudio();S.previewing=null;
+  S.song={idx:S.pick};
+  showIntro();
+}
+
+// ─────────────────────────────────────────
+// DONE
+// ─────────────────────────────────────────
+function showDone(){
+  stopAudio();hideNP();
+  let unsent=[];try{unsent=JSON.parse(localStorage.getItem('study_unsent')||'[]');}catch(_){}
+  document.getElementById('done-unsent').innerHTML=unsent.length
+    ?`<div class="warn-box">⚠️ ${unsent.length} response(s) couldn't reach our server. Please download this backup and email it to the research team.<br><button class="btn-mini" style="margin-top:8px" onclick="dlUnsent()">⬇ Download backup</button></div>`:'';
+  nav('sc-done');
+}
+
+function dlUnsent(){
+  const blob=new Blob([localStorage.getItem('study_unsent')||'[]'],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`phase1_backup_${S.roll}.json`;a.click();
+}
+
 
 // ─────────────────────────────────────────
 // TASK: READING
@@ -728,52 +1036,6 @@ function submitTyping(){
 }
 
 // ─────────────────────────────────────────
-// TASK: RUBIK
-// ─────────────────────────────────────────
-let RK={on:false,t0:null,el:0,iv:null};
-
-function startRubik(){
-  clearIv();
-  RK={on:false,t0:null,el:0,iv:null};
-  const pre=S.rubikPre;
-  document.getElementById('rk-size-show').textContent=pre.size||'3×3';
-  document.getElementById('rk-ch-show').textContent=pre.challenge==='full'?'Full Cube':'1 Side';
-  document.getElementById('rk-clock').textContent='0:00.0';
-  document.getElementById('rk-btn').textContent='▶ Start Timer';
-  document.getElementById('rk-rec-btn').disabled=true;
-  nav('sc-rubik');
-}
-
-function rkToggle(){
-  if(!RK.on){
-    RK.on=true;RK.t0=Date.now()-RK.el*1000;
-    document.getElementById('rk-btn').textContent='⏸ Stop Timer';
-    RK.iv=setInterval(()=>{
-      RK.el=(Date.now()-RK.t0)/1000;
-      const m=0|RK.el/60,s=(RK.el%60).toFixed(1).padStart(4,'0');
-      document.getElementById('rk-clock').textContent=`${m}:${s}`;
-    },100);
-    S._iv.push(RK.iv);
-  } else {
-    RK.on=false;clearInterval(RK.iv);
-    document.getElementById('rk-btn').textContent='▶ Resume';
-    document.getElementById('rk-rec-btn').disabled=false;
-  }
-}
-
-function rkReset(){
-  RK.on=false;clearInterval(RK.iv);RK.el=0;
-  document.getElementById('rk-clock').textContent='0:00.0';
-  document.getElementById('rk-btn').textContent='▶ Start Timer';
-  document.getElementById('rk-rec-btn').disabled=true;
-}
-
-function submitRubik(){
-  clearIv();
-  record('rubik',{time:RK.el,size:S.rubikPre.size,challenge:S.rubikPre.challenge,fam:S.rubikPre.fam,best:S.rubikPre.best},`${fmt(RK.el|0)} (${S.rubikPre.size}, ${S.rubikPre.challenge==='full'?'Full':'1 Side'})`);
-}
-
-// ─────────────────────────────────────────
 // TASK: DOTS
 // ─────────────────────────────────────────
 let DT={targets:[],marked:[],phase:'memo',G:6};
@@ -844,11 +1106,11 @@ function submitDots(){
 // ─────────────────────────────────────────
 // TASK: SYMMETRY
 // ─────────────────────────────────────────
-let SY={ok:0,bad:0,tot:0,cur:null,left:120,order:[]};
+let SY={ok:0,bad:0,tot:0,cur:null,left:120};
 
 function startSym(){
   clearIv();
-  SY={ok:0,bad:0,tot:0,cur:null,left:120,order:shuffle([...Array(SYM_ITEMS.length).keys()])};
+  SY={ok:0,bad:0,tot:0,cur:null,left:120};
   ['sym-ok','sym-bad','sym-tot'].forEach(id=>document.getElementById(id).textContent='0');
   nav('sc-sym');
   nextSymItem();
@@ -861,9 +1123,27 @@ function startSym(){
   S._iv.push(iv);
 }
 
+// Fresh random shape every item (so run A and run B never share shapes).
+// Symmetric: left half mirrored onto the right. Asymmetric: 2–3 right-half cells flipped.
+function genSymItem(){
+  const W=8,H=5+(0|Math.random()*3);
+  let rows;
+  do{rows=[...Array(H)].map(()=>{const h=[...Array(W/2)].map(()=>Math.random()<0.5?'X':' ');return h.concat([...h].reverse());});}
+  while(rows.flat().filter(c=>c==='X').length<10);
+  const sym=Math.random()<0.5;
+  if(!sym){
+    const k=2+(0|Math.random()*2),used=new Set();
+    while(used.size<k){
+      const r=0|Math.random()*H,c=W/2+(0|Math.random()*W/2);
+      if(used.has(r+','+c))continue;
+      used.add(r+','+c);rows[r][c]=rows[r][c]==='X'?' ':'X';
+    }
+  }
+  return{r:rows.map(r=>r.join('')),sym};
+}
+
 function nextSymItem(){
-  if(!SY.order.length)SY.order=shuffle([...Array(SYM_ITEMS.length).keys()]);
-  SY.cur=SYM_ITEMS[SY.order.pop()];
+  SY.cur=genSymItem();
   drawSymShape(SY.cur);
 }
 
@@ -908,11 +1188,11 @@ function submitSym(){
 // ─────────────────────────────────────────
 // TASK: ROTATION
 // ─────────────────────────────────────────
-let RT={ok:0,bad:0,tot:0,isMirror:false,left:120,si:0};
+let RT={ok:0,bad:0,tot:0,isMirror:false,left:120};
 
 function startRot(){
   clearIv();
-  RT={ok:0,bad:0,tot:0,isMirror:false,left:120,si:0};
+  RT={ok:0,bad:0,tot:0,isMirror:false,left:120};
   ['rot-ok','rot-bad','rot-tot'].forEach(id=>document.getElementById(id).textContent='0');
   nav('sc-rot');
   nextRotItem();
@@ -925,27 +1205,47 @@ function startRot(){
   S._iv.push(iv);
 }
 
-function drawRotShape(cv,pts,deg,mirror){
+// Fresh random 7-cell shape every item. Only chiral shapes are used (the mirror image
+// can't be produced by rotation), so "rotated" vs "mirrored" always has one right answer.
+const normCells=cs=>{const mx=Math.min(...cs.map(c=>c[0])),my=Math.min(...cs.map(c=>c[1]));return cs.map(([x,y])=>(x-mx)+','+(y-my)).sort().join(';');};
+function isChiral(cs){
+  const mir=normCells(cs.map(([x,y])=>[-x,y]));
+  let r=cs;
+  for(let i=0;i<4;i++){if(normCells(r)===mir)return false;r=r.map(([x,y])=>[-y,x]);}
+  return true;
+}
+function genRotShape(){
+  for(;;){
+    const cells=[[0,0]],has=(x,y)=>cells.some(c=>c[0]===x&&c[1]===y);
+    while(cells.length<7){
+      const [x,y]=cells[0|Math.random()*cells.length],[dx,dy]=[[1,0],[-1,0],[0,1],[0,-1]][0|Math.random()*4];
+      if(!has(x+dx,y+dy))cells.push([x+dx,y+dy]);
+    }
+    const w=Math.max(...cells.map(c=>c[0]))-Math.min(...cells.map(c=>c[0]))+1,h=Math.max(...cells.map(c=>c[1]))-Math.min(...cells.map(c=>c[1]))+1;
+    if(w<=5&&h<=5&&isChiral(cells))return cells;
+  }
+}
+
+function drawRotShape(cv,cells,deg,mirror){
   const ctx=cv.getContext('2d');
-  const W=cv.width,H=cv.height,PAD=22,s=Math.min(W,H)-PAD*2,sc=s/10;
+  const W=cv.width,H=cv.height,PAD=22;
+  const xs=cells.map(c=>c[0]),ys=cells.map(c=>c[1]);
+  const mnx=Math.min(...xs),mny=Math.min(...ys),w=Math.max(...xs)-mnx+1,h=Math.max(...ys)-mny+1;
+  const sc=(Math.min(W,H)-PAD*2)/Math.max(w,h),cx=mnx+w/2,cy=mny+h/2;
   ctx.clearRect(0,0,W,H);
   ctx.save();ctx.translate(W/2,H/2);ctx.rotate(deg*Math.PI/180);if(mirror)ctx.scale(-1,1);
-  ctx.beginPath();
-  ctx.moveTo((pts[0][0]-5)*sc,(pts[0][1]-5)*sc);
-  for(let i=1;i<pts.length;i++)ctx.lineTo((pts[i][0]-5)*sc,(pts[i][1]-5)*sc);
-  ctx.closePath();
-  ctx.fillStyle='rgba(129,140,248,0.8)';ctx.fill();
-  ctx.strokeStyle='#a5b4fc';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='rgba(129,140,248,0.8)';ctx.strokeStyle='#a5b4fc';ctx.lineWidth=1.5;
+  cells.forEach(([x,y])=>{const px=(x-cx)*sc,py=(y-cy)*sc;ctx.fillRect(px,py,sc,sc);ctx.strokeRect(px,py,sc,sc);});
   ctx.restore();
 }
 
 function nextRotItem(){
-  const pts=ROT_SHAPES[RT.si%ROT_SHAPES.length];RT.si++;
+  const cells=genRotShape();
   const rots=[0,90,180,270];
   const rA=rots[0|Math.random()*4],rB=rots[0|Math.random()*4];
   RT.isMirror=Math.random()>0.5;
-  drawRotShape(document.getElementById('rot-a'),pts,rA,false);
-  drawRotShape(document.getElementById('rot-b'),pts,rB,RT.isMirror);
+  drawRotShape(document.getElementById('rot-a'),cells,rA,false);
+  drawRotShape(document.getElementById('rot-b'),cells,rB,RT.isMirror);
 }
 
 function answerRot(userMirror){
@@ -974,39 +1274,6 @@ function flash(id,ok){
   setTimeout(()=>el.classList.remove('fl-ok','fl-bad'),320);
 }
 
-// ─────────────────────────────────────────
-// RECORD RESULT → BREAK / DONE
-// ─────────────────────────────────────────
-function record(tk,data,summary){
-  const r=S.round,music=S.musicOrder[r];
-  S.results.push({round:r+1,task:tk,taskName:TASKS[tk].name,musicId:music.id,musicLabel:music.lbl,data,summary,ts:new Date().toISOString()});
-  try{localStorage.setItem('session_'+S.pid,JSON.stringify(S.results));}catch(_){}
-  S.round++;
-  if(S.round>=5) showDone();
-  else showBreak(summary,TASKS[tk].name,music.lbl);
-}
-
-function showBreak(sum,tn,ml){
-  document.getElementById('brk-text').innerHTML=`<strong>${tn}</strong> during <strong>${ml}</strong><br><span style="color:#e8a317">${sum}</span>`;
-  nav('sc-break');
-}
-
-function nextRound(){showIntro();}
-
-function showDone(){
-  const tb=document.getElementById('res-tbody');tb.innerHTML='';
-  S.results.forEach(r=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${r.round}</td><td>${TASKS[r.task].icon} ${r.taskName}</td><td style="font-size:0.8rem">${r.musicLabel}</td><td class="sc">${r.summary}</td>`;
-    tb.appendChild(tr);
-  });
-  nav('sc-done');
-}
-
-function dlResults(){
-  const blob=new Blob([JSON.stringify({participantId:S.pid,date:new Date().toISOString(),rubikPre:S.rubikPre,results:S.results},null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`session_${S.pid}_${Date.now()}.json`;a.click();
-}
 
 // ─────────────────────────────────────────
 // KEYBOARD SHORTCUTS
@@ -1019,9 +1286,6 @@ document.addEventListener('keydown',e=>{
   if(!document.getElementById('sc-rot').classList.contains('hidden')){
     if(e.key.toLowerCase()==='r')answerRot(false);
     if(e.key.toLowerCase()==='m')answerRot(true);
-  }
-  if(!document.getElementById('sc-rubik').classList.contains('hidden')&&e.key===' '){
-    e.preventDefault();rkToggle();
   }
   // Alphabet task — handled inside task itself via alphaKey()
   if(!document.getElementById('sc-alpha').classList.contains('hidden')){
@@ -1158,9 +1422,6 @@ function startAlphabet(){
   renderAlpha();
   document.getElementById('al-timer').textContent='0.000s';
   document.getElementById('al-timer').classList.remove('warn');
-  // Personal best from localStorage
-  const pb=localStorage.getItem('alpha_pb');
-  document.getElementById('al-pb').textContent=pb?`Personal best: ${pb}s`:'';
   nav('sc-alpha');
 }
 
@@ -1202,21 +1463,20 @@ function alphaKey(key){
     document.getElementById('al-timer').textContent=elapsed+'s';
     document.getElementById('al-timer').classList.remove('warn');
 
-    // Update personal best
-    const pb=localStorage.getItem('alpha_pb');
-    if(!pb||parseFloat(elapsed)<parseFloat(pb)){
-      localStorage.setItem('alpha_pb',elapsed);
-      document.getElementById('al-pb').textContent=`🏆 New best: ${elapsed}s!`;
-    } else {
-      document.getElementById('al-pb').textContent=`Personal best: ${pb}s`;
-    }
-
     setTimeout(()=>{
       record('alphabet',{time:elapsed},`Completed in ${elapsed}s`);
     },600);
   }
 }
+
+// Roll number from the intake form's "Start Phase 1" link
+(()=>{
+  const r=new URLSearchParams(location.search).get('roll');
+  if(r){document.getElementById('roll-inp').value=r;login();}
+  if(!API_URL)document.querySelector('#sc-login .sub').insertAdjacentHTML('afterend',
+    '<p class="warn-box" style="margin-top:-10px;">Demo mode — no server configured, so nothing is saved online.</p>');
+})();
+
 </script>
 </body>
 </html>
-
