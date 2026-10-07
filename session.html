@@ -220,7 +220,7 @@
     <div class="music-box">
       <div class="lbl">🎵 Audio for this run</div>
       <div class="val" id="intro-music">—</div>
-      <div class="hint">Starts when you press Start and plays until the test ends. Don't change your volume.</div>
+      <div class="hint" id="intro-hint">Starts when you press Start and plays until the test ends. Don't change your volume.</div>
     </div>
 
     <div class="task-prev">
@@ -701,6 +701,9 @@ function showIntro(){
   for(let i=0;i<4;i++){const d=document.createElement('div');d.className='prog-dot'+(i<idx?' done':i===idx?' active':'');dots.appendChild(d);}
   document.getElementById('intro-badge').textContent=`Round ${S.round} of 2 · Run ${S.run==='A'?1:2} of 2`;
   document.getElementById('intro-music').textContent=S.run==='A'?'🌫️ White noise':'🎵 '+songLabel(S.song.idx);
+  document.getElementById('intro-hint').textContent=(task==='reading'
+    ?'Plays while you read, and stops when you start writing your summary.'
+    :'Starts when you press Start and plays until the test ends.')+' Don\'t change your volume.';
   document.getElementById('intro-icon').textContent=m.icon;
   document.getElementById('intro-name').textContent=m.name;
   document.getElementById('intro-desc').textContent=m.desc;
@@ -727,7 +730,8 @@ async function record(tk,data,summary){
   showMsg('💾','Saving…','');
   const rec={step_key:`r${S.round}${S.run}`,step:'run',round:S.round,run:S.run,
     condition:S.run==='A'?'white_noise':'song',task:tk,task_name:TASKS[tk].name,
-    duration_s:Math.round((Date.now()-S.runT0)/1000),blur_count:S.blur,audio_errors:S.audioErr,summary};
+    duration_s:Math.round((Date.now()-S.runT0)/1000),blur_count:S.blur,audio_errors:S.audioErr,summary,
+    audio_phase:tk==='reading'?'reading_only':'whole_task'};
   if(S.run==='B'){
     const i=S.song.idx,up=S.uploads[i];
     Object.assign(rec,{song_idx:i+1,song_title:songLabel(i),song_source:up?'upload':'download'},
@@ -986,6 +990,7 @@ function runRdTimer(){
       clearInterval(iv);
       if(RD.phase==='read'){
         RD.phase='write';RD.left=90;
+        stopAudio();setNP('🔇 Audio off — write your summary'); // audio covers reading only: we measure comprehension under audio, recall in silence
         document.getElementById('rd-phase-lbl').textContent='✏️ Phase 2 — Write Your Summary';
         document.getElementById('rd-timer-lbl').textContent='Time to write';
         document.getElementById('rd-read').classList.add('hidden');

@@ -72,7 +72,7 @@ Keep yt-dlp current — YouTube changes often: `pip install -U yt-dlp spotdl`.
 | step_key | what |
 |---|---|
 | `start` | starting mood check: `valence`, `arousal`, `sleepiness`, `stress`, `sleep_hours`, `caffeine` |
-| `r1A` / `r2A` | white-noise run: `task`, `summary`, `res_*` task scores, `duration_s`, `blur_count` (times the window lost focus), `audio_errors` |
+| `r1A` / `r2A` | white-noise run: `task`, `summary`, `res_*` task scores, `duration_s`, `blur_count` (times the window lost focus), `audio_errors`, `audio_phase` (`reading_only` for Reading + Summary: audio plays while reading and stops for the summary; `whole_task` otherwise) |
 | `r1quick` / `r2quick` | quick mood after the white-noise run: `valence`, `arousal` |
 | `r1B` / `r2B` | song run: as above + `song_idx`, `song_title`, `song_source` (`download` / `upload`), `upload_lufs`, `upload_gain` |
 | `r1end` / `r2end` | end of round — Part A: `valence`, `arousal`, `sleepiness`, `stress`; Part B: `conc_noise`, `conc_song`, `distract_noise`, `distract_song` |
@@ -80,4 +80,40 @@ Keep yt-dlp current — YouTube changes often: `pip install -U yt-dlp spotdl`.
 
 Mood scales: valence/arousal/sleepiness 1–9, stress 1–5, Part B ratings 1–5.
 
+Reading runs also get `score_*` columns from the automatic grader (§5).
+
 Delete the Drive audio folder once the study is over.
+
+## 5. Automatic grading of reading summaries
+
+[`Grader.gs`](Grader.gs) scores every *Reading + Summary* run against 10 key ideas
+per essay, using a free open-source LLM on Groq. It runs every 10 minutes on Google's
+servers — no laptop needed — and writes the scores into the same Results row.
+
+1. Get a free API key at <https://console.groq.com/keys>.
+2. In the Apps Script editor: **＋ (Add a file) → Script**, name it `Grader`, and paste
+   the contents of `Grader.gs`. Save. (No redeploy needed — the web app is unaffected.)
+3. **Project Settings → Script properties → Add property**: `GROQ_API_KEY` = your key.
+   Optional: `GRADER_MODEL` = a model id (default `llama-3.3-70b-versatile`).
+4. In the editor, pick a function from the dropdown and press **▶ Run**:
+   - `testGrader` — grades a sample summary and logs the result (checks key + model).
+     If the model has been retired, run `listGroqModels` and set `GRADER_MODEL`.
+   - `setupGrader` — installs the 10-minute trigger. Run once; approve the permissions.
+
+Scores (Results tab, reading rows only):
+
+| column | meaning |
+|---|---|
+| `score_recall_pct` | main score: (recalled + ½ × partial) / 10 × 100 |
+| `score_recalled`, `score_partial` | number of key ideas recalled / partly recalled |
+| `score_errors` | statements contradicting the essay |
+| `score_detail` | JSON: verdict per key idea + the error statements (for auditing) |
+| `score_model`, `scored_at` | which model graded it, and when |
+
+Empty summaries get 0 without calling the LLM. If Groq is down or rate-limited, the
+remaining rows are simply picked up on the next run. To re-grade a row, clear its
+`score_recall_pct` cell. To edit the key ideas, change `RUBRICS` in `Grader.gs` (keep
+the essay texts identical to `ESSAYS` in `session.html`).
+
+For the report: hand-grade ~20 summaries with the same key-idea lists and compare them
+with `score_recall_pct` to show the automatic grading agrees with a human.
