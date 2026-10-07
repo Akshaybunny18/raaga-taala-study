@@ -265,9 +265,16 @@
       </form>
 
       <div class="success-msg" id="successMsg">
-        🎉 You're registered! We're fetching your songs now.<br>
-        Put on your headphones and start Phase 1 right away:<br>
-        <a id="startLink" href="session.html" class="btn-submit" style="display:inline-block;margin-top:12px;text-decoration:none;">Start Phase 1 →</a>
+        <div id="readyMsg">
+          🎉 You're registered! We're fetching your songs now.<br>
+          Put on your headphones and start Phase 1 right away:<br>
+          <a id="startLink" href="session.html" class="btn-submit" style="display:inline-block;margin-top:12px;text-decoration:none;">Start Phase 1 →</a>
+        </div>
+        <div id="offlineMsg" style="display:none;">
+          🎉 You're registered!<br>
+          Our song server is offline right now, so Phase 1 can't start yet.<br>
+          Please come back later and log in on the <a href="session.html" style="color:#15803d;">session page</a> with your roll number.
+        </div>
       </div>
     </div>
   </div>
@@ -338,6 +345,11 @@
           throw new Error(msg);
         }
         document.getElementById('startLink').href = 'session.html?roll=' + encodeURIComponent(data.roll);
+        // Only offer to start now if the song worker is running (songs are needed by the first break)
+        let alive = true;
+        try { alive = (await API.profile(data.roll, [])).workerAlive !== false; } catch (_) {}
+        document.getElementById('readyMsg').style.display = alive ? '' : 'none';
+        document.getElementById('offlineMsg').style.display = alive ? 'none' : '';
         document.getElementById('successMsg').style.display = 'block';
         this.style.display = 'none';
         window.scrollTo({ top: 0, behavior: 'smooth' });

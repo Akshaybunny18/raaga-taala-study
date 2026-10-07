@@ -625,6 +625,14 @@ async function login(){
     Object.assign(S,{roll,name:p.name,songs:p.songs,tasks:p.tasks,done:new Set(p.done),workerAlive:p.workerAlive});
     S.variantBase=[...roll].reduce((a,c)=>a+c.charCodeAt(0),0);
     if(nextStep()==='complete'){showDone();return;}
+    // A break is still ahead but no song is ready and the song worker is offline → come back later
+    const needSongs=!S.done.has('r2B'),anyReady=S.songs.some(s=>s.status==='ready'&&s.audio);
+    if(needSongs&&!anyReady&&!S.workerAlive){
+      showMsg('🔌','Song server offline',
+        'Your songs aren\'t ready yet and our song server is offline right now, so Phase 1 can\'t start. Please try again later — your progress is saved.',
+        `<button class="btn-go" onclick="login()">↻ Try again</button>`);
+      return;
+    }
     nav('sc-check');
   }catch(err){
     alert('⚠️ Could not reach the study server. Check your connection and try again.\n\n('+err.message+')');

@@ -36,7 +36,7 @@ const API = (() => {
       if (!d.p[roll] && roll === 'DEMO') d.p[roll] = { name: 'Demo Participant', at: Date.now() };
       const p = d.p[roll];
       if (!p) return { ok: true, registered: false };
-      if (!p.tasks) { const s = [...pool].sort(() => Math.random() - 0.5); p.tasks = [s[0], s[1]]; }
+      if (!p.tasks && pool.length >= 2) { const s = [...pool].sort(() => Math.random() - 0.5); p.tasks = [s[0], s[1]]; }
       db.save(d);
       const downloading = Date.now() - p.at < 45000; // pretend the worker needs 45 s
       const songs = DEMO_SONGS.map((s, i) => ({
