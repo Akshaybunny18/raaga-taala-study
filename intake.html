@@ -38,7 +38,7 @@
           <label>Roll number
             <span class="hint">You'll log in to the test session with this — no password needed</span>
           </label>
-          <input type="text" name="roll" required pattern="[A-Za-z0-9]{4,20}" title="4–20 letters or digits" placeholder="e.g. 2024111033" />
+          <input type="text" name="roll" required pattern="[A-Za-z0-9]{4,20}" title="4–20 letters or digits" placeholder="e.g. 20xxxxxxxx" />
         </div>
 
         <div class="form-group">
@@ -68,14 +68,20 @@
         </div>
 
         <div class="form-group">
-          <label>What is your primary occupation / field of study?</label>
+          <label>Branch</label>
+          <input type="text" name="branch" required placeholder="e.g. CSE, ECE, CND" />
+        </div>
+
+        <div class="form-group">
+          <label>Current year</label>
           <div class="radio-group">
-            <label><input type="radio" name="occupation" value="engineering" required /> Engineering / Computer Science</label>
-            <label><input type="radio" name="occupation" value="arts_hum" /> Arts / Humanities</label>
-            <label><input type="radio" name="occupation" value="sciences" /> Natural Sciences</label>
-            <label><input type="radio" name="occupation" value="business" /> Business / Commerce</label>
-            <label><input type="radio" name="occupation" value="medicine" /> Medicine / Health</label>
-            <label><input type="radio" name="occupation" value="other" /> Other</label>
+            <label><input type="radio" name="year" value="UG1" required /> UG1</label>
+            <label><input type="radio" name="year" value="UG2" /> UG2</label>
+            <label><input type="radio" name="year" value="UG3" /> UG3</label>
+            <label><input type="radio" name="year" value="UG4" /> UG4</label>
+            <label><input type="radio" name="year" value="UG5" /> UG5 (dual degree)</label>
+            <label><input type="radio" name="year" value="PG" /> PG</label>
+            <label><input type="radio" name="year" value="PhD" /> PhD</label>
           </div>
         </div>
 
