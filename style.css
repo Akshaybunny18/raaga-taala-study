@@ -316,6 +316,28 @@ footer a { color: var(--gold); text-decoration: none; }
   color: #15803d; font-weight: 600; margin-top: 24px;
 }
 
+/* ---- MODAL (registration popup) ---- */
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 3000; background: rgba(26,16,64,0.55);
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+}
+.modal-backdrop[hidden] { display: none; }
+.modal {
+  background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow);
+  width: 100%; max-width: 420px; padding: 28px 24px 22px; text-align: center; color: var(--text-dark);
+}
+.modal-icon { font-size: 2.6rem; margin-bottom: 6px; }
+.modal h3 { font-family: 'Playfair Display', serif; color: var(--indigo); font-size: 1.4rem; margin-bottom: 8px; }
+.modal-roll { color: var(--text-mid); margin-bottom: 14px; }
+.modal-roll strong { color: var(--indigo); letter-spacing: 0.03em; }
+.modal p { font-size: 0.92rem; line-height: 1.55; margin-bottom: 14px; }
+.modal a:not(.btn-submit) { color: var(--indigo-light); }
+.modal .btn-submit { display: inline-block; text-decoration: none; margin-bottom: 6px; }
+.modal-close {
+  display: block; margin: 10px auto 0; background: none; border: none; color: var(--text-light);
+  font-family: inherit; font-size: 0.88rem; cursor: pointer; text-decoration: underline;
+}
+
 /* ---- RESPONSIVE ---- */
 @media (max-width: 768px) {
   .nav-links { display: none; }

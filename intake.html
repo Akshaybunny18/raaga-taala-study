@@ -277,6 +277,21 @@
           Please come back later and log in on the <a href="session.html" style="color:#15803d;">session page</a> with your roll number.
         </div>
       </div>
+
+      <!-- Registration success popup -->
+      <div class="modal-backdrop" id="regModal" hidden>
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="regModalTitle">
+          <div class="modal-icon">✅</div>
+          <h3 id="regModalTitle">Registration successful!</h3>
+          <p class="modal-roll">Roll number: <strong id="regModalRoll"></strong></p>
+          <div id="regModalReady">
+            <p>We're fetching your songs now. Put on your headphones and start Phase 1:</p>
+            <a id="regModalStart" href="session.html" class="btn-submit">Start Phase 1 →</a>
+          </div>
+          <p id="regModalOffline" hidden>Our song server is offline right now, so Phase 1 can't start yet. Please log in on the <a href="session.html">session page</a> later with your roll number.</p>
+          <button type="button" class="modal-close" id="regModalClose">Close</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -319,6 +334,25 @@
       });
     });
 
+    // Success popup; the inline success box underneath stays visible after it's closed
+    function showRegModal(roll, alive) {
+      const m = document.getElementById('regModal');
+      document.getElementById('regModalRoll').textContent = roll;
+      document.getElementById('regModalStart').href = 'session.html?roll=' + encodeURIComponent(roll);
+      document.getElementById('regModalReady').hidden = !alive;
+      document.getElementById('regModalOffline').hidden = alive;
+      m.hidden = false;
+      document.body.style.overflow = 'hidden';
+      (alive ? document.getElementById('regModalStart') : document.getElementById('regModalClose')).focus();
+    }
+    function closeRegModal() {
+      document.getElementById('regModal').hidden = true;
+      document.body.style.overflow = '';
+    }
+    document.getElementById('regModalClose').addEventListener('click', closeRegModal);
+    document.getElementById('regModal').addEventListener('click', e => { if (e.target.id === 'regModal') closeRegModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !document.getElementById('regModal').hidden) closeRegModal(); });
+
     document.getElementById('intakeForm').addEventListener('submit', async function(e) {
       e.preventDefault();
 
@@ -354,6 +388,7 @@
         document.getElementById('successMsg').style.display = 'block';
         this.style.display = 'none';
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        showRegModal(data.roll, alive);
       } catch (err) {
         alert('⚠️ ' + (err.message || 'Could not reach the server. Please try again.'));
         btn.disabled = false;
