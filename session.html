@@ -169,7 +169,7 @@
     </div>
     <div class="check-list" id="check-list">
       <label><input type="checkbox" onchange="updCheck()" /> I'm wearing headphones / earphones</label>
-      <label><input type="checkbox" onchange="updCheck()" /> I'm in a quiet place and won't be interrupted for ~30 minutes</label>
+      <label><input type="checkbox" onchange="updCheck()" /> I'm in a quiet place and won't be interrupted for ~25 minutes</label>
       <label><input type="checkbox" onchange="updCheck()" /> The volume is comfortable — I won't change it during the session</label>
       <label><input type="checkbox" onchange="updCheck()" /> I'm on a computer with a physical keyboard and other tabs/notifications are closed</label>
     </div>
@@ -181,13 +181,13 @@
 <div id="sc-howto" class="session-screen hidden">
   <div class="s-card" style="max-width:620px;">
     <h2>📋 How Phase 1 Works</h2>
-    <p class="sub">About 25–30 minutes in one sitting. Please don't switch tabs during the tests.</p>
+    <p class="sub">About 20–25 minutes in one sitting. Please don't switch tabs during the tests.</p>
     <ol class="howto-list">
       <li>A short <strong>mood check</strong> (under a minute).</li>
       <li><strong>Round 1</strong> — a test, done twice:
         <ul>
           <li>first with <strong>white noise</strong>, followed by 2 quick questions,</li>
-          <li>a <strong>5-minute break</strong> where you preview and pick one of your 3 songs,</li>
+          <li>a <strong>3-minute break</strong> where you preview and pick one of your 3 songs,</li>
           <li>then a different version of the same test with <strong>your song</strong>, followed by a short form.</li>
         </ul>
       </li>
@@ -428,9 +428,9 @@
 <div id="sc-break" class="session-screen hidden">
   <div class="s-card" style="text-align:center;max-width:600px;">
     <div class="round-badge" id="brk-badge">Round 1 of 2 · Break</div>
-    <h2>☕ 5-Minute Break</h2>
+    <h2>☕ 3-Minute Break</h2>
     <p style="color:rgba(255,255,255,0.55);margin-bottom:6px;">Relax, and pick the song you want for the next run. You can preview each for 20 seconds.</p>
-    <div class="timer" id="brk-timer" style="margin:10px 0 16px;">5:00</div>
+    <div class="timer" id="brk-timer" style="margin:10px 0 16px;">3:00</div>
     <div id="song-cards"></div>
     <input type="file" id="song-file" accept="audio/*" style="display:none;" onchange="onUpload(this)" />
     <div id="brk-note"></div>
@@ -497,7 +497,7 @@ const TASKS={
 const POOL=Object.keys(TASKS);
 const NOISE_AMP=0.108;   // uniform white noise ±0.108, played dual-mono ≈ −18 LUFS (same target as tools/fetch_songs.py)
 const TARGET_LUFS=-18;   // uploaded song files are gain-matched to this in the browser
-const BREAK_SECS=300, PREVIEW_SECS=20, UPLOAD_AFTER=120;
+const BREAK_SECS=180, PREVIEW_SECS=20, UPLOAD_AFTER=60;
 const STEPS=['start','r1A','r1quick','r1B','r1end','r2A','r2quick','r2B','r2end','final'];
 
 // ─────────────────────────────────────────
