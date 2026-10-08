@@ -24,26 +24,33 @@ function handle_(p) {
   if (p.action === 'audio') { // read-only and slow-ish → no lock, so it never holds up saves
     try { return json_(audio_(p)); } catch (err) { return json_({ ok: false, error: String(err) }); }
   }
+  if (p.action === 'uploadAudio') { // the slow Drive write runs outside the lock, so uploads can run in parallel
+    try { return json_(workerOk_(p) ? uploadAudio_(p) : { ok: false, error: 'bad_key' }); }
+    catch (err) { return json_({ ok: false, error: String(err) }); }
+  }
   const lock = LockService.getScriptLock();
   lock.waitLock(25000);
   try {
     const pub    = { profile: profile_, register: register_, submit: submit_ };
-    const worker = { pendingSongs: pendingSongs_, setSongStatus: setSongStatus_, uploadAudio: uploadAudio_ };
+    const worker = { pendingSongs: pendingSongs_, setSongStatus: setSongStatus_ };
     let out;
     if (pub[p.action]) out = pub[p.action](p);
-    else if (worker[p.action]) {
-      const props = PropertiesService.getScriptProperties(), key = props.getProperty('WORKER_KEY');
-      if (key && p.key === key) {
-        props.setProperty('WORKER_SEEN', String(Date.now())); // heartbeat, shown to participants as workerAlive
-        out = worker[p.action](p);
-      } else out = { ok: false, error: 'bad_key' };
-    } else out = { ok: false, error: 'unknown_action' };
+    else if (worker[p.action]) out = workerOk_(p) ? worker[p.action](p) : { ok: false, error: 'bad_key' };
+    else out = { ok: false, error: 'unknown_action' };
     return json_(out);
   } catch (err) {
     return json_({ ok: false, error: String(err) });
   } finally {
     lock.releaseLock();
   }
+}
+
+// Checks the worker's key and records its heartbeat (shown to participants as workerAlive)
+function workerOk_(p) {
+  const props = PropertiesService.getScriptProperties(), key = props.getProperty('WORKER_KEY');
+  if (!key || p.key !== key) return false;
+  props.setProperty('WORKER_SEEN', String(Date.now()));
+  return true;
 }
 
 // ── Participant-facing actions ───────────────────────────
@@ -139,16 +146,29 @@ function setSongStatus_(p) {
   return { ok: true };
 }
 
+// Runs without the global lock: the Drive write (the slow part) happens in parallel,
+// and the lock is only held briefly to find the folder and to write the sheet cells.
 function uploadAudio_(p) {
-  const sh = sheet_(P_SHEET, P_BASE), row = findRow_(sh, norm_(p.roll));
-  if (!row) return { ok: false, error: 'not_found' };
+  const lock = LockService.getScriptLock();
+  let folder;
+  lock.waitLock(25000);
+  try {
+    if (!findRow_(sheet_(P_SHEET, P_BASE), norm_(p.roll))) return { ok: false, error: 'not_found' };
+    folder = audioFolder_();   // under the lock, so parallel first uploads don't each create a folder
+  } finally { lock.releaseLock(); }
+
   const blob = Utilities.newBlob(Utilities.base64Decode(p.b64), 'audio/mpeg', norm_(p.roll) + '_song' + p.idx + '.mp3');
-  const file = audioFolder_().createFile(blob);
+  const file = folder.createFile(blob);
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  writeCell_(sh, row, 'song' + p.idx + '_audio', 'https://drive.google.com/uc?export=download&id=' + file.getId());
-  writeCell_(sh, row, 'song' + p.idx + '_status', 'ready');
-  writeCell_(sh, row, 'song' + p.idx + '_error', '');
-  return { ok: true };
+
+  lock.waitLock(25000);
+  try {
+    const sh = sheet_(P_SHEET, P_BASE), row = findRow_(sh, norm_(p.roll)); // re-find: rows may have moved meanwhile
+    if (!row) { file.setTrashed(true); return { ok: false, error: 'not_found' }; }
+    writeCell_(sh, row, 'song' + p.idx + '_audio', 'https://drive.google.com/uc?export=download&id=' + file.getId());
+    markReady_(sh, row, p.idx);
+    return { ok: true };
+  } finally { lock.releaseLock(); }
 }
 
 function markReady_(sh, row, idx) {

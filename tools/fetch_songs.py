@@ -7,17 +7,19 @@ it to the white noise (-18 LUFS), and uploads it to the study's Google Drive fol
 The website unlocks a song as soon as it's marked ready.
 
 Setup:  pip install yt-dlp spotdl   (ffmpeg must be on PATH)
-Usage:  python tools/fetch_songs.py --api <APPS_SCRIPT_URL> --key <WORKER_KEY> [--once]
+Usage:  python tools/fetch_songs.py --api <APPS_SCRIPT_URL> --key <WORKER_KEY> [--once] [--workers N]
         (or set STUDY_API_URL / STUDY_WORKER_KEY environment variables)
 
 Keep it running (without --once) whenever participants may be doing the study.
 """
 import argparse, base64, io, json, os, queue, re, subprocess, sys, tempfile, threading, time, urllib.parse, urllib.request
+from concurrent.futures import ThreadPoolExecutor, wait
 from pathlib import Path
 
 TARGET_LUFS = -18          # must match NOISE_AMP / TARGET_LUFS in session.html
 MAX_SECONDS = 480          # songs are looped in the browser, 8 minutes is plenty
 POLL_SECONDS = 15
+WORKERS = 3                # songs processed at once (download → convert → upload each)
 YOUTUBE_RE = re.compile(r'^https://(www\.|m\.|music\.)?(youtube\.com/(watch\?|shorts/)|youtu\.be/)', re.I)
 SPOTIFY_RE = re.compile(r'^https://open\.spotify\.com/(intl-[a-z-]+/)?track/', re.I)
 AUDIO_EXTS = {'.mp3', '.m4a', '.opus', '.webm', '.ogg', '.wav', '.flac', '.aac'}
@@ -28,11 +30,22 @@ def api_get(api, params):
         return json.load(r)
 
 
+PRINT_LOCK = threading.Lock()
+LIVE_LINE = False  # set in main(): rewrite one line in place only when songs run one at a time on a terminal
+
+
+def say(line, stamp=False):
+    with PRINT_LOCK:
+        print(f'[{time.strftime("%H:%M:%S")}] {line}' if stamp else line, flush=True)
+
+
 class Status:
-    """One status line per song: rewritten in place on a terminal, one plain line per stage otherwise."""
+    """Progress for one song: a single line rewritten in place (one song at a time on a terminal),
+    otherwise one line per stage."""
 
     def __init__(self, label):
-        self.label, self.t0, self.tty, self.stage, self.shown = label, time.time(), sys.stdout.isatty(), None, 0.0
+        self.label, self.t0, self.tty, self.stage, self.shown = label, time.time(), LIVE_LINE, None, 0.0
+        self.start = time.strftime('%H:%M:%S')
 
     def elapsed(self):
         s = int(time.time() - self.t0)
@@ -42,19 +55,19 @@ class Status:
         if self.tty:
             if stage == self.stage and not force and time.time() - self.shown < 0.2:
                 return  # throttle redraws
-            sys.stdout.write(f'\r\033[K{self.label}  {stage} {detail}'.rstrip())
+            sys.stdout.write(f'\r\033[K[{self.start}] {self.label}  {stage} {detail}'.rstrip())
             sys.stdout.flush()
         elif stage != self.stage:
-            print(f'{self.label}  {stage}', flush=True)
+            say(f'{self.label}  {stage}', stamp=True)
         self.stage, self.shown = stage, time.time()
 
     def done(self, text):
         line = f'{self.label}  {text} ({self.elapsed()})'
         if self.tty:
-            sys.stdout.write(f'\r\033[K{line}\n')
+            sys.stdout.write(f'\r\033[K[{self.start}] {line}\n')
             sys.stdout.flush()
         else:
-            print(line, flush=True)
+            say(line, stamp=True)
 
 
 class _UploadBody(io.BytesIO):
@@ -133,7 +146,7 @@ def normalize(src, dst):
 
 def process(api, key, song):
     roll, idx, link = song['roll'], song['idx'], song['link']
-    status = Status(f'[{time.strftime("%H:%M:%S")}] {roll} song {idx}')
+    status = Status(f'{roll} song {idx}')
     status.set('⏳ starting')
     api_post(api, {'action': 'setSongStatus', 'key': key, 'roll': roll, 'idx': idx, 'status': 'downloading'})
     try:
@@ -151,8 +164,7 @@ def process(api, key, song):
             raise RuntimeError('upload failed: ' + str(res.get('error')))
         status.done('✓ ready')
     except Exception as e:
-        status.done(f'✗ failed: {e}')
-        print(f'    link: {link}', flush=True)
+        status.done(f'✗ failed: {e} — link: {link}')
         api_post(api, {'action': 'setSongStatus', 'key': key, 'roll': roll, 'idx': idx,
                        'status': 'failed', 'error': str(e)[:300]})
 
@@ -162,30 +174,50 @@ def main():
     ap.add_argument('--api', default=os.environ.get('STUDY_API_URL'), help='Apps Script web-app URL (/exec)')
     ap.add_argument('--key', default=os.environ.get('STUDY_WORKER_KEY'), help='WORKER_KEY script property')
     ap.add_argument('--once', action='store_true', help='process pending songs once and exit')
+    ap.add_argument('--workers', type=int, default=WORKERS, help=f'songs processed at once (default {WORKERS})')
     a = ap.parse_args()
     if not a.api or not a.key:
         ap.error('--api and --key are required (or set STUDY_API_URL / STUDY_WORKER_KEY)')
+    global LIVE_LINE
+    LIVE_LINE = a.workers == 1 and sys.stdout.isatty()
 
-    print('Song worker running — Ctrl+C to stop.', flush=True)
+    say(f'Song worker running ({a.workers} at a time) — Ctrl+C to stop.')
+    pool = ThreadPoolExecutor(max_workers=max(1, a.workers))
+    lock = threading.Lock()
+    inflight, finished_at, futures = set(), {}, []   # (roll, idx) being processed / when each last finished
+    def finished(key):
+        with lock:
+            inflight.discard(key)
+            finished_at[key] = time.time()
     retry_failed = True  # each (re)start retries failed songs once; later polls only take new ones
     while True:
         try:
             params = {'action': 'pendingSongs', 'key': a.key}
             if retry_failed:
                 params['retryFailed'] = '1'
+            asked = time.time()
             res = api_get(a.api, params)
             if not res.get('ok'):
                 sys.exit('Server refused: ' + str(res.get('error')))
             retry_failed = False
-            if res['songs']:
-                print(f"{len(res['songs'])} song(s) to fetch", flush=True)
-            for song in res['songs']:
-                process(a.api, a.key, song)
+            with lock:   # skip songs in progress, or finished after this list was requested (it may be stale)
+                new = [s for s in res['songs'] if (s['roll'], s['idx']) not in inflight
+                       and finished_at.get((s['roll'], s['idx']), 0) < asked]
+                inflight.update((s['roll'], s['idx']) for s in new)
+            if new:
+                say(f'{len(new)} song(s) to fetch')
+            for song in new:
+                fut = pool.submit(process, a.api, a.key, song)
+                fut.add_done_callback(lambda _f, k=(song['roll'], song['idx']): finished(k))
+                futures.append(fut)
         except (OSError, ValueError) as e:  # network hiccup / bad response — try again next poll
-            print(f'    ! {e}', flush=True)
+            say(f'    ! {e}')
         if a.once:
+            wait(futures)
             break
+        futures = [f for f in futures if not f.done()]
         time.sleep(POLL_SECONDS)
+    pool.shutdown()
 
 
 if __name__ == '__main__':

@@ -40,7 +40,8 @@ pip install yt-dlp spotdl
 python tools/fetch_songs.py --api "https://script.google.com/macros/s/…/exec" --key "<WORKER_KEY>"
 ```
 
-Leave it running while participants may be taking the study. Every 15 s it picks up
+Leave it running while participants may be taking the study. It processes 3 songs at a time
+(change with `--workers N`; `--workers 1` shows a single live progress line). Every 15 s it picks up
 new songs, downloads them, normalises loudness to −18 LUFS (the same level as the
 in-browser white noise), trims to 8 min, and uploads to Drive. A participant's songs
 are usually ready within 1–2 minutes of registering — long before the break where
