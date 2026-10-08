@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet" />
   <style>
-    .session-screen { min-height:100vh; background:linear-gradient(135deg,#1a1040 0%,#2d1f6e 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px 40px; color:#fff; }
+    .session-screen { min-height:100vh; background:linear-gradient(135deg,#1a1040 0%,#2d1f6e 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px 90px; color:#fff; } /* bottom room for the now-playing bar */
     .hidden { display:none !important; }
     .s-card { background:rgba(255,255,255,0.06); border:1px solid rgba(232,163,23,0.3); border-radius:20px; padding:36px 40px; width:100%; max-width:700px; }
     .s-card h2 { font-family:'Playfair Display',serif; color:#fff; margin-bottom:6px; }
@@ -77,7 +77,15 @@
     .fl-bad { animation:flashR 0.32s ease; }
     /* Grid 2 col */
     .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    @media(max-width:520px){ .grid2{grid-template-columns:1fr;} }
+    @media(max-width:520px){
+      .grid2{grid-template-columns:1fr;}
+      .s-card{padding:24px 18px;}
+      #rot-wrap{flex-direction:column;gap:4px;margin:8px 0;}
+      #rot-wrap canvas{width:150px;height:150px;}
+      #rot-wrap .rot-vs{font-size:0.9rem!important;}
+      .score-strip{padding:8px 12px;margin-bottom:6px;}
+      .btn-ans{padding:12px 16px;min-width:0;flex:1;}
+    }
     /* Keyboard hint */
     .kbd-hint { color:rgba(255,255,255,0.28); font-size:0.72rem; margin-top:6px; }
     .kbd { display:inline-block; border:1px solid rgba(255,255,255,0.25); border-radius:4px; padding:1px 6px; font-family:monospace; }
@@ -171,7 +179,12 @@
       <label><input type="checkbox" onchange="updCheck()" /> I'm wearing headphones / earphones</label>
       <label><input type="checkbox" onchange="updCheck()" /> I'm in a quiet place and won't be interrupted for ~25 minutes</label>
       <label><input type="checkbox" onchange="updCheck()" /> The volume is comfortable — I won't change it during the session</label>
-      <label><input type="checkbox" onchange="updCheck()" /> I'm on a computer with a physical keyboard and other tabs/notifications are closed</label>
+    </div>
+    <label class="s-lbl">Which device are you using?</label>
+    <div class="scale-row" id="device-row" style="margin-bottom:20px;">
+      <button type="button" class="choice-btn" data-device="phone" onclick="setDevice(this)">📱 Phone</button>
+      <button type="button" class="choice-btn" data-device="tablet" onclick="setDevice(this)">📲 Tablet</button>
+      <button type="button" class="choice-btn" data-device="laptop" onclick="setDevice(this)">💻 Laptop</button>
     </div>
     <div style="text-align:center;"><button class="btn-go" id="btn-check" disabled onclick="afterCheck()">Continue →</button></div>
   </div>
@@ -229,7 +242,8 @@
       <p id="intro-desc">Description</p>
     </div>
 
-    <button class="btn-go" onclick="startRun()">▶ Start</button>
+    <p class="warn-box" id="intro-audio-warn" hidden>🔇 The audio didn't start, so the test hasn't begun. Check your sound isn't muted, then press Start again.</p>
+    <button class="btn-go" id="btn-start" onclick="startRun()">▶ Start</button>
   </div>
 </div>
 
@@ -264,25 +278,21 @@
 <div id="sc-typing" class="session-screen hidden">
   <div class="s-card" style="max-width:700px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-      <h3 style="color:#e8a317;">⌨️ Reverse Typing</h3>
+      <div>
+        <h3 style="color:#e8a317;">⌨️ Reverse Typing</h3>
+        <div id="ty-line" style="color:rgba(255,255,255,0.45);font-size:0.8rem;">Line 1</div>
+      </div>
       <div class="timer-wrap">
-        <div class="timer-lbl">Elapsed</div>
-        <div class="timer" id="ty-timer">0:00</div>
+        <div class="timer-lbl">Time left</div>
+        <div class="timer" id="ty-timer">3:00</div>
       </div>
     </div>
-    <p style="color:rgba(255,255,255,0.58);font-size:0.83rem;margin-bottom:8px;">Type the paragraph below with the <strong style="color:#e8a317">word order completely reversed</strong> (last word first). Punctuation & caps don't matter.</p>
+    <p style="color:rgba(255,255,255,0.58);font-size:0.83rem;margin-bottom:8px;">Type these words in <strong style="color:#e8a317">reverse order</strong> (last word first), then press <span class="kbd">Enter</span> for the next line. Caps don't matter.</p>
     <div class="orig-text" id="ty-orig">—</div>
     <p style="color:rgba(232,163,23,0.75);font-size:0.8rem;margin:8px 0 4px;">👇 Type the reversed version below:</p>
-    <textarea class="s-ta" id="ty-inp" placeholder="Start typing in reverse order…" style="min-height:76px;" oninput="tyCheck()"></textarea>
-    <div style="margin-top:10px;background:rgba(255,255,255,0.05);border-radius:10px;padding:11px 15px;">
-      <div style="display:flex;justify-content:space-between;font-size:0.8rem;">
-        <span style="color:rgba(255,255,255,0.45);">Words matched</span>
-        <span style="color:#e8a317;font-weight:700;" id="ty-prog">0 / 0</span>
-      </div>
-      <div class="pbar" style="margin:7px 0 0;"><div class="pbar-fill" id="ty-bar" style="width:0%"></div></div>
-    </div>
+    <textarea class="s-ta" id="ty-inp" placeholder="Start typing in reverse order…" style="min-height:76px;" spellcheck="false" autocomplete="off"></textarea>
     <div style="text-align:center;margin-top:14px;">
-      <button class="btn-go" onclick="submitTyping()">Submit →</button>
+      <button class="btn-go" onclick="typingLineDone()">Next line ↵</button>
     </div>
   </div>
 </div>
@@ -291,10 +301,13 @@
 <div id="sc-dots" class="session-screen hidden">
   <div class="s-card" style="text-align:center;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-      <h3 style="color:#e8a317;">🟣 Dot Memory Puzzle</h3>
-      <div id="dt-timer-wrap" class="hidden timer-wrap">
-        <div class="timer-lbl" id="dt-timer-lbl">Memorize</div>
-        <div class="timer" id="dt-timer" style="font-size:2rem;">6</div>
+      <div style="text-align:left;">
+        <h3 style="color:#e8a317;">🟣 Dot Memory Puzzle</h3>
+        <div id="dt-pattern" style="color:rgba(255,255,255,0.45);font-size:0.8rem;">Pattern 1</div>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-lbl">Time left</div>
+        <div class="timer" id="dt-left">2:00</div>
       </div>
     </div>
     <p id="dt-instr" style="color:rgba(255,255,255,0.62);font-size:0.86rem;margin-bottom:12px;">Remember the positions of the highlighted dots.</p>
@@ -363,7 +376,7 @@
         <canvas id="rot-a" width="190" height="190" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);"></canvas>
         <div class="canvas-lbl">Shape A</div>
       </div>
-      <div style="font-size:1.6rem;color:rgba(255,255,255,0.25);">vs</div>
+      <div class="rot-vs" style="font-size:1.6rem;color:rgba(255,255,255,0.25);">vs</div>
       <div>
         <canvas id="rot-b" width="190" height="190" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);"></canvas>
         <div class="canvas-lbl">Shape B</div>
@@ -386,8 +399,8 @@
         <div id="ns-instr" style="color:rgba(255,255,255,0.55);font-size:0.82rem;margin-top:2px;">Remember the position of each number</div>
       </div>
       <div class="timer-wrap">
-        <div class="timer-lbl" id="ns-timer-lbl">Visible for</div>
-        <div class="timer" id="ns-timer">8</div>
+        <div class="timer-lbl">Time left</div>
+        <div class="timer" id="ns-timer">2:00</div>
       </div>
     </div>
     <div class="pbar"><div class="pbar-fill" id="ns-bar" style="width:100%;"></div></div>
@@ -470,31 +483,25 @@ const ESSAYS=[
 // ─────────────────────────────────────────
 // TYPING PARAGRAPHS
 // ─────────────────────────────────────────
-const TY_PARAS=[
-  "The morning sun rose slowly over the distant hills casting long golden shadows across the quiet valley below",
-  "Scientists recently discovered a new deep sea fish that produces its own blue light to attract unsuspecting prey",
-  "Every great journey begins with a single small step taken in the right direction at precisely the right moment",
-  "The ancient library contained thousands of scrolls written by scholars who devoted their entire lives to knowledge",
-  "Music has the remarkable power to evoke memories and emotions that words alone cannot easily express or capture"
-];
+const WORDS=`time year people way day man thing woman life child world school state family student group country problem hand part place case week company system program question work government number night point home water room mother area money story fact month lot right study book eye job word business issue side kind head house service friend father power hour game line end member law car city community name president team minute idea kid body information back parent face others level office door health person art war history party result change morning reason research girl guy moment air teacher force education foot boy age policy music process market sense nation plan college interest death experience effect class control care field development role effort rate heart drug show leader light voice wife police mind price report decision son view relationship town road arm difference value building action model season society tax director position player record paper space ground form event official matter center couple site project activity star table need court oil situation cost industry figure street image phone data picture practice piece land product doctor wall patient worker news test movie north love support technology step baby computer type attention film tree source organization hair window evidence population site garden river bird summer winter green yellow simple quiet happy bright gentle quick slow early later small large`.split(/\s+/);
 
 // ─────────────────────────────────────────
 // TASKS METADATA
 // ─────────────────────────────────────────
 const TASKS={
   reading: {name:"Reading + Summary",    icon:"📖", desc:"Read a short essay (3 min), then write a summary (1.5 min) from memory.", dur:"~4.5 min"},
-  typing:  {name:"Reverse Typing",       icon:"⌨️", desc:"Type a paragraph with the word order completely reversed — last word first.", dur:"~2 min"},
-  dots:    {name:"Dot Memory Puzzle",    icon:"🟣", desc:"Memorise 7 dot positions in 6 seconds, then reproduce them on the grid.", dur:"~2 min"},
+  typing:  {name:"Reverse Typing",       icon:"⌨️", desc:"3 minutes — lines of 10 random words: type each line in reverse order (last word first), press Enter for the next.", dur:"3 min"},
+  dots:    {name:"Dot Memory Puzzle",    icon:"🟣", desc:"2 minutes — memorise 7 dots (6 s), mark where they were, then the next pattern. Do as many as you can.", dur:"2 min"},
   symmetry:{name:"Symmetry Test",        icon:"🔄", desc:"2 minutes — for each shape, say if it is left-right symmetric or not.", dur:"2 min"},
   rotation:{name:"Rotated Image Test",   icon:"🔃", desc:"2 minutes — is Shape B a rotation of A, or a mirrored version?", dur:"2 min"},
-  numseq:  {name:"Number Sequence",      icon:"🔢", desc:"10 numbered circles appear for 8 s. Memorise positions, then click 0→9 in order after they vanish.", dur:"~2 min"},
+  numseq:  {name:"Number Sequence",      icon:"🔢", desc:"2 minutes — memorise where 0–9 are (8 s), then click them in order. Do as many layouts as you can.", dur:"2 min"},
   alphabet:{name:"Alphabet Speed Typing",icon:"🔤", desc:"Type A–Z as fast as you can. Timer starts on first keypress. Wrong keys are silently ignored.", dur:"~1 min"},
 };
 
 // ─────────────────────────────────────────
 // PHASE 1 CONFIG
 // ─────────────────────────────────────────
-const POOL=Object.keys(TASKS);
+const POOL=Object.keys(TASKS).filter(k=>k!=='alphabet'); // alphabet retired (depends on typing speed); kept only for anyone already assigned it
 const NOISE_AMP=0.108;   // uniform white noise ±0.108, played dual-mono ≈ −18 LUFS (same target as tools/fetch_songs.py)
 const TARGET_LUFS=-18;   // uploaded song files are gain-matched to this in the browser
 const BREAK_SECS=180, PREVIEW_SECS=20, UPLOAD_AFTER=60;
@@ -504,12 +511,12 @@ const STEPS=['start','r1A','r1quick','r1B','r1end','r2A','r2quick','r2B','r2end'
 // STATE
 // ─────────────────────────────────────────
 let S={
-  roll:'', name:'', songs:[], tasks:[], done:new Set(), workerAlive:true, variantBase:0,
+  roll:'', name:'', device:'', songs:[], tasks:[], done:new Set(), workerAlive:true, variantBase:0,
   round:1, run:'A', song:null,                      // song = {idx} chosen for run B
-  pick:null, previewing:null, uploads:{}, songErr:{}, processing:{}, upIdx:0, brkT0:0, brkLeft:0, upShown:false,
+  pick:null, previewing:null, uploads:{}, songErr:{}, processing:{}, blobs:{}, loading:{}, loadingAll:false, restarts:0, upIdx:0, brkT0:0, brkLeft:0, upShown:false,
   inRun:false, runT0:0, blur:0, audioErr:0,
   form:{}, formKey:'',
-  essayIdx:0, tyIdx:0,
+  essayIdx:0,
   _iv:[], _brk:[],
 };
 
@@ -562,19 +569,50 @@ function playUrl(url,onErr){
   stopAudio();
   const a=new Audio(url);a.loop=true;
   a.onerror=()=>onErr&&onErr();
-  a.play().catch(()=>onErr&&onErr());
   AU.el=a;
+  return a.play();  // rejects if the browser refuses to play
 }
 function stopAudio(){
   if(AU.src){try{AU.src.stop();}catch(_){}AU.src=null;}
   if(AU.el){AU.el.onerror=null;AU.el.pause();AU.el.removeAttribute('src');AU.el.load();AU.el=null;}
 }
-// Plays song i — the participant's uploaded file if any, otherwise the prepared (downloaded) file
-function playSong(i,onErr){
-  if(S.uploads[i])playBuffer(S.uploads[i].buf,S.uploads[i].gain);
-  else playUrl(S.songs[i].audio,onErr);
+// Plays song i (uploaded file, or the prepared file loaded during the break).
+// Resolves once sound is actually playing; rejects if the browser blocks it.
+async function playSong(i,onErr){
+  if(S.uploads[i]){
+    playBuffer(S.uploads[i].buf,S.uploads[i].gain);
+    await ac().resume();
+    if(ac().state!=='running')throw new Error('audio blocked');
+  }else await playUrl(S.blobs[i],onErr);
 }
-const playable=i=>!!S.uploads[i]||(S.songs[i].status==='ready'&&!!S.songs[i].audio&&!S.songErr[i]);
+const playable=i=>!!S.uploads[i]||!!S.blobs[i];
+
+// Downloads each prepared song (through the web app), checks the browser can play it,
+// and keeps it in memory as a compressed file — only then is it "ready" to pick.
+function canPlay(url){
+  return new Promise((ok,bad)=>{
+    const a=new Audio();const t=setTimeout(()=>bad(new Error('timeout')),20000);
+    a.oncanplay=()=>{clearTimeout(t);ok();};a.onerror=()=>{clearTimeout(t);bad(new Error('decode'));};
+    a.preload='auto';a.src=url;a.load();
+  });
+}
+async function loadSongs(){
+  if(S.loadingAll)return;
+  S.loadingAll=true;
+  try{
+    for(let i=0;i<S.songs.length;i++){
+      const s=S.songs[i];
+      if(S.blobs[i]||S.uploads[i]||S.songErr[i]||s.status!=='ready'||!s.audio)continue;
+      S.loading[i]=true;renderSongs();
+      try{
+        const url=URL.createObjectURL(new Blob([await API.audio(S.roll,i+1)],{type:'audio/mpeg'}));
+        await canPlay(url);
+        S.blobs[i]=url;
+      }catch(_){S.songErr[i]=true;}
+      S.loading[i]=false;renderSongs();updBreak();
+    }
+  }finally{S.loadingAll=false;}
+}
 
 // Integrated loudness (EBU R128 / BS.1770: K-weighting, 400 ms blocks, −70 LUFS + relative gating)
 async function measureLoudness(buf){
@@ -661,7 +699,13 @@ function toggleTestSound(){
 }
 function updCheck(){
   const all=[...document.querySelectorAll('#check-list input')].every(c=>c.checked);
-  document.getElementById('btn-check').disabled=!(all&&testPlayed);
+  document.getElementById('btn-check').disabled=!(all&&testPlayed&&S.device);
+}
+// Device is only recorded (for normalising in analysis); the tests are the same on every device
+function setDevice(btn){
+  S.device=btn.dataset.device;
+  document.querySelectorAll('#device-row .choice-btn').forEach(b=>b.classList.toggle('sel',b===btn));
+  updCheck();
 }
 function afterCheck(){
   stopAudio();testOn=false;
@@ -688,7 +732,7 @@ function go(){
 
 async function save(rec){
   S.done.add(rec.step_key);
-  const full=Object.assign({roll:S.roll,name:S.name,phase:1,client_ts:new Date().toISOString()},rec);
+  const full=Object.assign({roll:S.roll,name:S.name,phase:1,device:S.device,client_ts:new Date().toISOString()},rec);
   try{await API.submit(full);}catch(_){} // failures are queued in localStorage and retried on the next save
 }
 
@@ -710,17 +754,35 @@ function showIntro(){
   nav('sc-intro');
 }
 
-function startRun(){
-  Object.assign(S,{inRun:true,runT0:Date.now(),blur:0,audioErr:0});
-  if(S.run==='A'){playBuffer(noiseBuf());setNP('🌫️ White noise');}
-  else{
-    playSong(S.song.idx,()=>{S.audioErr++;setNP('⚠️ Audio problem — please carry on with the test');});
-    setNP('🎵 '+songLabel(S.song.idx));
+// A run starts only once its audio is confirmed playing — a test without its audio is useless data
+async function startRun(){
+  const btn=document.getElementById('btn-start'),warn=document.getElementById('intro-audio-warn');
+  btn.disabled=true;warn.hidden=true;
+  try{
+    if(S.run==='A'){
+      playBuffer(noiseBuf());
+      await ac().resume();
+      if(ac().state!=='running')throw new Error('audio blocked');
+    }else await playSong(S.song.idx,audioFailed);
+  }catch(_){
+    stopAudio();warn.hidden=false;btn.disabled=false;
+    return;
   }
-  // Run A and run B always get a different essay / paragraph; other tasks are randomised anyway
-  S.essayIdx=S.tyIdx=S.variantBase+(S.run==='B'?1:0);
+  btn.disabled=false;
+  setNP(S.run==='A'?'🌫️ White noise':'🎵 '+songLabel(S.song.idx));
+  Object.assign(S,{inRun:true,runT0:Date.now(),blur:0,audioErr:0});
+  // Run A and run B always get a different essay; other tasks generate fresh content anyway
+  S.essayIdx=S.variantBase+(S.run==='B'?1:0);
   const fn={reading:startReading,typing:startTyping,dots:startDots,symmetry:startSym,rotation:startRot,numseq:startNumSeq,alphabet:startAlphabet};
   fn[S.tasks[S.round-1]]();
+}
+
+// The song stopped mid-run (very unlikely: it plays from memory) → discard this attempt and restart the run
+function audioFailed(){
+  if(!S.inRun)return;
+  S.inRun=false;S.restarts++;clearIv();stopAudio();hideNP();
+  showMsg('🔇','Audio stopped','Your song stopped playing, so this run can\'t count. It will restart from the beginning.',
+    `<button class="btn-go" onclick="showIntro()">↻ Restart this run</button>`);
 }
 
 // Called by every task when it finishes
@@ -730,7 +792,7 @@ async function record(tk,data,summary){
   showMsg('💾','Saving…','');
   const rec={step_key:`r${S.round}${S.run}`,step:'run',round:S.round,run:S.run,
     condition:S.run==='A'?'white_noise':'song',task:tk,task_name:TASKS[tk].name,
-    duration_s:Math.round((Date.now()-S.runT0)/1000),blur_count:S.blur,audio_errors:S.audioErr,summary,
+    duration_s:Math.round((Date.now()-S.runT0)/1000),blur_count:S.blur,audio_errors:S.audioErr,run_restarts:S.restarts,summary,
     audio_phase:tk==='reading'?'reading_only':'whole_task'};
   if(S.run==='B'){
     const i=S.song.idx,up=S.uploads[i];
@@ -738,6 +800,7 @@ async function record(tk,data,summary){
       up?{upload_file:up.name,upload_lufs:up.lufs,upload_gain:+up.gain.toFixed(3)}:{});
   }
   Object.entries(data).forEach(([k,v])=>{rec['res_'+k]=v;});
+  S.restarts=0;
   await save(rec);
   go();
 }
@@ -855,6 +918,7 @@ function showBreak(){
   },1000));
   S._brk.push(setInterval(refreshSongs,10000));
   refreshSongs();
+  loadSongs();
 }
 
 async function refreshSongs(){
@@ -866,6 +930,7 @@ async function refreshSongs(){
     S.songs=p.songs;S.workerAlive=p.workerAlive;
     if(changed){renderSongs();updBreak();}
   }catch(_){}
+  loadSongs();
 }
 
 function renderSongs(){
@@ -876,10 +941,11 @@ function renderSongs(){
     if(S.processing[i]){st='⏳ Processing your file…';cls='st-wait';}
     else if(S.uploads[i]){st='✓ Ready (your file)';cls='st-ready';}
     else if(S.songErr[i]){st='✗ Couldn\'t play this song';cls='st-bad';}
-    else if(s.status==='ready'){st='✓ Ready';cls='st-ready';}
+    else if(S.blobs[i]){st='✓ Ready';cls='st-ready';}
+    else if(s.status==='ready'){st='⏳ Loading song…';cls='st-wait';}
     else if(s.status==='failed'){st='✗ Couldn\'t get this song';cls='st-bad';}
     else{st='⏳ Getting your song ready…';cls='st-wait';}
-    const canUpload=!ok&&!S.processing[i]&&(s.status==='failed'||S.songErr[i]||!S.workerAlive||S.upShown);
+    const canUpload=!ok&&!S.processing[i]&&!S.loading[i]&&(s.status==='failed'||S.songErr[i]||!S.workerAlive||S.upShown);
     const c=document.createElement('div');
     c.className='song-card'+(S.pick===i?' sel':'');
     c.innerHTML=`<input type="radio" name="song-pick" ${S.pick===i?'checked':''} ${ok?'':'disabled'} />
@@ -909,7 +975,8 @@ function preview(i){
   clearTimeout(S.pvT);
   if(S.previewing===i){stopAudio();S.previewing=null;renderSongs();return;}
   S.previewing=i;
-  playSong(i,()=>{S.songErr[i]=true;S.previewing=null;if(S.pick===i)S.pick=null;renderSongs();updBreak();});
+  const failed=()=>{if(S.previewing===i){stopAudio();S.previewing=null;}renderSongs();};
+  playSong(i,failed).catch(failed);
   S.pvT=setTimeout(()=>{if(S.previewing===i){stopAudio();S.previewing=null;renderSongs();}},PREVIEW_SECS*1000);
   renderSongs();
 }
@@ -1010,67 +1077,133 @@ function submitReading(){
 }
 
 // ─────────────────────────────────────────
-// TASK: TYPING
+// TIMED TESTS: shared timer + scoring
 // ─────────────────────────────────────────
-let TY={target:[],t0:0};
+const PUZZLE_SECS=120, TYPING_SECS=180;
 
-function startTyping(){
-  clearIv();
-  const p=TY_PARAS[S.tyIdx%TY_PARAS.length];S.tyIdx++;
-  TY.target=p.split(' ').reverse();
-  document.getElementById('ty-orig').textContent=p;
-  document.getElementById('ty-inp').value='';
-  document.getElementById('ty-timer').textContent='0:00';
-  document.getElementById('ty-timer').classList.remove('warn');
-  document.getElementById('ty-prog').textContent=`0 / ${TY.target.length}`;
-  document.getElementById('ty-bar').style.width='0%';
-  nav('sc-typing');
-  TY.t0=Date.now();
-  const iv=setInterval(()=>{document.getElementById('ty-timer').textContent=fmt((Date.now()-TY.t0)/1000|0);},1000);
+// 2-minute puzzle tests: a fully correct puzzle scores +1; otherwise a penalty
+// by the share x of that puzzle that was wrong (<25% → −0.25, 25–75% → −0.5, >75% → −1).
+const penalty=x=>x<=0?0:x<0.25?0.25:x<=0.75?0.5:1;
+function puzzleScore(xs){
+  const correct=xs.filter(x=>x<=0).length,pen=xs.reduce((a,x)=>a+penalty(x),0);
+  return {puzzles:xs.length,correct,penalty:pen,score:correct-pen};
+}
+
+// Countdown for a whole test; calls onEnd once when time is up
+function testTimer(secs,elId,onEnd){
+  const t0=Date.now(),el=document.getElementById(elId);
+  const tick=()=>{
+    const left=Math.max(0,secs-(Date.now()-t0)/1000);
+    el.textContent=fmt(Math.ceil(left));el.classList.toggle('warn',left<=20);
+    return left<=0;
+  };
+  tick();
+  const iv=setInterval(()=>{if(tick()){clearInterval(iv);onEnd();}},250);
   S._iv.push(iv);
 }
 
-function tyCheck(){
-  const typed=document.getElementById('ty-inp').value.trim().split(/\s+/).filter(w=>w).map(w=>w.toLowerCase().replace(/[^a-z]/g,''));
-  const tgt=TY.target.map(w=>w.toLowerCase().replace(/[^a-z]/g,''));
-  let ok=0;typed.forEach((w,i)=>{if(i<tgt.length&&w===tgt[i])ok++;});
-  document.getElementById('ty-prog').textContent=`${ok} / ${tgt.length}`;
-  document.getElementById('ty-bar').style.width=(ok/tgt.length*100)+'%';
+// ─────────────────────────────────────────
+// TASK: TYPING  (3 min, lines of 10 random words typed in reverse order)
+// ─────────────────────────────────────────
+let TY={lines:[],cur:[],over:true};
+
+function startTyping(){
+  clearIv();
+  TY={lines:[],cur:[],over:false};
+  nav('sc-typing');
+  testTimer(TYPING_SECS,'ty-timer',finishTyping);
+  nextTypingLine();
 }
 
-function submitTyping(){
-  clearIv();
-  const elapsed=(Date.now()-TY.t0)/1000|0;
-  const typed=document.getElementById('ty-inp').value.trim().split(/\s+/).filter(w=>w).map(w=>w.toLowerCase().replace(/[^a-z]/g,''));
-  const tgt=TY.target.map(w=>w.toLowerCase().replace(/[^a-z]/g,''));
-  let ok=0;typed.forEach((w,i)=>{if(i<tgt.length&&w===tgt[i])ok++;});
-  const acc=tgt.length?Math.round(ok/tgt.length*100):0;
-  record('typing',{time:elapsed,correct:ok,total:tgt.length,accuracy:acc,typed:document.getElementById('ty-inp').value},`${acc}% accuracy in ${fmt(elapsed)}`);
+function nextTypingLine(){
+  TY.cur=Array.from({length:10},()=>WORDS[0|Math.random()*WORDS.length]);
+  document.getElementById('ty-orig').textContent=TY.cur.join(' ');
+  document.getElementById('ty-line').textContent=`Line ${TY.lines.length+1}`;
+  const inp=document.getElementById('ty-inp');inp.value='';inp.focus();
+}
+
+function typingLineDone(){
+  const text=document.getElementById('ty-inp').value;
+  if(TY.over||!text.trim())return;   // an empty Enter doesn't skip a line
+  TY.lines.push(scoreTypingLine(TY.cur,text));
+  nextTypingLine();
+}
+document.getElementById('ty-inp').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();typingLineDone();}
+});
+
+function finishTyping(){
+  TY.over=true;
+  const text=document.getElementById('ty-inp').value;
+  if(text.trim())TY.lines.push(scoreTypingLine(TY.cur,text));   // the line in progress counts as attempted
+  const attempted=TY.lines.length*10,exact=TY.lines.reduce((a,l)=>a+l.exact,0),typo=TY.lines.reduce((a,l)=>a+l.typo,0);
+  const score=exact+typo,pct=attempted?Math.round(score/attempted*1000)/10:0;
+  record('typing',{lines:TY.lines.length,words_attempted:attempted,exact,typo,score,score_pct:pct,
+    detail:TY.lines.map(l=>({target:l.target.join(' '),typed:l.typed}))},`score ${score}/${attempted} words (${pct}%)`);
+}
+
+const normWord=w=>w.toLowerCase().replace(/[^a-z]/g,'');
+function lev(a,b){
+  let prev=Array.from({length:b.length+1},(_,j)=>j);
+  for(let i=1;i<=a.length;i++){
+    const cur=[i];
+    for(let j=1;j<=b.length;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    prev=cur;
+  }
+  return prev[b.length];
+}
+// Match strength for aligning words: exact → 1, typo (≤2 letters wrong and under half the word) → 0.5, else 0.
+// Both exact and typo words score a full point (no typo penalty — phones are allowed).
+function wordPoints(t,y){
+  if(t===y)return 1;
+  const d=lev(t,y);
+  return d<=2&&d*2<t.length?0.5:0;
+}
+// Best in-order match of typed words against the reversed line, so a skipped
+// or extra word only costs that word, not everything after it.
+function scoreTypingLine(words,text){
+  const tgt=[...words].reverse().map(normWord),typ=text.split(/\s+/).map(normWord).filter(Boolean);
+  const n=tgt.length,m=typ.length,D=Array.from({length:n+1},()=>new Array(m+1).fill(0));
+  for(let i=1;i<=n;i++)for(let j=1;j<=m;j++)
+    D[i][j]=Math.max(D[i-1][j],D[i][j-1],D[i-1][j-1]+wordPoints(tgt[i-1],typ[j-1]));
+  let i=n,j=m,exact=0,typo=0;
+  while(i>0&&j>0){
+    const pts=wordPoints(tgt[i-1],typ[j-1]);
+    if(pts>0&&D[i][j]===D[i-1][j-1]+pts){if(pts===1)exact++;else typo++;i--;j--;}
+    else if(D[i][j]===D[i-1][j])i--;
+    else j--;
+  }
+  return {target:tgt,typed:text.trim(),exact,typo};
 }
 
 // ─────────────────────────────────────────
 // TASK: DOTS
 // ─────────────────────────────────────────
-let DT={targets:[],marked:[],phase:'memo',G:6};
+let DT={targets:[],marked:[],phase:'memo',G:6,xs:[],hits:0,extras:0,n:0,over:true};
 
 function startDots(){
   clearIv();
-  const G=DT.G=6;
+  DT={targets:[],marked:[],phase:'memo',G:6,xs:[],hits:0,extras:0,n:0,over:false};
+  nav('sc-dots');
+  testTimer(PUZZLE_SECS,'dt-left',finishDots);
+  nextDots();
+}
+
+function nextDots(){
+  const G=DT.G;DT.n++;
   DT.targets=shuffle([...Array(G*G).keys()]).slice(0,7);
   DT.marked=[];DT.phase='memo';
-  document.getElementById('dt-instr').textContent='Remember the positions of the highlighted dots.';
+  document.getElementById('dt-pattern').textContent=`Pattern ${DT.n}`;
+  document.getElementById('dt-instr').textContent='Memorise the highlighted dots… 6';
   document.getElementById('dt-recall-btns').classList.add('hidden');
-  nav('sc-dots');
-  const tw=document.getElementById('dt-timer-wrap');
-  tw.classList.remove('hidden');
   drawDots(true);
-  let cd=6;document.getElementById('dt-timer').textContent=cd;
+  let cd=6;
   const iv=setInterval(()=>{
-    cd--;document.getElementById('dt-timer').textContent=cd;
+    if(DT.over){clearInterval(iv);return;}
+    cd--;document.getElementById('dt-instr').textContent=`Memorise the highlighted dots… ${cd}`;
     if(cd<=0){
-      clearInterval(iv);tw.classList.add('hidden');
-      DT.phase='recall';
-      document.getElementById('dt-instr').textContent='Click cells to mark where the dots were, then submit.';
+      clearInterval(iv);DT.phase='recall';
+      document.getElementById('dt-instr').textContent='Click the cells where the dots were, then submit.';
       document.getElementById('dt-recall-btns').classList.remove('hidden');
       drawDots(false);
     }
@@ -1108,12 +1241,19 @@ document.getElementById('dt-canvas').addEventListener('click',e=>{
 function dtClear(){DT.marked=[];drawDots(false);}
 
 function submitDots(){
-  clearIv();
+  if(DT.over||DT.phase!=='recall')return;
   const tgt=new Set(DT.targets),mk=new Set(DT.marked);
-  const hit=[...tgt].filter(i=>mk.has(i)).length;
-  const extra=[...mk].filter(i=>!tgt.has(i)).length;
-  const score=Math.max(0,hit-extra);
-  record('dots',{targets:DT.targets,marked:DT.marked,hits:hit,extras:extra,total:7,score},`${hit}/7 correct, ${extra} extra → score ${score}/7`);
+  const hit=[...tgt].filter(i=>mk.has(i)).length,extra=[...mk].filter(i=>!tgt.has(i)).length;
+  DT.hits+=hit;DT.extras+=extra;
+  DT.xs.push(Math.min(1,(7-hit+extra)/7));   // wrong share: missed + extra dots, out of 7
+  nextDots();
+}
+
+function finishDots(){
+  DT.over=true;
+  const sc=puzzleScore(DT.xs);
+  record('dots',Object.assign(sc,{unfinished:DT.n-DT.xs.length,hits:DT.hits,extras:DT.extras,
+    wrong_shares:DT.xs.map(x=>+x.toFixed(2))}),`score ${sc.score} (${sc.correct}/${sc.puzzles} patterns perfect)`);
 }
 
 // ─────────────────────────────────────────
@@ -1194,8 +1334,8 @@ function answerSym(yes){
 
 function submitSym(){
   clearIv();
-  const acc=SY.tot?Math.round(SY.ok/SY.tot*100):0;
-  record('symmetry',{correct:SY.ok,wrong:SY.bad,total:SY.tot,accuracy:acc},`${SY.ok}/${SY.tot} correct (${acc}%)`);
+  const acc=SY.tot?Math.round(SY.ok/SY.tot*100):0,score=SY.ok-SY.bad;
+  record('symmetry',{correct:SY.ok,wrong:SY.bad,total:SY.tot,accuracy:acc,score},`score ${score} (${SY.ok}/${SY.tot} correct)`);
 }
 
 // ─────────────────────────────────────────
@@ -1273,8 +1413,8 @@ function answerRot(userMirror){
 
 function submitRot(){
   clearIv();
-  const acc=RT.tot?Math.round(RT.ok/RT.tot*100):0;
-  record('rotation',{correct:RT.ok,wrong:RT.bad,total:RT.tot,accuracy:acc},`${RT.ok}/${RT.tot} correct (${acc}%)`);
+  const acc=RT.tot?Math.round(RT.ok/RT.tot*100):0,score=RT.ok-RT.bad;
+  record('rotation',{correct:RT.ok,wrong:RT.bad,total:RT.tot,accuracy:acc,score},`score ${score} (${RT.ok}/${RT.tot} correct)`);
 }
 
 // ─────────────────────────────────────────
@@ -1309,27 +1449,41 @@ document.addEventListener('keydown',e=>{
 // ─────────────────────────────────────────
 // TASK: NUMBER SEQUENCE
 // ─────────────────────────────────────────
-let NS={circles:[],order:[],next:0,hits:0,phase:'memo',t0:0,iv:null};
+let NS={over:true};
 
 function startNumSeq(){
   clearIv();
-  NS={circles:[],order:shuffle([0,1,2,3,4,5,6,7,8,9]),next:0,hits:0,phase:'memo',t0:0,iv:null};
+  NS={xs:[],times:[],n:0,wrongTotal:0,over:false,circles:[],order:[],next:0,hits:0,wrong:0,phase:'memo',t0:0};
+  nav('sc-numseq');
+  testTimer(PUZZLE_SECS,'ns-timer',finishNumSeq);
+  nsNewRound();
+}
 
+function nsNewRound(){
+  Object.assign(NS,{n:NS.n+1,circles:[],order:shuffle([0,1,2,3,4,5,6,7,8,9]),next:0,hits:0,wrong:0,phase:'memo'});
   const arena=document.getElementById('ns-arena');
   arena.innerHTML='';
   arena.style.pointerEvents='none';
 
-  // Place 10 circles randomly (with padding so they don't overflow)
-  const W=arena.offsetWidth||620, H=340, R=36;
-  const placed=[];
-  NS.order.forEach((digit,i)=>{
-    let x,y,tries=0;
-    do{
-      x=R+Math.random()*(W-2*R);
-      y=R+Math.random()*(H-2*R);
-      tries++;
-    }while(tries<200&&placed.some(p=>Math.hypot(p.x-x,p.y-y)<R*2.4));
-    placed.push({x,y});
+  // Place 10 circles randomly without overlaps; narrow (phone) screens get a tall area and smaller circles
+  const W=arena.offsetWidth||620, narrow=W<500, H=narrow?460:340, R=narrow?28:36;
+  arena.style.height=H+'px';
+  let placed;
+  for(let attempt=0;attempt<100;attempt++){
+    placed=[];
+    for(let k=0;k<10;k++){
+      let x,y,tries=0;
+      do{
+        x=R+Math.random()*(W-2*R);
+        y=R+Math.random()*(H-2*R);
+        tries++;
+      }while(tries<200&&placed.some(p=>Math.hypot(p.x-x,p.y-y)<R*2.4));
+      placed.push({x,y});
+    }
+    if(placed.every((p,i)=>placed.every((q,j)=>i===j||Math.hypot(p.x-q.x,p.y-q.y)>=R*2.4)))break;
+  }
+  NS.order.forEach((digit,k)=>{
+    const {x,y}=placed[k];
 
     const c=document.createElement('div');
     c.className='ns-circle';
@@ -1337,7 +1491,7 @@ function startNumSeq(){
     c.style.cssText=`position:absolute;left:${x-R}px;top:${y-R}px;width:${R*2}px;height:${R*2}px;
       border-radius:50%;background:rgba(232,163,23,0.15);border:2.5px solid #e8a317;
       display:flex;align-items:center;justify-content:center;
-      font-size:1.6rem;font-weight:900;color:#fff;cursor:pointer;
+      font-size:${narrow?'1.3rem':'1.6rem'};font-weight:900;color:#fff;cursor:pointer;
       transition:transform 0.12s,background 0.12s;user-select:none;`;
     c.textContent=digit;
     c.addEventListener('click',()=>nsClick(c,digit));
@@ -1345,75 +1499,52 @@ function startNumSeq(){
     NS.circles.push(c);
   });
 
-  // UI reset
-  document.getElementById('ns-phase-lbl').textContent='MEMORISE';
-  document.getElementById('ns-instr').textContent='Remember the position of each number';
-  document.getElementById('ns-timer-lbl').textContent='Visible for';
+  document.getElementById('ns-phase-lbl').textContent=`PATTERN ${NS.n} · MEMORISE`;
+  document.getElementById('ns-instr').textContent='Remember the position of each number… 8';
   document.getElementById('ns-next').textContent='—';
   document.getElementById('ns-hits').textContent='0';
-  nav('sc-numseq');
 
-  // Countdown 8 s → hide digits
+  // 8 s to memorise, then the digits are hidden
   let cd=8;
-  document.getElementById('ns-timer').textContent=cd;
   document.getElementById('ns-bar').style.width='100%';
   const iv=setInterval(()=>{
+    if(NS.over){clearInterval(iv);return;}
     cd--;
-    document.getElementById('ns-timer').textContent=cd;
+    document.getElementById('ns-instr').textContent=`Remember the position of each number… ${cd}`;
     document.getElementById('ns-bar').style.width=(cd/8*100)+'%';
-    document.getElementById('ns-timer').classList.toggle('warn',cd<=3);
-    if(cd<=0){
-      clearInterval(iv);
-      nsStartRecall();
-    }
+    if(cd<=0){clearInterval(iv);nsStartRecall();}
   },1000);
   S._iv.push(iv);
 }
 
 function nsStartRecall(){
-  NS.phase='recall';
-  NS.t0=Date.now();
-  NS.next=0;NS.hits=0;
-
-  // Hide digits (keep circles)
+  NS.phase='recall';NS.t0=Date.now();
   NS.circles.forEach(c=>{c.textContent='';});
   document.getElementById('ns-arena').style.pointerEvents='auto';
-
-  document.getElementById('ns-phase-lbl').textContent='RECALL';
+  document.getElementById('ns-phase-lbl').textContent=`PATTERN ${NS.n} · RECALL`;
   document.getElementById('ns-instr').textContent='Click circles in order: 0 → 1 → 2 … → 9';
-  document.getElementById('ns-timer-lbl').textContent='Time';
   document.getElementById('ns-next').textContent=NS.next;
-  document.getElementById('ns-timer').classList.remove('warn');
-
-  // Start elapsed timer
-  const iv=setInterval(()=>{
-    const s=(Date.now()-NS.t0)/1000;
-    document.getElementById('ns-timer').textContent=s.toFixed(1);
-  },100);
-  S._iv.push(iv);
 }
 
 function nsClick(el,digit){
-  if(NS.phase!=='recall')return;
+  if(NS.over||NS.phase!=='recall')return;
   if(digit===NS.next){
-    // Correct
     el.style.background='rgba(34,197,94,0.3)';
     el.style.borderColor='#22c55e';
     el.style.color='#22c55e';
     el.style.pointerEvents='none';
-    NS.hits++;
-    NS.next++;
+    NS.hits++;NS.next++;
     document.getElementById('ns-hits').textContent=NS.hits;
     document.getElementById('ns-next').textContent=NS.next<10?NS.next:'✓ Done!';
     if(NS.next>=10){
-      clearIv();
-      const elapsed=((Date.now()-NS.t0)/1000).toFixed(2);
-      setTimeout(()=>{
-        record('numseq',{time:elapsed,correct:NS.hits,total:10},`${NS.hits}/10 correct in ${elapsed}s`);
-      },400);
+      NS.phase='done';
+      NS.xs.push(Math.min(1,NS.wrong/10));   // wrong share: wrong clicks, out of 10
+      NS.times.push((Date.now()-NS.t0)/1000);
+      S._iv.push(setTimeout(()=>{if(!NS.over)nsNewRound();},400));
     }
-  } else {
-    // Wrong — flash red but do nothing
+  }else{
+    // Wrong — counted; they keep going
+    NS.wrong++;NS.wrongTotal++;
     el.style.background='rgba(239,68,68,0.25)';
     el.style.borderColor='#ef4444';
     setTimeout(()=>{
@@ -1421,6 +1552,13 @@ function nsClick(el,digit){
       el.style.borderColor='#e8a317';
     },300);
   }
+}
+
+function finishNumSeq(){
+  NS.over=true;
+  const sc=puzzleScore(NS.xs),mean=NS.times.length?+(NS.times.reduce((a,b)=>a+b,0)/NS.times.length).toFixed(2):'';
+  record('numseq',Object.assign(sc,{unfinished:NS.n-NS.xs.length,wrong_clicks:NS.wrongTotal,mean_recall_s:mean,
+    wrong_shares:NS.xs.map(x=>+x.toFixed(2))}),`score ${sc.score} (${sc.correct}/${sc.puzzles} layouts perfect)`);
 }
 
 // ─────────────────────────────────────────

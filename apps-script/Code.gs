@@ -21,6 +21,9 @@ function doGet(e)  { return handle_(e.parameter || {}); }
 function doPost(e) { return handle_(JSON.parse(e.postData.contents || '{}')); }
 
 function handle_(p) {
+  if (p.action === 'audio') { // read-only and slow-ish → no lock, so it never holds up saves
+    try { return json_(audio_(p)); } catch (err) { return json_({ ok: false, error: String(err) }); }
+  }
   const lock = LockService.getScriptLock();
   lock.waitLock(25000);
   try {
@@ -97,6 +100,16 @@ function submit_(p) {
   delete rec.action;
   appendObj_(sheet_(R_SHEET, R_BASE), rec);
   return { ok: true };
+}
+
+// Returns a song's MP3 as base64. Browsers can't play Drive download links directly
+// (the response is blocked as a cross-site media source), but they can read the web app's replies.
+function audio_(p) {
+  const sh = sheet_(P_SHEET, P_BASE), row = findRow_(sh, norm_(p.roll)), idx = Number(p.idx);
+  if (!row || [1, 2, 3].indexOf(idx) === -1) return { ok: false, error: 'not_found' };
+  const m = String(readRow_(sh, row)['song' + idx + '_audio'] || '').match(/[?&]id=([\w-]+)/);
+  if (!m) return { ok: false, error: 'not_ready' };
+  return { ok: true, b64: Utilities.base64Encode(DriveApp.getFileById(m[1]).getBlob().getBytes()) };
 }
 
 // ── Worker actions (tools/fetch_songs.py) ────────────────

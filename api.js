@@ -68,6 +68,13 @@ const API = (() => {
     isDemo,
     profile: (roll, pool) => isDemo(roll) ? Promise.resolve(demo.profile(norm(roll), pool))
                                           : get({ action: 'profile', roll: norm(roll), pool: pool.join(',') }),
+    // A prepared song's MP3 bytes (ArrayBuffer), streamed through the web app
+    async audio(roll, idx) {
+      if (isDemo(roll)) return (await fetch(DEMO_SONGS[idx - 1].audio)).arrayBuffer();
+      const out = await get({ action: 'audio', roll: norm(roll), idx });
+      if (!out.ok) throw new Error(out.error);
+      return (await fetch('data:audio/mpeg;base64,' + out.b64)).arrayBuffer();
+    },
     register: data => isDemo(data.roll) ? Promise.resolve(demo.register(Object.assign({}, data, { roll: norm(data.roll) })))
                                         : post(Object.assign({ action: 'register' }, data)),
     // Saves one step; failed saves are queued in localStorage and retried on the next call.

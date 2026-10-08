@@ -80,6 +80,17 @@ Keep yt-dlp current — YouTube changes often: `pip install -U yt-dlp spotdl`.
 
 Mood scales: valence/arousal/sleepiness 1–9, stress 1–5, Part B ratings 1–5.
 
+Every Results row has `device` (phone / tablet / laptop, chosen by the participant — data only).
+
+Test scores (`res_score` on run rows):
+- **Symmetry, Rotation, Dot Memory, Number Sequence** (2 min, as many puzzles as possible):
+  each fully correct puzzle +1; a puzzle with mistakes scores a penalty by the share wrong —
+  under 25% → −0.25, 25–75% → −0.5, over 75% → −1. Dot Memory: wrong share = (missed + extra) / 7;
+  Number Sequence: wrong clicks / 10; Symmetry/Rotation: a wrong answer = −1.
+  `res_unfinished` = the puzzle cut off at 2:00 (not scored).
+- **Reverse Typing** (3 min of random 10-word lines): words typed correctly in reverse order;
+  small typos count as correct (`res_typo` tallies them). `res_score_pct` = score / words attempted.
+
 Reading runs also get `score_*` columns from the automatic grader (§5).
 
 Delete the Drive audio folder once the study is over.
