@@ -242,8 +242,9 @@
       <p id="intro-desc">Description</p>
     </div>
 
+    <div class="music-box" id="intro-practice" hidden></div>
     <p class="warn-box" id="intro-audio-warn" hidden>🔇 The audio didn't start, so the test hasn't begun. Check your sound isn't muted, then press Start again.</p>
-    <button class="btn-go" id="btn-start" onclick="startRun()">▶ Start</button>
+    <button class="btn-go" id="btn-start" onclick="introGo()">▶ Start</button>
   </div>
 </div>
 
@@ -255,7 +256,7 @@
       <h3 style="color:#e8a317;" id="rd-phase-lbl">📖 Phase 1 — Read the Essay</h3>
       <div class="timer-wrap">
         <div class="timer-lbl" id="rd-timer-lbl">Time to read</div>
-        <div class="timer" id="rd-timer">3:00</div>
+        <div class="timer" id="rd-timer">2:00</div>
       </div>
     </div>
     <div class="pbar"><div class="pbar-fill" id="rd-bar" style="width:100%"></div></div>
@@ -489,7 +490,7 @@ const WORDS=`time year people way day man thing woman life child world school st
 // TASKS METADATA
 // ─────────────────────────────────────────
 const TASKS={
-  reading: {name:"Reading + Summary",    icon:"📖", desc:"Read a short essay (3 min), then write a summary (1.5 min) from memory.", dur:"~4.5 min"},
+  reading: {name:"Reading + Summary",    icon:"📖", desc:"Read a short essay (2 min), then write a summary (1.5 min) from memory.", dur:"~3.5 min"},
   typing:  {name:"Reverse Typing",       icon:"⌨️", desc:"3 minutes — lines of 10 random words: type each line in reverse order (last word first), press Enter for the next.", dur:"3 min"},
   dots:    {name:"Dot Memory Puzzle",    icon:"🟣", desc:"2 minutes — memorise 7 dots (6 s), mark where they were, then the next pattern. Do as many as you can.", dur:"2 min"},
   symmetry:{name:"Symmetry Test",        icon:"🔄", desc:"2 minutes — for each shape, say if it is left-right symmetric or not.", dur:"2 min"},
@@ -504,14 +505,14 @@ const TASKS={
 const POOL=Object.keys(TASKS).filter(k=>k!=='alphabet'); // alphabet retired (depends on typing speed); kept only for anyone already assigned it
 const NOISE_AMP=0.108;   // uniform white noise ±0.108, played dual-mono ≈ −18 LUFS (same target as tools/fetch_songs.py)
 const TARGET_LUFS=-18;   // uploaded song files are gain-matched to this in the browser
-const BREAK_SECS=180, PREVIEW_SECS=20, UPLOAD_AFTER=60;
+const BREAK_SECS=150, PREVIEW_SECS=20, UPLOAD_AFTER=60;
 const STEPS=['start','r1A','r1quick','r1B','r1end','r2A','r2quick','r2B','r2end','final'];
 
 // ─────────────────────────────────────────
 // STATE
 // ─────────────────────────────────────────
 let S={
-  roll:'', name:'', device:'', songs:[], tasks:[], done:new Set(), workerAlive:true, variantBase:0,
+  roll:'', name:'', device:'', songs:[], tasks:[], done:new Set(), practice:false, practiced:{}, workerAlive:true, variantBase:0,
   round:1, run:'A', song:null,                      // song = {idx} chosen for run B
   pick:null, previewing:null, uploads:{}, songErr:{}, processing:{}, blobs:{}, loading:{}, loadingAll:false, restarts:0, upIdx:0, brkT0:0, brkLeft:0, upShown:false,
   inRun:false, runT0:0, blur:0, audioErr:0,
@@ -739,6 +740,38 @@ async function save(rec){
 // ─────────────────────────────────────────
 // RUN INTRO + RUN
 // ─────────────────────────────────────────
+// Before run A of these tests, one untimed, silent, unscored practice puzzle with feedback
+const PRACTICE_TASKS=['symmetry','rotation','dots','numseq'];
+const needsPractice=()=>S.run==='A'&&PRACTICE_TASKS.includes(S.tasks[S.round-1])&&!S.practiced[S.round];
+
+function introGo(){
+  if(!needsPractice())return startRun();
+  S.practice=true;
+  const t=S.tasks[S.round-1];
+  ({symmetry:startSym,rotation:startRot,dots:startDots,numseq:startNumSeq})[t]();
+  practiceLabels(t,true);
+}
+
+// Show "Practice" where the countdown normally is
+function practiceLabels(task,on){
+  const id={symmetry:'sym-timer',rotation:'rot-timer',dots:'dt-left',numseq:'ns-timer'}[task];
+  if(!id)return;
+  const el=document.getElementById(id),lbl=el.previousElementSibling;
+  if(lbl)lbl.textContent=on?'Practice':'Time left';
+  if(on){el.textContent='✎';el.classList.remove('warn');}
+}
+
+// Called by a test's own answer handler while practising
+function practiceDone(ok,msg){
+  clearIv();
+  S.practice=false;S.practiced[S.round]=true;
+  practiceLabels(S.tasks[S.round-1],false);
+  const box=document.getElementById('intro-practice');
+  box.innerHTML=`<div class="lbl">Practice result</div><div class="val" style="color:${ok?'#22c55e':'#fbbf24'}">${ok?'✓ Correct!':'✗ Not quite'}</div><div class="hint" style="font-size:0.85rem;color:rgba(255,255,255,0.65)">${msg}</div>`;
+  box.hidden=false;
+  showIntro();
+}
+
 function showIntro(){
   const task=S.tasks[S.round-1],m=TASKS[task],idx=(S.round-1)*2+(S.run==='B'?1:0);
   const dots=document.getElementById('prog-dots');dots.innerHTML='';
@@ -751,6 +784,9 @@ function showIntro(){
   document.getElementById('intro-icon').textContent=m.icon;
   document.getElementById('intro-name').textContent=m.name;
   document.getElementById('intro-desc').textContent=m.desc;
+  const practice=needsPractice();
+  document.getElementById('btn-start').textContent=practice?'▶ Try a practice puzzle (no audio, not scored)':(S.practiced[S.round]&&S.run==='A'?'▶ Start the real test':'▶ Start');
+  if(practice||S.run==='B')document.getElementById('intro-practice').hidden=true;
   nav('sc-intro');
 }
 
@@ -793,6 +829,7 @@ async function record(tk,data,summary){
   const rec={step_key:`r${S.round}${S.run}`,step:'run',round:S.round,run:S.run,
     condition:S.run==='A'?'white_noise':'song',task:tk,task_name:TASKS[tk].name,
     duration_s:Math.round((Date.now()-S.runT0)/1000),blur_count:S.blur,audio_errors:S.audioErr,run_restarts:S.restarts,summary,
+    practiced:S.run==='A'&&PRACTICE_TASKS.includes(tk)?'yes':'',
     audio_phase:tk==='reading'?'reading_only':'whole_task'};
   if(S.run==='B'){
     const i=S.song.idx,up=S.uploads[i];
@@ -1039,13 +1076,13 @@ function startReading(){
   document.getElementById('rd-summary').value='';
   document.getElementById('rd-read').classList.remove('hidden');
   document.getElementById('rd-write').classList.add('hidden');
-  RD={phase:'read',left:180};
+  RD={phase:'read',left:READ_SECS};
   nav('sc-reading');
   runRdTimer();
 }
 
 function runRdTimer(){
-  const total=RD.phase==='read'?180:90;
+  const total=RD.phase==='read'?READ_SECS:90;
   const timerEl=document.getElementById('rd-timer');
   const barEl=document.getElementById('rd-bar');
   const iv=setInterval(()=>{
@@ -1079,7 +1116,7 @@ function submitReading(){
 // ─────────────────────────────────────────
 // TIMED TESTS: shared timer + scoring
 // ─────────────────────────────────────────
-const PUZZLE_SECS=120, TYPING_SECS=180;
+const PUZZLE_SECS=120, TYPING_SECS=180, READ_SECS=120;
 
 // 2-minute puzzle tests: a fully correct puzzle scores +1; otherwise a penalty
 // by the share x of that puzzle that was wrong (<25% → −0.25, 25–75% → −0.5, >75% → −1).
@@ -1185,8 +1222,9 @@ function startDots(){
   clearIv();
   DT={targets:[],marked:[],phase:'memo',G:6,xs:[],hits:0,extras:0,n:0,over:false};
   nav('sc-dots');
-  testTimer(PUZZLE_SECS,'dt-left',finishDots);
+  if(!S.practice)testTimer(PUZZLE_SECS,'dt-left',finishDots);
   nextDots();
+  if(S.practice)document.getElementById('dt-pattern').textContent='Practice pattern';
 }
 
 function nextDots(){
@@ -1244,6 +1282,12 @@ function submitDots(){
   if(DT.over||DT.phase!=='recall')return;
   const tgt=new Set(DT.targets),mk=new Set(DT.marked);
   const hit=[...tgt].filter(i=>mk.has(i)).length,extra=[...mk].filter(i=>!tgt.has(i)).length;
+  if(S.practice){
+    DT.over=true;DT.phase='done';drawDots(true);   // show where the dots really were
+    const missed=7-hit,ok=!missed&&!extra;
+    S._iv.push(setTimeout(()=>practiceDone(ok,ok?'You marked all 7 dots.':`You found ${hit} of 7 dots${extra?` and marked ${extra} extra`:''}. In the real test, mark all 7 exactly.`),1500));
+    return;
+  }
   DT.hits+=hit;DT.extras+=extra;
   DT.xs.push(Math.min(1,(7-hit+extra)/7));   // wrong share: missed + extra dots, out of 7
   nextDots();
@@ -1267,6 +1311,9 @@ function startSym(){
   ['sym-ok','sym-bad','sym-tot'].forEach(id=>document.getElementById(id).textContent='0');
   nav('sc-sym');
   nextSymItem();
+  if(S.practice)return;
+  practiceLabels('symmetry',false);
+  document.getElementById('sym-timer').textContent=fmt(SY.left);
   const iv=setInterval(()=>{
     SY.left--;
     document.getElementById('sym-timer').textContent=fmt(SY.left);
@@ -1324,6 +1371,7 @@ function drawSymShape(item){
 
 function answerSym(yes){
   const ok=SY.cur.sym===yes;
+  if(S.practice)return practiceDone(ok,`That shape was ${SY.cur.sym?'symmetric':'not symmetric'} — compare its left and right halves across the dashed line.`);
   SY.tot++;if(ok)SY.ok++;else SY.bad++;
   flash('sym-canvas-wrap',ok);
   document.getElementById('sym-ok').textContent=SY.ok;
@@ -1349,6 +1397,9 @@ function startRot(){
   ['rot-ok','rot-bad','rot-tot'].forEach(id=>document.getElementById(id).textContent='0');
   nav('sc-rot');
   nextRotItem();
+  if(S.practice)return;
+  practiceLabels('rotation',false);
+  document.getElementById('rot-timer').textContent=fmt(RT.left);
   const iv=setInterval(()=>{
     RT.left--;
     document.getElementById('rot-timer').textContent=fmt(RT.left);
@@ -1403,6 +1454,7 @@ function nextRotItem(){
 
 function answerRot(userMirror){
   const ok=RT.isMirror===userMirror;
+  if(S.practice)return practiceDone(ok,`Shape B was ${RT.isMirror?'a mirror image':'just rotated'} — a mirror image can't be turned to match Shape A.`);
   RT.tot++;if(ok)RT.ok++;else RT.bad++;
   flash('rot-wrap',ok);
   document.getElementById('rot-ok').textContent=RT.ok;
@@ -1455,7 +1507,7 @@ function startNumSeq(){
   clearIv();
   NS={xs:[],times:[],n:0,wrongTotal:0,over:false,circles:[],order:[],next:0,hits:0,wrong:0,phase:'memo',t0:0};
   nav('sc-numseq');
-  testTimer(PUZZLE_SECS,'ns-timer',finishNumSeq);
+  if(!S.practice)testTimer(PUZZLE_SECS,'ns-timer',finishNumSeq);
   nsNewRound();
 }
 
@@ -1499,7 +1551,7 @@ function nsNewRound(){
     NS.circles.push(c);
   });
 
-  document.getElementById('ns-phase-lbl').textContent=`PATTERN ${NS.n} · MEMORISE`;
+  document.getElementById('ns-phase-lbl').textContent=`${S.practice?'PRACTICE':'PATTERN '+NS.n} · MEMORISE`;
   document.getElementById('ns-instr').textContent='Remember the position of each number… 8';
   document.getElementById('ns-next').textContent='—';
   document.getElementById('ns-hits').textContent='0';
@@ -1521,7 +1573,7 @@ function nsStartRecall(){
   NS.phase='recall';NS.t0=Date.now();
   NS.circles.forEach(c=>{c.textContent='';});
   document.getElementById('ns-arena').style.pointerEvents='auto';
-  document.getElementById('ns-phase-lbl').textContent=`PATTERN ${NS.n} · RECALL`;
+  document.getElementById('ns-phase-lbl').textContent=`${S.practice?'PRACTICE':'PATTERN '+NS.n} · RECALL`;
   document.getElementById('ns-instr').textContent='Click circles in order: 0 → 1 → 2 … → 9';
   document.getElementById('ns-next').textContent=NS.next;
 }
@@ -1537,6 +1589,11 @@ function nsClick(el,digit){
     document.getElementById('ns-hits').textContent=NS.hits;
     document.getElementById('ns-next').textContent=NS.next<10?NS.next:'✓ Done!';
     if(NS.next>=10){
+      if(S.practice){
+        NS.over=true;NS.phase='done';const w=NS.wrong;
+        S._iv.push(setTimeout(()=>practiceDone(!w,w?`You finished with ${w} wrong click${w>1?'s':''}. In the real test, each layout counts as correct only with no wrong clicks.`:'All 10 in order with no wrong clicks.'),600));
+        return;
+      }
       NS.phase='done';
       NS.xs.push(Math.min(1,NS.wrong/10));   // wrong share: wrong clicks, out of 10
       NS.times.push((Date.now()-NS.t0)/1000);
