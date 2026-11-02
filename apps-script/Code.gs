@@ -2,7 +2,8 @@
 // Setup: see apps-script/SETUP.md.
 //
 // Tabs (created automatically on first use):
-//   Participants — one row per intake registration + song download status.
+//   Participants — one row per intake registration + song download status
+//                  + the Phase 2 assignment (p2_task, p2_order).
 //   Results      — one row per saved step (start mood, each run, quick mood,
 //                  end-of-round form, end-of-phase form). `step_key` identifies it.
 //
@@ -63,6 +64,7 @@ function profile_(p) {
   if (!row) return { ok: true, registered: false };
 
   const rec = readRow_(sh, row);
+  if (Number(p.phase) === 2) return profile2_(p, roll, sh, row, rec);
   const songs = [1, 2, 3].map(i => ({
     title : rec['song' + i + '_title'],
     artist: rec['song' + i + '_artist'],
@@ -82,6 +84,21 @@ function profile_(p) {
   const seen = Number(PropertiesService.getScriptProperties().getProperty('WORKER_SEEN') || 0);
   return { ok: true, registered: true, name: rec.name, songs, tasks,
            done: doneKeys_(roll, 1), workerAlive: Date.now() - seen < 180000 }; // a 3-song batch can take ~2 min between heartbeats
+}
+
+// Phase 2: open only to participants who finished Phase 1. Their one test and their round
+// order (a row 1–4 of the Latin square in phase2-session.html) are assigned once, on first login.
+function profile2_(p, roll, sh, row, rec) {
+  const phase1Done = doneKeys_(roll, 1).indexOf('final') !== -1;
+  let task = String(rec.p2_task || ''), order = Number(rec.p2_order) || 0;
+  const pool = String(p.pool || '').split(',').filter(String);
+  if (phase1Done && (!task || !order) && pool.length) {
+    ensureCols_(sh, ['p2_task', 'p2_order']);
+    [task, order] = pickPhase2_(sh, pool);
+    writeCell_(sh, row, 'p2_task', task);
+    writeCell_(sh, row, 'p2_order', order);
+  }
+  return { ok: true, registered: true, name: rec.name, phase1Done, task, order, done: doneKeys_(roll, 2) };
 }
 
 function register_(p) {
@@ -205,6 +222,21 @@ function pickBalanced_(sh, pool) {
   return Math.random() < 0.5 ? [a, b] : [b, a];
 }
 
+// Phase 2 assignment: the test used least so far (ties at random), then the Latin-square order
+// used least among participants with that test (ties by overall use, then at random).
+// So each test gets about the same number of people, and within each test the 4 orders fill evenly.
+function pickPhase2_(sh, pool) {
+  const vals = sh.getDataRange().getValues(), h = vals[0];
+  const ct = h.indexOf('p2_task'), co = h.indexOf('p2_order');
+  const rows = vals.slice(1).map(r => [String(r[ct]), Number(r[co])]).filter(r => r[0] && r[1]);
+  const least = (keys, count, tie) => keys.map(k => [count(k), tie ? tie(k) : 0, Math.random(), k])
+    .sort((x, y) => x[0] - y[0] || x[1] - y[1] || x[2] - y[2])[0][3];
+  const task = least(pool, t => rows.filter(r => r[0] === t).length);
+  const order = least([1, 2, 3, 4], o => rows.filter(r => r[0] === task && r[1] === o).length,
+                                    o => rows.filter(r => r[1] === o).length);
+  return [task, order];
+}
+
 function doneKeys_(roll, phase) {
   const vals = sheet_(R_SHEET, R_BASE).getDataRange().getValues();
   const h = vals[0], ri = h.indexOf('roll'), pi = h.indexOf('phase'), ki = h.indexOf('step_key');
@@ -227,16 +259,22 @@ function headers_(sh) {
   return sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0];
 }
 
-// Appends an object as a row; adds any unseen keys as new header columns.
-function appendObj_(sh, obj) {
+// Adds any of these keys that aren't header columns yet; returns the headers.
+function ensureCols_(sh, keys) {
   const h = headers_(sh);
-  Object.keys(obj).forEach(k => {
+  keys.forEach(k => {
     if (h.indexOf(k) === -1) {
       h.push(k);
       if (sh.getMaxColumns() < h.length) sh.insertColumnsAfter(sh.getMaxColumns(), 10);
       sh.getRange(1, h.length).setValue(k).setFontWeight('bold');
     }
   });
+  return h;
+}
+
+// Appends an object as a row; adds any unseen keys as new header columns.
+function appendObj_(sh, obj) {
+  const h = ensureCols_(sh, Object.keys(obj));
   const row = h.map(k => {
     const v = obj[k];
     return v === undefined || v === null ? '' : (typeof v === 'object' ? JSON.stringify(v) : String(v));

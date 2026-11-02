@@ -1,4 +1,4 @@
-# Phase 1 backend setup
+# Backend setup (Phase 1 + Phase 2)
 
 The site is static (GitHub Pages). All data goes to one Google Sheet through a small
 Apps Script web app, and participants' songs are fetched by a Python worker that runs
@@ -129,3 +129,47 @@ the essay texts identical to `ESSAYS` in `session.html`).
 
 For the report: hand-grade ~20 summaries with the same key-idea lists and compare them
 with `score_recall_pct` to show the automatic grading agrees with a human.
+
+## 6. Phase 2
+
+`phase2-session.html` uses the same Sheet and web app. **Redeploy `Code.gs`** (new version, §1)
+before Phase 2 opens. No song worker is needed: the tracks are fixed and served with the site.
+
+**Who can take it:** only roll numbers whose Phase 1 `final` step is saved. Others are sent back
+to Phase 1.
+
+**Assignment** (written once to Participants on first login, as `p2_task` and `p2_order`):
+- `p2_task`: one of the 6 tests, whichever has been used least in Phase 2 so far (ties at random),
+  independent of the participant's Phase 1 tests.
+- `p2_order`: a row of a balanced 4×4 Latin square (each condition once in every round position, and
+  each condition directly after every other once), the one used least among people with the same test:
+
+  | p2_order | round 1 | round 2 | round 3 | round 4 |
+  |---|---|---|---|---|
+  | 1 | white_noise | western | indian_instr | indian_vocal |
+  | 2 | western | indian_vocal | white_noise | indian_instr |
+  | 3 | indian_vocal | indian_instr | western | white_noise |
+  | 4 | indian_instr | white_noise | indian_vocal | western |
+
+**Tracks:** `audio/phase2/western.mp3`, `indian_vocal.mp3`, `indian_instr.mp3` (placeholders until the
+real pieces are chosen). Prepare the real ones with
+`python tools/prep_phase2_audio.py western=<file> indian_vocal=<file> indian_instr=<file>`
+(ffmpeg; matches them to the white noise at −18 LUFS), then set each `title` in `CONDS` at the top of
+`phase2-session.html`. Tracks should be at least 4 minutes long; shorter ones loop.
+
+**Flow:** audio check → instructions → `start` mood check → `practice` (3 untimed, silent puzzles for
+Symmetry / Rotation / Dot Memory / Number Sequence, 1 line for Reverse Typing, none for Reading) →
+4 rounds, each: 30 s of the round's audio with nothing to do → the test, audio continuing (Reading:
+audio stops for the summary, as in Phase 1) → mood form → `final`.
+
+**Results** rows have `phase` = 2 and `order_id` (= `p2_order`):
+
+| step_key | what |
+|---|---|
+| `start` | as Phase 1: `valence`, `arousal`, `sleepiness`, `stress`, `sleep_hours`, `caffeine` |
+| `practice` | `task`, `practice_n`, `practice_correct` |
+| `r1run` … `r4run` | `round` (1–4 = position), `condition`, `track_title`, `order`, `task`, `res_*` scores (same scoring as Phase 1), `listen_s` (30), `duration_s` (test only), `blur_count`, `run_restarts`, `audio_phase` |
+| `r1mood` … `r4mood` | `round`, `condition`; Part A: `valence`, `arousal` (1–9); Part B (1–5): `concentration`, `distraction`, `liking`, and, after music rounds only (not white noise): `familiar_feel` (how familiar it felt), `indian_feel` (how Indian it felt). Sleepiness and stress are only in `start` |
+| `final` | `rank_white_noise`, `rank_western`, `rank_indian_vocal`, `rank_indian_instr` (1 = best for focus … 4), `best` (a condition or `no_difference`), `best_why`, `vocal`, `vs_phase1`, `usual` |
+
+Reading runs are graded by `Grader.gs` exactly like Phase 1 (each round gets a different essay).

@@ -27,7 +27,10 @@ const API = (() => {
     { title: 'Demo Tune 3 (fails to download)', artist: 'Sine Ensemble', audio: '' },
   ];
   const db = {
-    load() { try { return JSON.parse(localStorage.getItem('demo_db')) || { p: {}, done: {}, results: [] }; } catch (_) { return { p: {}, done: {}, results: [] }; } },
+    load() {
+      let d; try { d = JSON.parse(localStorage.getItem('demo_db')); } catch (_) {}
+      return Object.assign({ p: {}, done: {}, done2: {}, results: [] }, d);
+    },
     save(d) { try { localStorage.setItem('demo_db', JSON.stringify(d)); } catch (_) {} },
   };
   const demo = {
@@ -45,6 +48,17 @@ const API = (() => {
       }));
       return { ok: true, registered: true, name: p.name, songs, tasks: p.tasks, done: d.done[roll] || [], workerAlive: true };
     },
+    // Phase 2: DEMO counts as having finished Phase 1; test and order are picked at random
+    profile2(roll, pool) {
+      const d = db.load();
+      if (!d.p[roll] && roll === 'DEMO') d.p[roll] = { name: 'Demo Participant', at: Date.now() };
+      const p = d.p[roll];
+      if (!p) return { ok: true, registered: false };
+      const phase1Done = roll === 'DEMO' || (d.done[roll] || []).includes('final');
+      if (phase1Done && !p.p2_task) { p.p2_task = pool[0 | Math.random() * pool.length]; p.p2_order = 1 + (0 | Math.random() * 4); }
+      db.save(d);
+      return { ok: true, registered: true, name: p.name, phase1Done, task: p.p2_task, order: p.p2_order, done: d.done2[roll] || [] };
+    },
     register(data) {
       const d = db.load();
       if (d.p[data.roll]) return { ok: false, error: 'already_registered' };
@@ -54,7 +68,8 @@ const API = (() => {
     },
     submit(rec) {
       const d = db.load();
-      (d.done[rec.roll] = d.done[rec.roll] || []).push(rec.step_key);
+      const done = Number(rec.phase) === 2 ? d.done2 : d.done;
+      (done[rec.roll] = done[rec.roll] || []).push(rec.step_key);
       d.results.push(rec);
       db.save(d);
       console.log('[demo] saved', rec);
@@ -68,6 +83,8 @@ const API = (() => {
     isDemo,
     profile: (roll, pool) => isDemo(roll) ? Promise.resolve(demo.profile(norm(roll), pool))
                                           : get({ action: 'profile', roll: norm(roll), pool: pool.join(',') }),
+    profile2: (roll, pool) => isDemo(roll) ? Promise.resolve(demo.profile2(norm(roll), pool))
+                                           : get({ action: 'profile', phase: 2, roll: norm(roll), pool: pool.join(',') }),
     // A prepared song's MP3 bytes (ArrayBuffer), streamed through the web app
     async audio(roll, idx) {
       if (isDemo(roll)) return (await fetch(DEMO_SONGS[idx - 1].audio)).arrayBuffer();

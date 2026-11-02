@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phase 2 Session — Raaga &amp; Taala Study</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    .session-screen { min-height:100vh; background:linear-gradient(135deg,#1a1040 0%,#2d1f6e 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px 90px; color:#fff; } /* bottom room for the now-playing bar */
+    .hidden { display:none !important; }
+    .s-card { background:rgba(255,255,255,0.06); border:1px solid rgba(232,163,23,0.3); border-radius:20px; padding:36px 40px; width:100%; max-width:700px; }
+    .s-card h2 { font-family:'Playfair Display',serif; color:#fff; margin-bottom:6px; }
+    .s-card .sub { color:rgba(255,255,255,0.55); font-size:0.88rem; margin-bottom:24px; }
+    /* Buttons */
+    .btn-go { background:#e8a317; color:#1a1040; border:none; padding:13px 34px; border-radius:40px; font-family:inherit; font-size:0.97rem; font-weight:700; cursor:pointer; transition:all 0.18s; }
+    .btn-go:hover { background:#f5c842; transform:translateY(-2px); }
+    .btn-go:disabled { opacity:0.35; cursor:not-allowed; transform:none; }
+    .btn-ghost { background:transparent; color:rgba(255,255,255,0.65); border:2px solid rgba(255,255,255,0.25); padding:11px 26px; border-radius:40px; font-family:inherit; font-size:0.9rem; font-weight:600; cursor:pointer; transition:all 0.18s; }
+    .btn-ghost:hover { border-color:rgba(255,255,255,0.55); color:#fff; }
+    /* Inputs */
+    .s-inp { background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,255,255,0.2); color:#fff; padding:11px 15px; border-radius:10px; font-family:inherit; font-size:0.93rem; width:100%; outline:none; transition:border-color 0.18s; }
+    .s-inp:focus { border-color:#e8a317; }
+    .s-inp::placeholder { color:rgba(255,255,255,0.3); }
+    .s-lbl { display:block; color:rgba(255,255,255,0.65); font-size:0.83rem; font-weight:600; margin-bottom:7px; letter-spacing:0.02em; }
+    /* Round intro */
+    .prog-dots { display:flex; gap:8px; justify-content:center; margin-bottom:14px; }
+    .prog-dot { width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.18); }
+    .prog-dot.done { background:#22c55e; }
+    .prog-dot.active { background:#e8a317; }
+    .round-badge { display:inline-block; background:rgba(232,163,23,0.18); border:1px solid #e8a317; color:#e8a317; padding:5px 15px; border-radius:20px; font-size:0.82rem; font-weight:700; margin-bottom:18px; }
+    .music-box { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.18); border-radius:14px; padding:18px 22px; margin:16px 0; text-align:center; }
+    .music-box .lbl { color:rgba(255,255,255,0.45); font-size:0.8rem; margin-bottom:6px; }
+    .music-box .val { color:#fff; font-size:1.18rem; font-weight:700; }
+    .music-box .hint { color:rgba(255,255,255,0.35); font-size:0.75rem; margin-top:5px; }
+    .task-prev { background:rgba(232,163,23,0.08); border:1px solid rgba(232,163,23,0.28); border-radius:14px; padding:18px 22px; margin:14px 0; text-align:center; }
+    .task-prev .big-icon { font-size:2.4rem; margin-bottom:6px; }
+    .task-prev h3 { color:#e8a317; font-size:1.22rem; margin-bottom:4px; }
+    .task-prev p { color:rgba(255,255,255,0.55); font-size:0.85rem; }
+    /* Timer */
+    .timer-wrap { text-align:right; }
+    .timer-lbl { color:rgba(255,255,255,0.45); font-size:0.78rem; }
+    .timer { font-size:2.6rem; font-weight:800; font-family:'SF Mono','Fira Code',monospace; color:#e8a317; letter-spacing:0.04em; line-height:1; }
+    .timer.warn { color:#ef4444; animation:blink 1s step-end infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.45} }
+    /* Phase bar */
+    .pbar { background:rgba(255,255,255,0.1); border-radius:6px; height:5px; margin:12px 0; }
+    .pbar-fill { height:100%; background:#e8a317; border-radius:6px; transition:width 1s linear; }
+    /* Essay */
+    .essay-box { background:rgba(255,255,255,0.94); color:#1a1040; border-radius:12px; padding:22px 26px; max-height:260px; overflow-y:auto; font-size:0.9rem; line-height:1.72; margin:12px 0; }
+    .essay-box h4 { font-size:0.97rem; font-weight:700; margin-bottom:10px; color:#1a1040; }
+    /* Textarea */
+    .s-ta { width:100%; min-height:110px; background:rgba(255,255,255,0.07); border:1.5px solid rgba(255,255,255,0.18); color:#fff; border-radius:12px; padding:13px 15px; font-family:inherit; font-size:0.9rem; resize:vertical; outline:none; }
+    .s-ta:focus { border-color:#e8a317; }
+    .s-ta::placeholder { color:rgba(255,255,255,0.28); }
+    /* Typing */
+    .orig-text { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.13); border-radius:11px; padding:15px 18px; font-size:0.96rem; line-height:1.7; color:rgba(255,255,255,0.84); margin:10px 0; font-family:'SF Mono','Fira Code',monospace; }
+    /* Score strip */
+    .score-strip { display:flex; gap:18px; justify-content:center; background:rgba(255,255,255,0.05); border-radius:12px; padding:11px 18px; margin-bottom:12px; }
+    .sc-item .v { font-size:1.5rem; font-weight:800; color:#e8a317; text-align:center; }
+    .sc-item .l { font-size:0.7rem; color:rgba(255,255,255,0.45); text-align:center; }
+    /* Answer buttons */
+    .ans-row { display:flex; gap:14px; justify-content:center; margin:14px 0; flex-wrap:wrap; }
+    .btn-ans { padding:15px 32px; border-radius:12px; font-family:inherit; font-size:0.97rem; font-weight:700; cursor:pointer; border:2px solid; transition:all 0.14s; min-width:130px; }
+    .btn-yes { background:rgba(34,197,94,0.13); border-color:#22c55e; color:#22c55e; }
+    .btn-yes:hover { background:rgba(34,197,94,0.28); }
+    .btn-no  { background:rgba(239,68,68,0.13); border-color:#ef4444; color:#ef4444; }
+    .btn-no:hover { background:rgba(239,68,68,0.28); }
+    .btn-same { background:rgba(99,102,241,0.13); border-color:#818cf8; color:#818cf8; }
+    .btn-same:hover { background:rgba(99,102,241,0.28); }
+    .btn-mirr { background:rgba(245,158,11,0.13); border-color:#fbbf24; color:#fbbf24; }
+    .btn-mirr:hover { background:rgba(245,158,11,0.28); }
+    /* Flash feedback */
+    @keyframes flashG { 0%,100%{background:transparent} 50%{background:rgba(34,197,94,0.22)} }
+    @keyframes flashR { 0%,100%{background:transparent} 50%{background:rgba(239,68,68,0.22)} }
+    .fl-ok { animation:flashG 0.32s ease; }
+    .fl-bad { animation:flashR 0.32s ease; }
+    /* Grid 2 col */
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media(max-width:520px){
+      .grid2{grid-template-columns:1fr;}
+      .s-card{padding:24px 18px;}
+      #rot-wrap{flex-direction:column;gap:4px;margin:8px 0;}
+      #rot-wrap canvas{width:150px;height:150px;}
+      #rot-wrap .rot-vs{font-size:0.9rem!important;}
+      .score-strip{padding:8px 12px;margin-bottom:6px;}
+      .btn-ans{padding:12px 16px;min-width:0;flex:1;}
+    }
+    /* Keyboard hint */
+    .kbd-hint { color:rgba(255,255,255,0.28); font-size:0.72rem; margin-top:6px; }
+    .kbd { display:inline-block; border:1px solid rgba(255,255,255,0.25); border-radius:4px; padding:1px 6px; font-family:monospace; }
+    canvas { border-radius:10px; display:block; cursor:default; }
+    hr.div { border:none; border-top:1px solid rgba(255,255,255,0.1); margin:20px 0; }
+    .two-canvas { display:flex; align-items:center; justify-content:center; gap:24px; margin:14px 0; flex-wrap:wrap; }
+    .canvas-lbl { color:rgba(255,255,255,0.45); font-size:0.78rem; text-align:center; margin-top:5px; }
+    .big-emoji { font-size:3.6rem; text-align:center; margin-bottom:10px; }
+    .progress-info { color:rgba(255,255,255,0.5); font-size:0.82rem; margin-bottom:4px; }
+    .progress-info span { color:#e8a317; font-weight:700; }
+    /* Forms (mood checks, round-end, phase-end) */
+    .q-block { margin-bottom:22px; }
+    .q-block.missing .s-lbl { color:#f87171; }
+    .q-sec { color:#e8a317; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; margin:6px 0 14px; }
+    .scale-row { display:flex; gap:6px; flex-wrap:wrap; }
+    .scale-btn, .choice-btn { flex:1; min-width:38px; padding:10px 6px; border-radius:10px; border:1.5px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.05); color:#fff; font-family:inherit; font-size:0.92rem; font-weight:600; cursor:pointer; transition:all 0.15s; }
+    .choice-btn { flex:1 1 auto; padding:10px 14px; font-weight:500; font-size:0.86rem; }
+    .scale-btn:hover, .choice-btn:hover { border-color:rgba(232,163,23,0.5); }
+    .scale-btn.sel, .choice-btn.sel { background:#e8a317; border-color:#e8a317; color:#1a1040; }
+    .scale-ends { display:flex; justify-content:space-between; color:rgba(255,255,255,0.42); font-size:0.74rem; margin-top:5px; gap:10px; }
+    .ta-count { color:rgba(255,255,255,0.35); font-size:0.72rem; text-align:right; margin-top:3px; }
+    /* Checklists */
+    .check-list { display:flex; flex-direction:column; gap:9px; margin:16px 0 20px; }
+    .check-list label { display:flex; align-items:center; gap:10px; padding:10px 14px; background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.12); border-radius:10px; cursor:pointer; color:rgba(255,255,255,0.8); font-size:0.88rem; }
+    .check-list input { accent-color:#e8a317; width:17px; height:17px; }
+    .howto-list { color:rgba(255,255,255,0.75); font-size:0.9rem; line-height:1.7; padding-left:20px; margin:10px 0 6px; }
+    .howto-list strong { color:#e8a317; }
+    .warn-box { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.4); color:#fca5a5; border-radius:12px; padding:12px 15px; font-size:0.85rem; margin:12px 0; }
+    .rank-line { display:flex; align-items:center; gap:12px; margin-bottom:8px; flex-wrap:wrap; }
+    .rank-name { flex:1 1 200px; color:rgba(255,255,255,0.85); font-size:0.88rem; }
+    .rank-line .scale-row { flex:0 1 220px; }
+    .btn-mini { background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,255,255,0.25); padding:6px 12px; border-radius:20px; font-family:inherit; font-size:0.76rem; font-weight:600; cursor:pointer; white-space:nowrap; }
+    .btn-mini:hover { border-color:#e8a317; }
+    /* Now-playing bar */
+    .np { position:fixed; left:50%; bottom:16px; transform:translateX(-50%); z-index:900; background:rgba(26,16,64,0.95); border:1px solid rgba(232,163,23,0.45); border-radius:30px; padding:8px 18px; color:#fff; font-size:0.82rem; display:flex; align-items:center; gap:10px; box-shadow:0 6px 24px rgba(0,0,0,0.4); max-width:calc(100% - 32px); }
+    .np #np-text { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .eq { display:flex; gap:2px; align-items:flex-end; height:14px; }
+    .eq i { width:3px; background:#e8a317; animation:eq 0.9s ease-in-out infinite; }
+    .eq i:nth-child(2){animation-delay:0.2s} .eq i:nth-child(3){animation-delay:0.4s}
+    @keyframes eq { 0%,100%{height:3px} 50%{height:14px} }
+  </style>
+</head>
+<body>
+
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo" style="text-decoration:none">🎵 Raaga &amp; Taala Study</a>
+  </div>
+</nav>
+
+<!-- ══════════════════════ LOGIN ══════════════════════ -->
+<div id="sc-login" class="session-screen">
+  <div class="s-card" style="max-width:480px;">
+    <h2>🎧 Phase 2 — Log In</h2>
+    <p class="sub">Enter the roll number you used in Phase 1.</p>
+    <label class="s-lbl">Roll number</label>
+    <input type="text" id="roll-inp" class="s-inp" placeholder="e.g. 20xxxxxxxx" maxlength="20" onkeydown="if(event.key==='Enter')login()" />
+    <div style="text-align:center;margin-top:20px;">
+      <button class="btn-go" id="btn-login" onclick="login()">Continue →</button>
+    </div>
+    <p style="color:rgba(255,255,255,0.4);font-size:0.8rem;text-align:center;margin-top:18px;">Haven't done Phase 1 yet? <a href="session.html" style="color:#e8a317;">Start with Phase 1</a></p>
+  </div>
+</div>
+
+<!-- ══════════════════════ MESSAGE ══════════════════════ -->
+<div id="sc-msg" class="session-screen hidden">
+  <div class="s-card" style="max-width:520px;text-align:center;">
+    <div class="big-emoji" id="msg-emoji">ℹ️</div>
+    <h2 id="msg-title">—</h2>
+    <p id="msg-text" style="color:rgba(255,255,255,0.65);margin:10px 0 20px;line-height:1.6;"></p>
+    <div id="msg-actions"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════ HEADPHONE CHECK ══════════════════════ -->
+<div id="sc-check" class="session-screen hidden">
+  <div class="s-card" style="max-width:560px;">
+    <h2>🎧 Audio Check</h2>
+    <p class="sub">This study plays audio during the tests. Let's make sure you can hear it properly.</p>
+    <div style="text-align:center;">
+      <button class="btn-ghost" id="btn-testsound" onclick="toggleTestSound()">▶ Play test sound</button>
+      <p style="color:rgba(255,255,255,0.45);font-size:0.8rem;margin-top:8px;">This is the white noise you'll hear in the test. Set your volume so it's clearly audible but comfortable.</p>
+    </div>
+    <div class="check-list" id="check-list">
+      <label><input type="checkbox" onchange="updCheck()" /> I'm wearing headphones / earphones</label>
+      <label><input type="checkbox" onchange="updCheck()" /> I'm in a quiet place and won't be interrupted for ~30 minutes</label>
+      <label><input type="checkbox" onchange="updCheck()" /> The volume is comfortable — I won't change it during the session</label>
+    </div>
+    <label class="s-lbl">Which device are you using?</label>
+    <div class="scale-row" id="device-row" style="margin-bottom:20px;">
+      <button type="button" class="choice-btn" data-device="phone" onclick="setDevice(this)">📱 Phone</button>
+      <button type="button" class="choice-btn" data-device="tablet" onclick="setDevice(this)">📲 Tablet</button>
+      <button type="button" class="choice-btn" data-device="laptop" onclick="setDevice(this)">💻 Laptop</button>
+    </div>
+    <div style="text-align:center;"><button class="btn-go" id="btn-check" disabled onclick="afterCheck()">Continue →</button></div>
+  </div>
+</div>
+
+<!-- ══════════════════════ HOW IT WORKS ══════════════════════ -->
+<div id="sc-howto" class="session-screen hidden">
+  <div class="s-card" style="max-width:620px;">
+    <h2>📋 How Phase 2 Works</h2>
+    <p class="sub">About 20–25 minutes in one sitting. Please don't switch tabs during the tests.</p>
+    <ol class="howto-list">
+      <li>A short <strong>mood check</strong> (under a minute).</li>
+      <li id="howto-practice" hidden></li>
+      <li><strong>4 rounds</strong> of the same test, each with different audio — white noise, Western classical, Indian classical vocal and Indian classical instrumental, in a set order:
+        <ul>
+          <li>the round's audio plays for <strong>30 seconds</strong> while you just listen,</li>
+          <li>then the test starts automatically, with the audio still playing,</li>
+          <li>followed by a short form about how you feel and how the round went.</li>
+        </ul>
+      </li>
+      <li>A few <strong>final questions</strong> about your experience.</li>
+    </ol>
+    <p style="color:rgba(255,255,255,0.5);font-size:0.82rem;margin-bottom:10px;">Your progress is saved after every step — if something goes wrong, log in again with your roll number to continue.</p>
+    <div class="check-list"><label><input type="checkbox" id="howto-ok" onchange="document.getElementById('btn-howto').disabled=!this.checked" /> I understand</label></div>
+    <div style="text-align:center;"><button class="btn-go" id="btn-howto" disabled onclick="go()">Begin →</button></div>
+  </div>
+</div>
+
+<!-- ══════════════════════ FORM (mood / round-end / final) ══════════════════════ -->
+<div id="sc-form" class="session-screen hidden">
+  <div class="s-card" style="max-width:640px;">
+    <div class="round-badge" id="form-badge" style="display:none;"></div>
+    <h2 id="form-title">—</h2>
+    <p class="sub" id="form-sub"></p>
+    <div id="form-box"></div>
+    <div style="text-align:center;margin-top:10px;"><button class="btn-go" id="btn-form" onclick="submitForm()">Continue →</button></div>
+  </div>
+</div>
+
+<!-- ══════════════════════ PRACTICE ══════════════════════ -->
+<div id="sc-practice" class="session-screen hidden" style="text-align:center;">
+  <div class="s-card" style="text-align:center;">
+    <div class="round-badge">Practice</div>
+    <h2>🧪 Get to know your test</h2>
+    <p class="sub" id="pr-sub"></p>
+    <div class="task-prev">
+      <div class="big-icon" id="pr-icon">📖</div>
+      <h3 id="pr-name">Task Name</h3>
+      <p id="pr-desc">Description</p>
+    </div>
+    <div class="music-box" id="pr-result" hidden></div>
+    <button class="btn-go" id="btn-practice" onclick="practiceGo()">▶ Practice</button>
+  </div>
+</div>
+
+<!-- ══════════════════════ ROUND INTRO ══════════════════════ -->
+<div id="sc-intro" class="session-screen hidden" style="text-align:center;">
+  <div class="s-card" style="text-align:center;">
+    <div class="prog-dots" id="prog-dots"></div>
+    <div class="round-badge" id="intro-badge">Round 1 of 4</div>
+
+    <div class="music-box">
+      <div class="lbl">🎵 Audio for this round</div>
+      <div class="val" id="intro-music">—</div>
+      <div class="hint" id="intro-hint"></div>
+    </div>
+
+    <div class="task-prev">
+      <div class="big-icon" id="intro-icon">📖</div>
+      <h3 id="intro-name">Task Name</h3>
+      <p id="intro-desc">Description</p>
+    </div>
+
+    <p class="warn-box" id="intro-audio-warn" hidden>🔇 The audio didn't start, so the round hasn't begun. Check your connection and that your sound isn't muted, then press Start again.</p>
+    <button class="btn-go" id="btn-start" onclick="startRound()">▶ Start round</button>
+  </div>
+</div>
+
+<!-- ══════════════════════ 30 s LISTENING ══════════════════════ -->
+<div id="sc-listen" class="session-screen hidden" style="text-align:center;">
+  <div class="s-card" style="text-align:center;max-width:560px;">
+    <div class="round-badge" id="ls-badge">Round 1 of 4</div>
+    <div class="big-emoji">🎧</div>
+    <h2>Just listen</h2>
+    <p class="sub" style="margin-bottom:10px;">Relax and listen — you don't need to do anything. The test starts automatically when the countdown ends.</p>
+    <div class="music-box"><div class="val" id="ls-music">—</div></div>
+    <div class="timer" id="ls-timer" style="margin:14px 0 6px;">0:30</div>
+    <div class="pbar"><div class="pbar-fill" id="ls-bar" style="width:100%"></div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════ TASK: READING ══════════════════════ -->
+<div id="sc-reading" class="session-screen hidden">
+  <div class="s-card" style="max-width:760px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <h3 style="color:#e8a317;" id="rd-phase-lbl">📖 Step 1 — Read the Essay</h3>
+      <div class="timer-wrap">
+        <div class="timer-lbl" id="rd-timer-lbl">Time to read</div>
+        <div class="timer" id="rd-timer">2:00</div>
+      </div>
+    </div>
+    <div class="pbar"><div class="pbar-fill" id="rd-bar" style="width:100%"></div></div>
+
+    <div id="rd-read">
+      <div class="essay-box"><h4 id="essay-title">—</h4><div id="essay-body"></div></div>
+      <p style="color:rgba(255,255,255,0.38);font-size:0.78rem;text-align:center;margin-top:6px;">Read carefully. You'll write a summary after the timer ends.</p>
+    </div>
+    <div id="rd-write" class="hidden">
+      <p style="color:rgba(255,255,255,0.68);font-size:0.88rem;margin-bottom:10px;">Write a summary of what you just read — as many key points as you can remember.</p>
+      <textarea class="s-ta" id="rd-summary" placeholder="Start writing your summary here…"></textarea>
+      <div style="text-align:center;margin-top:12px;">
+        <button class="btn-go" onclick="submitReading()">Submit Summary →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ TASK: TYPING ══════════════════════ -->
+<div id="sc-typing" class="session-screen hidden">
+  <div class="s-card" style="max-width:700px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <div>
+        <h3 style="color:#e8a317;">⌨️ Reverse Typing</h3>
+        <div id="ty-line" style="color:rgba(255,255,255,0.45);font-size:0.8rem;">Line 1</div>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-lbl">Time left</div>
+        <div class="timer" id="ty-timer">3:00</div>
+      </div>
+    </div>
+    <p style="color:rgba(255,255,255,0.58);font-size:0.83rem;margin-bottom:8px;">Type these words in <strong style="color:#e8a317">reverse order</strong> (last word first), then press <span class="kbd">Enter</span> for the next line. Caps don't matter.</p>
+    <div class="orig-text" id="ty-orig">—</div>
+    <p style="color:rgba(232,163,23,0.75);font-size:0.8rem;margin:8px 0 4px;">👇 Type the reversed version below:</p>
+    <textarea class="s-ta" id="ty-inp" placeholder="Start typing in reverse order…" style="min-height:76px;" spellcheck="false" autocomplete="off"></textarea>
+    <div style="text-align:center;margin-top:14px;">
+      <button class="btn-go" onclick="typingLineDone()">Next line ↵</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ TASK: DOTS ══════════════════════ -->
+<div id="sc-dots" class="session-screen hidden">
+  <div class="s-card" style="text-align:center;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <div style="text-align:left;">
+        <h3 style="color:#e8a317;">🟣 Dot Memory Puzzle</h3>
+        <div id="dt-pattern" style="color:rgba(255,255,255,0.45);font-size:0.8rem;">Pattern 1</div>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-lbl">Time left</div>
+        <div class="timer" id="dt-left">2:00</div>
+      </div>
+    </div>
+    <p id="dt-instr" style="color:rgba(255,255,255,0.62);font-size:0.86rem;margin-bottom:12px;">Remember the positions of the highlighted dots.</p>
+    <div style="display:flex;justify-content:center;">
+      <canvas id="dt-canvas" width="300" height="300" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);"></canvas>
+    </div>
+    <div id="dt-recall-btns" class="hidden" style="margin-top:14px;">
+      <p style="color:rgba(255,255,255,0.42);font-size:0.8rem;margin-bottom:12px;">Click cells to mark dot positions, then submit.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn-go" onclick="submitDots()">Submit Answer →</button>
+        <button class="btn-ghost" onclick="dtClear()">Clear</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ TASK: SYMMETRY ══════════════════════ -->
+<div id="sc-sym" class="session-screen hidden">
+  <div class="s-card" style="text-align:center;max-width:600px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="text-align:left;">
+        <h3 style="color:#e8a317;">🔄 Symmetry Test</h3>
+        <p style="color:rgba(255,255,255,0.45);font-size:0.8rem;">Is the shape symmetric about the vertical centre line?</p>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-lbl">Time left</div>
+        <div class="timer" id="sym-timer">2:00</div>
+      </div>
+    </div>
+    <div class="score-strip">
+      <div class="sc-item"><div class="v" id="sym-ok">0</div><div class="l">Correct</div></div>
+      <div class="sc-item"><div class="v" id="sym-bad">0</div><div class="l">Wrong</div></div>
+      <div class="sc-item"><div class="v" id="sym-tot">0</div><div class="l">Total</div></div>
+    </div>
+    <div id="sym-canvas-wrap" style="display:flex;justify-content:center;margin:12px 0;">
+      <canvas id="sym-canvas" width="280" height="280" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);"></canvas>
+    </div>
+    <div class="ans-row">
+      <button class="btn-ans btn-yes" onclick="answerSym(true)">✓ Symmetric</button>
+      <button class="btn-ans btn-no" onclick="answerSym(false)">✗ Not Symmetric</button>
+    </div>
+    <p class="kbd-hint"><kbd class="kbd">Y</kbd> = Symmetric &nbsp; <kbd class="kbd">N</kbd> = Not Symmetric</p>
+  </div>
+</div>
+
+<!-- ══════════════════════ TASK: ROTATION ══════════════════════ -->
+<div id="sc-rot" class="session-screen hidden">
+  <div class="s-card" style="text-align:center;max-width:660px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <div style="text-align:left;">
+        <h3 style="color:#e8a317;">🔃 Rotated Image Test</h3>
+        <p style="color:rgba(255,255,255,0.45);font-size:0.8rem;">Is Shape B a <em>rotation</em> of A, or a <em>mirror</em> of A?</p>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-lbl">Time left</div>
+        <div class="timer" id="rot-timer">2:00</div>
+      </div>
+    </div>
+    <div class="score-strip">
+      <div class="sc-item"><div class="v" id="rot-ok">0</div><div class="l">Correct</div></div>
+      <div class="sc-item"><div class="v" id="rot-bad">0</div><div class="l">Wrong</div></div>
+      <div class="sc-item"><div class="v" id="rot-tot">0</div><div class="l">Total</div></div>
+    </div>
+    <div id="rot-wrap" class="two-canvas">
+      <div>
+        <canvas id="rot-a" width="190" height="190" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);"></canvas>
+        <div class="canvas-lbl">Shape A</div>
+      </div>
+      <div class="rot-vs" style="font-size:1.6rem;color:rgba(255,255,255,0.25);">vs</div>
+      <div>
+        <canvas id="rot-b" width="190" height="190" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);"></canvas>
+        <div class="canvas-lbl">Shape B</div>
+      </div>
+    </div>
+    <div class="ans-row">
+      <button class="btn-ans btn-same" onclick="answerRot(false)">🔄 Rotated (Same)</button>
+      <button class="btn-ans btn-mirr" onclick="answerRot(true)">🪞 Mirrored</button>
+    </div>
+    <p class="kbd-hint"><kbd class="kbd">R</kbd> = Rotated &nbsp; <kbd class="kbd">M</kbd> = Mirrored</p>
+  </div>
+</div>
+
+<!-- ══════════════════════ NUM SEQUENCE ══════════════════════ -->
+<div id="sc-numseq" class="session-screen hidden">
+  <div class="s-card" style="max-width:700px;width:100%;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <div>
+        <span id="ns-phase-lbl" style="color:#e8a317;font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;">Memorise</span>
+        <div id="ns-instr" style="color:rgba(255,255,255,0.55);font-size:0.82rem;margin-top:2px;">Remember the position of each number</div>
+      </div>
+      <div class="timer-wrap">
+        <div class="timer-lbl">Time left</div>
+        <div class="timer" id="ns-timer">2:00</div>
+      </div>
+    </div>
+    <div class="pbar"><div class="pbar-fill" id="ns-bar" style="width:100%;"></div></div>
+
+    <!-- Circle arena -->
+    <div id="ns-arena" style="position:relative;width:100%;height:340px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:14px;overflow:hidden;margin:12px 0;"></div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div style="color:rgba(255,255,255,0.45);font-size:0.82rem;">Next to click: <span id="ns-next" style="color:#e8a317;font-weight:800;font-size:1.1rem;">—</span></div>
+      <div>
+        <span id="ns-hits" style="color:#22c55e;font-weight:700;">0</span>
+        <span style="color:rgba(255,255,255,0.35);font-size:0.8rem;"> / 10 correct</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ DONE ══════════════════════ -->
+<div id="sc-done" class="session-screen hidden">
+  <div class="s-card" style="max-width:560px;text-align:center;">
+    <div class="big-emoji">🎉</div>
+    <h2>Phase 2 Complete!</h2>
+    <p style="color:rgba(255,255,255,0.6);margin:10px 0 18px;line-height:1.6;">Thank you for taking part in both phases of the study. Your responses have been recorded.</p>
+    <div id="done-unsent"></div>
+    <a href="index.html" class="btn-ghost" style="text-decoration:none;display:inline-block;">← Back to homepage</a>
+  </div>
+</div>
+
+<!-- Now-playing bar (visible during runs) -->
+<div id="np-bar" class="np hidden"><span class="eq"><i></i><i></i><i></i></span><span id="np-text">—</span></div>
+
+
+<script src="api.js"></script>
+<script>
+// ─────────────────────────────────────────
+// ESSAYS (5 × ~220 words)
+// ─────────────────────────────────────────
+const ESSAYS=[
+{title:"The Water Cycle",text:`Water moves constantly through the environment in the water cycle. The sun heats surface water in oceans, lakes, and rivers, causing it to evaporate and rise as water vapor. As the vapor ascends and cools, it condenses around tiny dust particles to form clouds. When enough droplets collect, they fall as precipitation — rain, snow, sleet, or hail.\n\nOnce on the ground, water takes several paths. Some flows across the surface as runoff, reaching rivers and oceans. Some soaks into soil as groundwater, which plants absorb through roots and release as vapor through transpiration. Ice in polar regions and mountains may stay frozen for thousands of years as glaciers before slowly melting.\n\nThe water cycle is critical to life on Earth. It distributes fresh water across continents, regulates climate, and sustains ecosystems. Human activities such as deforestation and urbanization disrupt the cycle by reducing evaporation and increasing runoff, threatening fresh water supplies worldwide. Understanding this cycle is essential for managing water resources in an era of changing climate.`},
+{title:"The Rise of Ancient Rome",text:`Rome began as a small village on the Tiber River around the 8th century BCE. Legend says it was founded by twin brothers Romulus and Remus, raised by a she-wolf. By 509 BCE the Romans expelled their kings and created a republic governed by elected consuls and guided by a Senate of wealthy citizens.\n\nOver centuries, Rome expanded aggressively. Its disciplined army conquered the Italian peninsula, then North Africa, Greece, Spain, and much of Western Europe. Roads, aqueducts, and a legal system unified these territories into an empire that facilitated trade and cultural exchange.\n\nAt its height in the 2nd century CE, the empire housed roughly 60 million people. It gifted the world ideas about law, governance, and architecture. Latin, Rome's language, evolved into modern Italian, French, Spanish, Portuguese, and Romanian. Economic strain and repeated invasions eventually brought down the Western Empire in 476 CE, while the Eastern Empire survived as Byzantium for nearly a thousand more years.`},
+{title:"How Vaccines Work",text:`Vaccines are among medicine's most powerful tools. They train the immune system to recognise and fight specific pathogens — bacteria or viruses — without causing the disease. A vaccine introduces a harmless version or fragment of the pathogen: a weakened form, a killed form, or just a protein from its surface.\n\nThe immune system responds by producing antibodies — proteins that bind and neutralise the pathogen. It also creates memory cells that remain long after the response ends. If the real pathogen enters the body later, memory cells recognise it quickly and mount a rapid defence, often eliminating it before symptoms appear.\n\nDifferent vaccines work differently. Live-attenuated vaccines use weakened pathogens and give strong, long-lasting immunity. Inactivated vaccines use killed pathogens. Newer mRNA vaccines deliver genetic instructions so cells produce a harmless protein fragment that triggers immunity. Widespread vaccination creates herd immunity — enough people are protected that the pathogen struggles to spread, shielding even the unvaccinated. This strategy has eliminated smallpox and greatly reduced polio and measles worldwide.`},
+{title:"The Amazon Rainforest",text:`The Amazon rainforest covers roughly 5.5 million square kilometres across nine South American countries, mostly in Brazil. The world's largest tropical rainforest, it is often called the "lungs of the Earth" because it absorbs vast amounts of carbon dioxide and produces oxygen, helping regulate global climate.\n\nThe Amazon is extraordinarily biodiverse — home to an estimated 10 percent of all species on Earth, including more than 40,000 plant species, 1,300 bird species, 3,000 fish types, and millions of insects, many still unknown to science. Indigenous peoples have lived here for thousands of years, holding deep knowledge of its plants and ecology.\n\nThe Amazon faces severe threats. Cattle ranching, soy farming, illegal logging, and infrastructure projects destroy millions of hectares each year. Burning trees releases stored carbon into the atmosphere, accelerating climate change. Scientists warn that if deforestation continues, the Amazon could reach a tipping point, converting to dry savanna with catastrophic consequences for biodiversity and global climate stability.`},
+{title:"Light and Photosynthesis",text:`Photosynthesis is the process by which plants, algae, and some bacteria convert light into chemical energy stored as sugar. It occurs in chloroplasts, which contain a pigment called chlorophyll. Chlorophyll absorbs red and blue light and reflects green light — which is why most plants look green.\n\nThe process has two stages. In the light-dependent reactions, sunlight energises electrons in the chlorophyll, driving production of ATP and NADPH — energy-carrying molecules — while splitting water molecules and releasing oxygen as a byproduct. This oxygen is what most life on Earth breathes.\n\nIn the Calvin cycle, the plant uses ATP and NADPH to convert carbon dioxide into glucose. This glucose powers the plant and, through the food chain, nearly all other organisms on Earth. Changes in sunlight, carbon dioxide, or water supply directly affect photosynthesis rates, making it a crucial process to understand for food security and climate science. Without photosynthesis, almost no life on Earth would exist.`}
+];
+
+// ─────────────────────────────────────────
+// TYPING PARAGRAPHS
+// ─────────────────────────────────────────
+const WORDS=`time year people way day man thing woman life child world school state family student group country problem hand part place case week company system program question work government number night point home water room mother area money story fact month lot right study book eye job word business issue side kind head house service friend father power hour game line end member law car city community name president team minute idea kid body information back parent face others level office door health person art war history party result change morning reason research girl guy moment air teacher force education foot boy age policy music process market sense nation plan college interest death experience effect class control care field development role effort rate heart drug show leader light voice wife police mind price report decision son view relationship town road arm difference value building action model season society tax director position player record paper space ground form event official matter center couple site project activity star table need court oil situation cost industry figure street image phone data picture practice piece land product doctor wall patient worker news test movie north love support technology step baby computer type attention film tree source organization hair window evidence population site garden river bird summer winter green yellow simple quiet happy bright gentle quick slow early later small large`.split(/\s+/);
+
+
+// ─────────────────────────────────────────
+// TASKS METADATA
+// ─────────────────────────────────────────
+const TASKS={
+  reading: {name:"Reading + Summary",    icon:"📖", desc:"Read a short essay (2 min), then write a summary (1.5 min) from memory.", dur:"~3.5 min"},
+  typing:  {name:"Reverse Typing",       icon:"⌨️", desc:"3 minutes — lines of 10 random words: type each line in reverse order (last word first), press Enter for the next.", dur:"3 min"},
+  dots:    {name:"Dot Memory Puzzle",    icon:"🟣", desc:"2 minutes — memorise 7 dots (6 s), mark where they were, then the next pattern. Do as many as you can.", dur:"2 min"},
+  symmetry:{name:"Symmetry Test",        icon:"🔄", desc:"2 minutes — for each shape, say if it is left-right symmetric or not.", dur:"2 min"},
+  rotation:{name:"Rotated Image Test",   icon:"🔃", desc:"2 minutes — is Shape B a rotation of A, or a mirrored version?", dur:"2 min"},
+  numseq:  {name:"Number Sequence",      icon:"🔢", desc:"2 minutes — memorise where 0–9 are (8 s), then click them in order. Do as many layouts as you can.", dur:"2 min"},
+};
+
+// ─────────────────────────────────────────
+// PHASE 2 CONFIG
+// ─────────────────────────────────────────
+const POOL=Object.keys(TASKS);
+const NOISE_AMP=0.108;   // uniform white noise ±0.108, played dual-mono ≈ −18 LUFS (same as Phase 1)
+const LISTEN_SECS=30;    // each round's audio plays this long before the test starts
+// The same tracks for everyone. To change one, replace its file in audio/phase2/ (prepared with
+// tools/prep_phase2_audio.py, so it matches the white noise at −18 LUFS) and set its title here.
+const CONDS={
+  white_noise: {name:'White noise',                     icon:'🌫️', title:'',    file:''},
+  western:     {name:'Western classical',               icon:'🎻', title:'TBD', file:'audio/phase2/western.mp3'},
+  indian_vocal:{name:'Indian classical (vocal)',        icon:'🎤', title:'TBD', file:'audio/phase2/indian_vocal.mp3'},
+  indian_instr:{name:'Indian classical (instrumental)', icon:'🪕', title:'TBD', file:'audio/phase2/indian_instr.mp3'},
+};
+// Balanced 4×4 Latin square (Williams design): each condition once in every round position,
+// and each condition directly follows every other exactly once. The server assigns a row (p2_order 1–4).
+const ORDERS=[
+  ['white_noise','western','indian_instr','indian_vocal'],
+  ['western','indian_vocal','white_noise','indian_instr'],
+  ['indian_vocal','indian_instr','western','white_noise'],
+  ['indian_instr','white_noise','indian_vocal','western'],
+];
+const ROUNDS=ORDERS[0].length;
+// Practice before round 1 (silent, untimed, unscored): 3 puzzles, 1 line for Reverse Typing, none for Reading
+const PRACTICE_N={symmetry:3,rotation:3,dots:3,numseq:3,typing:1};
+
+// ─────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────
+let S={
+  roll:'', name:'', device:'', task:'', orderId:0, order:[], steps:[], done:new Set(), variantBase:0,
+  practice:false, practiceN:0, practiceOk:0,
+  round:1, tracks:{}, restarts:0,
+  inRun:false, listening:false, runT0:0, blur:0, audioErr:0,
+  form:{}, formKey:'',
+  essayIdx:0,
+  _iv:[],
+};
+
+// ─────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────
+const shuffle=a=>{const b=[...a];for(let i=b.length-1;i>0;i--){const j=0|Math.random()*(i+1);[b[i],b[j]]=[b[j],b[i]];}return b;};
+const nav=id=>{document.querySelectorAll('.session-screen').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');};
+const clearIv=()=>{S._iv.forEach(t=>{clearInterval(t);clearTimeout(t);});S._iv=[];};
+const fmt=(s,dec)=>{const m=0|Math.abs(s)/60,r=Math.abs(s)%60;return dec?`${m}:${r.toFixed(1).padStart(4,'0')}`:`${m}:${String(0|r).padStart(2,'0')}`;};
+
+// roundRect polyfill
+if(!CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){
+    this.beginPath();this.moveTo(x+r,y);this.lineTo(x+w-r,y);this.quadraticCurveTo(x+w,y,x+w,y+r);
+    this.lineTo(x+w,y+h-r);this.quadraticCurveTo(x+w,y+h,x+w-r,y+h);this.lineTo(x+r,y+h);
+    this.quadraticCurveTo(x,y+h,x,y+h-r);this.lineTo(x,y+r);this.quadraticCurveTo(x,y,x+r,y);this.closePath();
+  };
+}
+
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cond=()=>S.order[S.round-1];
+const condLabel=c=>{const m=CONDS[c];return m.icon+' '+m.name+(m.title?' — '+m.title:'');};
+const nextStep=()=>S.steps.find(k=>!S.done.has(k))||'complete';
+
+// ─────────────────────────────────────────
+// AUDIO  (white noise + the three tracks, one source at a time)
+// ─────────────────────────────────────────
+const AU={ctx:null,src:null,el:null,noise:null};
+function ac(){
+  if(!AU.ctx)AU.ctx=new (window.AudioContext||window.webkitAudioContext)();
+  if(AU.ctx.state==='suspended')AU.ctx.resume();
+  return AU.ctx;
+}
+function noiseBuf(){
+  if(!AU.noise){
+    const c=ac(),n=c.sampleRate*10,b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);
+    for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*NOISE_AMP;
+    AU.noise=b;
+  }
+  return AU.noise;
+}
+function playBuffer(buf,gain=1){
+  stopAudio();
+  const c=ac(),s=c.createBufferSource(),g=c.createGain();
+  s.buffer=buf;s.loop=true;g.gain.value=gain;
+  s.connect(g).connect(c.destination);s.start();
+  AU.src=s;
+}
+function playUrl(url,onErr){
+  stopAudio();
+  const a=new Audio(url);a.loop=true;
+  a.onerror=()=>onErr&&onErr();
+  AU.el=a;
+  return a.play();  // rejects if the browser refuses to play
+}
+function stopAudio(){
+  if(AU.src){try{AU.src.stop();}catch(_){}AU.src=null;}
+  if(AU.el){AU.el.onerror=null;AU.el.pause();AU.el.removeAttribute('src');AU.el.load();AU.el=null;}
+}
+function canPlay(url){
+  return new Promise((ok,bad)=>{
+    const a=new Audio();const t=setTimeout(()=>bad(new Error('timeout')),20000);
+    a.oncanplay=()=>{clearTimeout(t);ok();};a.onerror=()=>{clearTimeout(t);bad(new Error('decode'));};
+    a.preload='auto';a.src=url;a.load();
+  });
+}
+// Each track is downloaded once into memory (so it can't stall mid-round) and checked playable.
+// Started right after login; a failed download is retried when its round starts.
+function loadTrack(c){
+  if(!S.tracks[c])S.tracks[c]=(async()=>{
+    const res=await fetch(CONDS[c].file);
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const url=URL.createObjectURL(await res.blob());
+    await canPlay(url);
+    return url;
+  })().catch(err=>{delete S.tracks[c];throw err;});
+  return S.tracks[c];
+}
+// Resolves once sound is actually playing; rejects if the track can't load or the browser blocks it
+async function playCond(c,onErr){
+  if(c==='white_noise'){
+    playBuffer(noiseBuf());
+    await ac().resume();
+    if(ac().state!=='running')throw new Error('audio blocked');
+  }else await playUrl(await loadTrack(c),onErr);
+}
+
+// Now-playing bar
+const setNP=t=>{document.getElementById('np-text').textContent=t;document.getElementById('np-bar').classList.remove('hidden');};
+const hideNP=()=>document.getElementById('np-bar').classList.add('hidden');
+
+window.addEventListener('blur',()=>{if(S.inRun&&!S.listening)S.blur++;});
+window.addEventListener('beforeunload',e=>{if(S.inRun){e.preventDefault();e.returnValue='';}});
+
+// ─────────────────────────────────────────
+// LOGIN
+// ─────────────────────────────────────────
+async function login(){
+  const roll=document.getElementById('roll-inp').value.trim().toUpperCase();
+  if(!roll){alert('Enter your roll number.');return;}
+  const btn=document.getElementById('btn-login');
+  btn.disabled=true;btn.textContent='Checking…';
+  try{
+    const p=await API.profile2(roll,POOL);
+    if(!p.ok)throw new Error(p.error);
+    if(!p.registered){
+      showMsg('📝','Roll number not found',`We couldn't find <strong>${esc(roll)}</strong>. Phase 2 is for people who took part in Phase 1 — check that you typed the roll number you used there.`,
+        `<button class="btn-go" onclick="nav('sc-login')">← Try again</button>`);
+      return;
+    }
+    if(!p.phase1Done){
+      showMsg('⏳','Finish Phase 1 first',`Phase 2 opens once you've completed Phase 1. Your Phase 1 progress is saved — pick up where you left off.`,
+        `<a href="session.html?roll=${encodeURIComponent(roll)}" class="btn-go" style="text-decoration:none;display:inline-block;">Continue Phase 1 →</a>`);
+      return;
+    }
+    if(!TASKS[p.task]||!ORDERS[p.order-1])throw new Error('no test assigned');
+    const order=ORDERS[p.order-1];
+    Object.assign(S,{roll,name:p.name,task:p.task,orderId:p.order,order,done:new Set(p.done)});
+    S.steps=['start',...(PRACTICE_N[p.task]?['practice']:[]),...order.flatMap((_,i)=>[`r${i+1}run`,`r${i+1}mood`]),'final'];
+    S.variantBase=[...roll].reduce((a,c)=>a+c.charCodeAt(0),0);
+    if(nextStep()==='complete'){showDone();return;}
+    order.forEach(c=>{if(CONDS[c].file)loadTrack(c).catch(()=>{});});
+    const n=PRACTICE_N[p.task];
+    const hp=document.getElementById('howto-practice');
+    hp.hidden=!n;
+    hp.innerHTML=n?`<strong>Practice</strong> — ${n>1?n+' practice puzzles':'one practice line'} of your test (no audio, not timed, not scored).`:'';
+    nav('sc-check');
+  }catch(err){
+    alert('⚠️ Could not reach the study server. Check your connection and try again.\n\n('+err.message+')');
+  }finally{
+    btn.disabled=false;btn.textContent='Continue →';
+  }
+}
+
+function showMsg(emoji,title,html,actions=''){
+  document.getElementById('msg-emoji').textContent=emoji;
+  document.getElementById('msg-title').textContent=title;
+  document.getElementById('msg-text').innerHTML=html;
+  document.getElementById('msg-actions').innerHTML=actions;
+  nav('sc-msg');
+}
+
+// ─────────────────────────────────────────
+// AUDIO CHECK
+// ─────────────────────────────────────────
+let testOn=false,testPlayed=false;
+function toggleTestSound(){
+  const b=document.getElementById('btn-testsound');
+  if(testOn){stopAudio();b.textContent='▶ Play test sound';}
+  else{playBuffer(noiseBuf());testPlayed=true;b.textContent='⏹ Stop test sound';}
+  testOn=!testOn;updCheck();
+}
+function updCheck(){
+  const all=[...document.querySelectorAll('#check-list input')].every(c=>c.checked);
+  document.getElementById('btn-check').disabled=!(all&&testPlayed&&S.device);
+}
+// Device is only recorded (for normalising in analysis); the tests are the same on every device
+function setDevice(btn){
+  S.device=btn.dataset.device;
+  document.querySelectorAll('#device-row .choice-btn').forEach(b=>b.classList.toggle('sel',b===btn));
+  updCheck();
+}
+function afterCheck(){
+  stopAudio();testOn=false;
+  document.getElementById('btn-testsound').textContent='▶ Play test sound';
+  if(S.done.has('start'))go();   // resuming — skip the instructions
+  else nav('sc-howto');
+}
+
+// ─────────────────────────────────────────
+// FLOW  (resumes at the first step not yet saved)
+// ─────────────────────────────────────────
+function go(){
+  window.scrollTo(0,0);
+  const k=nextStep();
+  if(k==='complete')return showDone();
+  if(k==='start'||k==='final')return showForm(k);
+  if(k==='practice')return showPractice();
+  const [,r,t]=k.match(/^r(\d)(run|mood)$/);
+  S.round=+r;
+  if(t==='run')return showIntro();
+  return showForm('mood');
+}
+
+async function save(rec){
+  S.done.add(rec.step_key);
+  const full=Object.assign({roll:S.roll,name:S.name,phase:2,device:S.device,order_id:S.orderId,client_ts:new Date().toISOString()},rec);
+  try{await API.submit(full);}catch(_){} // failures are queued in localStorage and retried on the next save
+}
+
+// ─────────────────────────────────────────
+// PRACTICE  (before round 1: silent, untimed, unscored, with feedback)
+// ─────────────────────────────────────────
+function showPractice(){
+  const t=S.task,m=TASKS[t],n=PRACTICE_N[t],unit=t==='typing'?'line':'puzzle';
+  document.getElementById('pr-icon').textContent=m.icon;
+  document.getElementById('pr-name').textContent=m.name;
+  document.getElementById('pr-desc').textContent=m.desc;
+  document.getElementById('pr-sub').textContent=`Before the real rounds, try ${n>1?n+' practice '+unit+'s':'one practice '+unit} to get used to the test. No audio, no timer, not scored — you'll see whether you got it right.`;
+  if(!S.practiceN)document.getElementById('pr-result').hidden=true;
+  document.getElementById('btn-practice').textContent=S.practiceN>=n?'Continue to Round 1 →':`▶ Practice ${unit} ${S.practiceN+1} of ${n}`;
+  nav('sc-practice');
+}
+
+async function practiceGo(){
+  if(S.practiceN>=PRACTICE_N[S.task]){
+    const btn=document.getElementById('btn-practice');btn.disabled=true;
+    await save({step_key:'practice',step:'practice',task:S.task,practice_n:S.practiceN,practice_correct:S.practiceOk});
+    btn.disabled=false;
+    return go();
+  }
+  S.practice=true;
+  ({symmetry:startSym,rotation:startRot,dots:startDots,numseq:startNumSeq,typing:startTyping})[S.task]();
+  practiceLabels(S.task,true);
+}
+
+// Show "Practice" where the countdown normally is
+function practiceLabels(task,on){
+  const id={symmetry:'sym-timer',rotation:'rot-timer',dots:'dt-left',numseq:'ns-timer',typing:'ty-timer'}[task];
+  if(!id)return;
+  const el=document.getElementById(id),lbl=el.previousElementSibling;
+  if(lbl)lbl.textContent=on?'Practice':'Time left';
+  if(on){el.textContent='✎';el.classList.remove('warn');}
+}
+
+// Called by a test's own answer handler while practising
+function practiceDone(ok,msg){
+  clearIv();
+  S.practice=false;S.practiceN++;if(ok)S.practiceOk++;
+  practiceLabels(S.task,false);
+  const box=document.getElementById('pr-result');
+  box.innerHTML=`<div class="lbl">Practice ${S.practiceN} of ${PRACTICE_N[S.task]}</div><div class="val" style="color:${ok?'#22c55e':'#fbbf24'}">${ok?'✓ Correct!':'✗ Not quite'}</div><div class="hint" style="font-size:0.85rem;color:rgba(255,255,255,0.65)">${msg}</div>`;
+  box.hidden=false;
+  showPractice();
+}
+
+// ─────────────────────────────────────────
+// ROUND: intro → 30 s listening → test (audio continues) → mood
+// ─────────────────────────────────────────
+function showIntro(){
+  const m=TASKS[S.task],c=cond();
+  const dots=document.getElementById('prog-dots');dots.innerHTML='';
+  for(let i=0;i<ROUNDS;i++){const d=document.createElement('div');d.className='prog-dot'+(i<S.round-1?' done':i===S.round-1?' active':'');dots.appendChild(d);}
+  document.getElementById('intro-badge').textContent=`Round ${S.round} of ${ROUNDS}`;
+  document.getElementById('intro-music').textContent=condLabel(c);
+  document.getElementById('intro-hint').textContent=`Plays for ${LISTEN_SECS} seconds on its own first, then the test starts automatically. `+(S.task==='reading'
+    ?'It keeps playing while you read, and stops when you start writing your summary.'
+    :'It keeps playing until the test ends.')+' Don\'t change your volume.';
+  document.getElementById('intro-icon').textContent=m.icon;
+  document.getElementById('intro-name').textContent=m.name;
+  document.getElementById('intro-desc').textContent=m.desc;
+  document.getElementById('intro-audio-warn').hidden=true;
+  nav('sc-intro');
+}
+
+// The round starts only once its audio is confirmed playing — a test without its audio is useless data
+async function startRound(){
+  const btn=document.getElementById('btn-start'),warn=document.getElementById('intro-audio-warn');
+  btn.disabled=true;btn.textContent='Loading audio…';warn.hidden=true;
+  try{await playCond(cond(),audioFailed);}
+  catch(_){
+    stopAudio();warn.hidden=false;
+    return;
+  }finally{btn.disabled=false;btn.textContent='▶ Start round';}
+  setNP(condLabel(cond()));
+  Object.assign(S,{inRun:true,listening:true,audioErr:0});
+  document.getElementById('ls-badge').textContent=`Round ${S.round} of ${ROUNDS}`;
+  document.getElementById('ls-music').textContent=condLabel(cond());
+  nav('sc-listen');
+  const t0=Date.now(),el=document.getElementById('ls-timer'),bar=document.getElementById('ls-bar');
+  const tick=()=>{
+    const left=Math.max(0,LISTEN_SECS-(Date.now()-t0)/1000);
+    el.textContent=fmt(Math.ceil(left));bar.style.width=(left/LISTEN_SECS*100)+'%';
+    return left<=0;
+  };
+  tick();
+  const iv=setInterval(()=>{if(tick()){clearInterval(iv);beginTask();}},250);
+  S._iv.push(iv);
+}
+
+function beginTask(){
+  Object.assign(S,{listening:false,runT0:Date.now(),blur:0});
+  S.essayIdx=S.variantBase+S.round-1;   // a different essay every round (5 essays, 4 rounds)
+  ({reading:startReading,typing:startTyping,dots:startDots,symmetry:startSym,rotation:startRot,numseq:startNumSeq})[S.task]();
+}
+
+// The audio stopped mid-round (very unlikely: it plays from memory) → discard this attempt and restart the round
+function audioFailed(){
+  if(!S.inRun)return;
+  S.inRun=false;S.listening=false;S.restarts++;clearIv();stopAudio();hideNP();
+  showMsg('🔇','Audio stopped','The audio stopped playing, so this round can\'t count. It will restart from the beginning.',
+    `<button class="btn-go" onclick="showIntro()">↻ Restart this round</button>`);
+}
+
+// Called by every task when it finishes
+async function record(tk,data,summary){
+  if(!S.inRun)return;
+  S.inRun=false;stopAudio();hideNP();clearIv();
+  showMsg('💾','Saving…','');
+  const c=cond();
+  const rec={step_key:`r${S.round}run`,step:'run',round:S.round,condition:c,track_title:CONDS[c].title,
+    order:S.order.join('>'),task:tk,task_name:TASKS[tk].name,listen_s:LISTEN_SECS,
+    duration_s:Math.round((Date.now()-S.runT0)/1000),blur_count:S.blur,audio_errors:S.audioErr,run_restarts:S.restarts,summary,
+    practiced:S.done.has('practice')?'yes':'',
+    audio_phase:tk==='reading'?'reading_only':'whole_task'};
+  Object.entries(data).forEach(([k,v])=>{rec['res_'+k]=v;});
+  S.restarts=0;
+  await save(rec);
+  go();
+}
+
+// ─────────────────────────────────────────
+// FORMS  (starting mood, mood after each round, final questions)
+// ─────────────────────────────────────────
+const CHOICE_CONDS=Object.keys(CONDS).map(c=>[c,CONDS[c].name]);
+const Q={
+  valence:      {t:'scale',q:'How pleasant or unpleasant do you feel right now?',min:1,max:9,lo:'Very unpleasant 😞',hi:'Very pleasant 😊'},
+  arousal:      {t:'scale',q:'How calm or excited / energised do you feel right now?',min:1,max:9,lo:'Very calm 😌',hi:'Very excited ⚡'},
+  sleepiness:   {t:'scale',q:'How sleepy do you feel right now?',min:1,max:9,lo:'Extremely alert',hi:'Very sleepy, fighting sleep'},
+  stress:       {t:'scale',q:'How stressed do you feel right now?',min:1,max:5,lo:'Not at all',hi:'Extremely'},
+  sleep_hours:  {t:'number',q:'How many hours did you sleep last night?',min:0,max:16,step:0.5},
+  caffeine:     {t:'choice',q:'Have you had caffeine (coffee, tea, energy drink) in the last 3 hours?',opts:[['yes','Yes'],['no','No']]},
+  concentration:{t:'scale',q:'How well could you concentrate during this round?',min:1,max:5,lo:'Very poorly',hi:'Very well'},
+  distraction:  {t:'scale',q:'How distracting was the audio in this round?',min:1,max:5,lo:'Not at all',hi:'Extremely'},
+  liking:       {t:'scale',q:'How much did you like the audio in this round?',min:1,max:5,lo:'Not at all',hi:'Very much'},
+  familiar_feel:{t:'scale',q:'How familiar did the music feel?',min:1,max:5,lo:'Not at all familiar',hi:'Very familiar'},
+  indian_feel:  {t:'scale',q:'How Indian did the music feel?',min:1,max:5,lo:'Not at all Indian',hi:'Very Indian'},
+  rank:         {t:'rank', q:'Rank the four kinds of audio by how well you could focus with them (1 = best, 4 = worst).',items:CHOICE_CONDS},
+  best:         {t:'choice',q:'Which do you think actually helped you concentrate the most?',opts:CHOICE_CONDS.concat([['no_difference','No real difference']])},
+  best_why:     {t:'text', q:'Why do you think so?'},
+  vocal:        {t:'text', q:'How did the vocal piece compare with the instrumental ones? Did the singing distract you or help?'},
+  vs_phase1:    {t:'text', q:'How did these pieces compare with your own song from Phase 1?'},
+  usual:        {t:'choice',q:'What do you usually choose when you need to concentrate?',opts:[['silence','Silence'],['white_noise','White / ambient noise'],['instrumental','Instrumental music'],['lyrics','Songs with lyrics'],['depends','Depends on the task']]},
+};
+const FORMS={
+  start:{title:'🙂 How are you feeling?',sub:'Answer based on how you feel right now — there are no right or wrong answers.',
+         sections:()=>[[null,['valence','arousal','sleepiness','stress','sleep_hours','caffeine']]]},
+  mood: {title:'📝 After this round',sub:'Part A is about how you feel now; Part B is about this round.',
+         sections:()=>[['Part A — How you feel now',['valence','arousal']],
+                       ['Part B — This round',['concentration','distraction','liking'].concat(cond()==='white_noise'?[]:['familiar_feel','indian_feel'])]]},
+  final:{title:'💬 Final Questions',sub:'Tell us about your experience in your own words. Each written answer needs at least 10 characters — write as much as you like.',
+         sections:()=>[['Looking back at all four rounds',['rank','best','best_why','vocal','vs_phase1','usual']]]},
+};
+
+function showForm(key){
+  S.formKey=key;S.form={};
+  const f=FORMS[key],box=document.getElementById('form-box'),badge=document.getElementById('form-badge');
+  document.getElementById('form-title').textContent=key==='mood'?`📝 After Round ${S.round}`:f.title;
+  document.getElementById('form-sub').textContent=key==='mood'&&S.round===ROUNDS?'Part A is about how you feel now; Part B is about this round.':f.sub;
+  badge.style.display=key==='mood'?'inline-block':'none';
+  badge.textContent=`Round ${S.round} of ${ROUNDS} · ${condLabel(cond())}`;
+  box.innerHTML='';
+  f.sections().forEach(([h,ids])=>{
+    if(h)box.insertAdjacentHTML('beforeend',`<div class="q-sec">${h}</div>`);
+    ids.forEach(id=>box.appendChild(qEl(id)));
+  });
+  nav('sc-form');
+}
+
+function qEl(id){
+  const q=Q[id],d=document.createElement('div');
+  d.className='q-block';d.id='q_'+id;
+  d.innerHTML=`<label class="s-lbl">${q.q}</label>`;
+  if(q.t==='scale'||q.t==='choice'){
+    const row=document.createElement('div');row.className='scale-row';
+    const opts=q.t==='scale'?Array.from({length:q.max-q.min+1},(_,k)=>[q.min+k,String(q.min+k)]):q.opts;
+    opts.forEach(([v,l])=>{
+      const b=document.createElement('button');
+      b.type='button';b.className=q.t==='scale'?'scale-btn':'choice-btn';b.textContent=l;
+      b.onclick=()=>{S.form[id]=v;row.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b));d.classList.remove('missing');};
+      row.appendChild(b);
+    });
+    d.appendChild(row);
+    if(q.t==='scale')d.insertAdjacentHTML('beforeend',`<div class="scale-ends"><span>${q.min} = ${q.lo}</span><span>${q.max} = ${q.hi}</span></div>`);
+  }else if(q.t==='rank'){
+    // One row per item with buttons 1…n; each rank can go to one item only (picking it again moves it)
+    const val=S.form[id]={},n=q.items.length,rows={};
+    const paint=()=>Object.entries(rows).forEach(([k,r])=>r.querySelectorAll('button').forEach(b=>b.classList.toggle('sel',val[k]===+b.textContent)));
+    q.items.forEach(([k,l])=>{
+      const line=document.createElement('div');line.className='rank-line';
+      line.innerHTML=`<span class="rank-name">${esc(CONDS[k]?CONDS[k].icon+' '+l:l)}</span>`;
+      const r=rows[k]=document.createElement('div');r.className='scale-row';
+      for(let v=1;v<=n;v++){
+        const b=document.createElement('button');b.type='button';b.className='scale-btn';b.textContent=v;
+        b.onclick=()=>{Object.keys(val).forEach(o=>{if(val[o]===v)delete val[o];});val[k]=v;paint();if(Object.keys(val).length===n)d.classList.remove('missing');};
+        r.appendChild(b);
+      }
+      line.appendChild(r);d.appendChild(line);
+    });
+  }else if(q.t==='number'){
+    const i=document.createElement('input');
+    Object.assign(i,{type:'number',className:'s-inp',min:q.min,max:q.max,step:q.step});i.style.maxWidth='140px';
+    i.oninput=()=>{S.form[id]=i.value;};
+    d.appendChild(i);
+  }else{
+    const t=document.createElement('textarea'),c=document.createElement('div');
+    t.className='s-ta';t.placeholder='Write in your own words…';
+    c.className='ta-count';c.textContent='0 characters (min 10)';
+    t.oninput=()=>{const n=(S.form[id]=t.value.trim()).length;c.textContent=`${n} characters${n<10?' (min 10)':''}`;};
+    d.append(t,c);
+  }
+  return d;
+}
+
+function validQ(id){
+  const q=Q[id],v=S.form[id];
+  if(q.t==='text')return(v||'').length>=10;
+  if(q.t==='number')return v!==undefined&&v!==''&&+v>=q.min&&+v<=q.max;
+  if(q.t==='rank')return Object.keys(v||{}).length===q.items.length;
+  return v!==undefined;
+}
+
+async function submitForm(){
+  const key=S.formKey,ids=FORMS[key].sections().flatMap(s=>s[1]);
+  let first=null;
+  ids.forEach(id=>{const ok=validQ(id),el=document.getElementById('q_'+id);el.classList.toggle('missing',!ok);if(!ok&&!first)first=el;});
+  if(first){first.scrollIntoView({behavior:'smooth',block:'center'});return;}
+  const btn=document.getElementById('btn-form');
+  btn.disabled=true;btn.textContent='Saving…';
+  const ans={};
+  ids.forEach(id=>{if(Q[id].t==='rank')Object.entries(S.form[id]).forEach(([k,v])=>{ans[id+'_'+k]=v;});else ans[id]=S.form[id];});   // rank → rank_<condition> columns
+  const step_key=key==='mood'?`r${S.round}mood`:key;
+  await save(Object.assign({step_key,step:key},key==='mood'?{round:S.round,condition:cond()}:{},ans));
+  btn.disabled=false;btn.textContent='Continue →';
+  go();
+}
+
+// ─────────────────────────────────────────
+// DONE
+// ─────────────────────────────────────────
+function showDone(){
+  stopAudio();hideNP();
+  let unsent=[];try{unsent=JSON.parse(localStorage.getItem('study_unsent')||'[]');}catch(_){}
+  document.getElementById('done-unsent').innerHTML=unsent.length
+    ?`<div class="warn-box">⚠️ ${unsent.length} response(s) couldn't reach our server. Please download this backup and email it to the research team.<br><button class="btn-mini" style="margin-top:8px" onclick="dlUnsent()">⬇ Download backup</button></div>`:'';
+  nav('sc-done');
+}
+
+function dlUnsent(){
+  const blob=new Blob([localStorage.getItem('study_unsent')||'[]'],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`phase2_backup_${S.roll}.json`;a.click();
+}
+
+// ─────────────────────────────────────────
+// TASK: READING
+// ─────────────────────────────────────────
+let RD={phase:'read',left:0};
+
+function startReading(){
+  clearIv();
+  const e=ESSAYS[S.essayIdx%ESSAYS.length];S.essayIdx++;
+  document.getElementById('essay-title').textContent=e.title;
+  document.getElementById('essay-body').textContent=e.text;
+  document.getElementById('rd-phase-lbl').textContent='📖 Step 1 — Read the Essay';
+  document.getElementById('rd-timer-lbl').textContent='Time to read';
+  document.getElementById('rd-summary').value='';
+  document.getElementById('rd-read').classList.remove('hidden');
+  document.getElementById('rd-write').classList.add('hidden');
+  RD={phase:'read',left:READ_SECS};
+  nav('sc-reading');
+  runRdTimer();
+}
+
+function runRdTimer(){
+  const total=RD.phase==='read'?READ_SECS:90;
+  const timerEl=document.getElementById('rd-timer');
+  const barEl=document.getElementById('rd-bar');
+  const iv=setInterval(()=>{
+    RD.left--;
+    timerEl.textContent=fmt(RD.left);
+    timerEl.classList.toggle('warn',RD.left<=20);
+    barEl.style.width=(RD.left/total*100)+'%';
+    if(RD.left<=0){
+      clearInterval(iv);
+      if(RD.phase==='read'){
+        RD.phase='write';RD.left=90;
+        stopAudio();setNP('🔇 Audio off — write your summary'); // audio covers reading only: we measure comprehension under audio, recall in silence
+        document.getElementById('rd-phase-lbl').textContent='✏️ Step 2 — Write Your Summary';
+        document.getElementById('rd-timer-lbl').textContent='Time to write';
+        document.getElementById('rd-read').classList.add('hidden');
+        document.getElementById('rd-write').classList.remove('hidden');
+        runRdTimer();
+      } else submitReading();
+    }
+  },1000);
+  S._iv.push(iv);
+}
+
+function submitReading(){
+  clearIv();
+  const s=document.getElementById('rd-summary').value.trim();
+  const wc=s.split(/\s+/).filter(w=>w).length;
+  record('reading',{essay:document.getElementById('essay-title').textContent,summary:s,wordCount:wc,note:'AI-scored later'},`${wc} words written`);
+}
+
+// ─────────────────────────────────────────
+// TIMED TESTS: shared timer + scoring
+// ─────────────────────────────────────────
+const PUZZLE_SECS=120, TYPING_SECS=180, READ_SECS=120;
+
+// 2-minute puzzle tests: a fully correct puzzle scores +1; otherwise a penalty
+// by the share x of that puzzle that was wrong (<25% → −0.25, 25–75% → −0.5, >75% → −1).
+const penalty=x=>x<=0?0:x<0.25?0.25:x<=0.75?0.5:1;
+function puzzleScore(xs){
+  const correct=xs.filter(x=>x<=0).length,pen=xs.reduce((a,x)=>a+penalty(x),0);
+  return {puzzles:xs.length,correct,penalty:pen,score:correct-pen};
+}
+
+// Countdown for a whole test; calls onEnd once when time is up
+function testTimer(secs,elId,onEnd){
+  const t0=Date.now(),el=document.getElementById(elId);
+  const tick=()=>{
+    const left=Math.max(0,secs-(Date.now()-t0)/1000);
+    el.textContent=fmt(Math.ceil(left));el.classList.toggle('warn',left<=20);
+    return left<=0;
+  };
+  tick();
+  const iv=setInterval(()=>{if(tick()){clearInterval(iv);onEnd();}},250);
+  S._iv.push(iv);
+}
+
+// ─────────────────────────────────────────
+// TASK: TYPING  (3 min, lines of 10 random words typed in reverse order)
+// ─────────────────────────────────────────
+let TY={lines:[],cur:[],over:true};
+
+function startTyping(){
+  clearIv();
+  TY={lines:[],cur:[],over:false};
+  nav('sc-typing');
+  if(!S.practice)testTimer(TYPING_SECS,'ty-timer',finishTyping);
+  nextTypingLine();
+}
+
+function nextTypingLine(){
+  TY.cur=Array.from({length:10},()=>WORDS[0|Math.random()*WORDS.length]);
+  document.getElementById('ty-orig').textContent=TY.cur.join(' ');
+  document.getElementById('ty-line').textContent=`Line ${TY.lines.length+1}`;
+  const inp=document.getElementById('ty-inp');inp.value='';inp.focus();
+}
+
+function typingLineDone(){
+  const text=document.getElementById('ty-inp').value;
+  if(TY.over||!text.trim())return;   // an empty Enter doesn't skip a line
+  const l=scoreTypingLine(TY.cur,text);
+  if(S.practice){
+    TY.over=true;const n=l.exact+l.typo;
+    return practiceDone(n===10,`${n} of 10 words in the right reversed order. The answer was: “${[...TY.cur].reverse().join(' ')}”.`);
+  }
+  TY.lines.push(l);
+  nextTypingLine();
+}
+document.getElementById('ty-inp').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();typingLineDone();}
+});
+
+function finishTyping(){
+  TY.over=true;
+  const text=document.getElementById('ty-inp').value;
+  if(text.trim())TY.lines.push(scoreTypingLine(TY.cur,text));   // the line in progress counts as attempted
+  const attempted=TY.lines.length*10,exact=TY.lines.reduce((a,l)=>a+l.exact,0),typo=TY.lines.reduce((a,l)=>a+l.typo,0);
+  const score=exact+typo,pct=attempted?Math.round(score/attempted*1000)/10:0;
+  record('typing',{lines:TY.lines.length,words_attempted:attempted,exact,typo,score,score_pct:pct,
+    detail:TY.lines.map(l=>({target:l.target.join(' '),typed:l.typed}))},`score ${score}/${attempted} words (${pct}%)`);
+}
+
+const normWord=w=>w.toLowerCase().replace(/[^a-z]/g,'');
+function lev(a,b){
+  let prev=Array.from({length:b.length+1},(_,j)=>j);
+  for(let i=1;i<=a.length;i++){
+    const cur=[i];
+    for(let j=1;j<=b.length;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    prev=cur;
+  }
+  return prev[b.length];
+}
+// Match strength for aligning words: exact → 1, typo (≤2 letters wrong and under half the word) → 0.5, else 0.
+// Both exact and typo words score a full point (no typo penalty — phones are allowed).
+function wordPoints(t,y){
+  if(t===y)return 1;
+  const d=lev(t,y);
+  return d<=2&&d*2<t.length?0.5:0;
+}
+// Best in-order match of typed words against the reversed line, so a skipped
+// or extra word only costs that word, not everything after it.
+function scoreTypingLine(words,text){
+  const tgt=[...words].reverse().map(normWord),typ=text.split(/\s+/).map(normWord).filter(Boolean);
+  const n=tgt.length,m=typ.length,D=Array.from({length:n+1},()=>new Array(m+1).fill(0));
+  for(let i=1;i<=n;i++)for(let j=1;j<=m;j++)
+    D[i][j]=Math.max(D[i-1][j],D[i][j-1],D[i-1][j-1]+wordPoints(tgt[i-1],typ[j-1]));
+  let i=n,j=m,exact=0,typo=0;
+  while(i>0&&j>0){
+    const pts=wordPoints(tgt[i-1],typ[j-1]);
+    if(pts>0&&D[i][j]===D[i-1][j-1]+pts){if(pts===1)exact++;else typo++;i--;j--;}
+    else if(D[i][j]===D[i-1][j])i--;
+    else j--;
+  }
+  return {target:tgt,typed:text.trim(),exact,typo};
+}
+
+// ─────────────────────────────────────────
+// TASK: DOTS
+// ─────────────────────────────────────────
+let DT={targets:[],marked:[],phase:'memo',G:6,xs:[],hits:0,extras:0,n:0,over:true};
+
+function startDots(){
+  clearIv();
+  DT={targets:[],marked:[],phase:'memo',G:6,xs:[],hits:0,extras:0,n:0,over:false};
+  nav('sc-dots');
+  if(!S.practice)testTimer(PUZZLE_SECS,'dt-left',finishDots);
+  nextDots();
+  if(S.practice)document.getElementById('dt-pattern').textContent='Practice pattern';
+}
+
+function nextDots(){
+  const G=DT.G;DT.n++;
+  DT.targets=shuffle([...Array(G*G).keys()]).slice(0,7);
+  DT.marked=[];DT.phase='memo';
+  document.getElementById('dt-pattern').textContent=`Pattern ${DT.n}`;
+  document.getElementById('dt-instr').textContent='Memorise the highlighted dots… 6';
+  document.getElementById('dt-recall-btns').classList.add('hidden');
+  drawDots(true);
+  let cd=6;
+  const iv=setInterval(()=>{
+    if(DT.over){clearInterval(iv);return;}
+    cd--;document.getElementById('dt-instr').textContent=`Memorise the highlighted dots… ${cd}`;
+    if(cd<=0){
+      clearInterval(iv);DT.phase='recall';
+      document.getElementById('dt-instr').textContent='Click the cells where the dots were, then submit.';
+      document.getElementById('dt-recall-btns').classList.remove('hidden');
+      drawDots(false);
+    }
+  },1000);
+  S._iv.push(iv);
+}
+
+function drawDots(show){
+  const cv=document.getElementById('dt-canvas');
+  const ctx=cv.getContext('2d');
+  const G=DT.G,sz=cv.width,cell=sz/G,r=cell*0.34;
+  ctx.clearRect(0,0,sz,sz);
+  ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;
+  for(let i=0;i<=G;i++){ctx.beginPath();ctx.moveTo(i*cell,0);ctx.lineTo(i*cell,sz);ctx.stroke();ctx.beginPath();ctx.moveTo(0,i*cell);ctx.lineTo(sz,i*cell);ctx.stroke();}
+  for(let i=0;i<G*G;i++){
+    const row=0|i/G,col=i%G,cx=col*cell+cell/2,cy=row*cell+cell/2;
+    const isTgt=DT.targets.includes(i),isMk=DT.marked.includes(i);
+    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+    if(show&&isTgt){ctx.fillStyle='#e8a317';ctx.fill();ctx.strokeStyle='#f5c842';ctx.lineWidth=2;ctx.stroke();}
+    else if(!show&&isMk){ctx.fillStyle='rgba(129,140,248,0.85)';ctx.fill();ctx.strokeStyle='#818cf8';ctx.lineWidth=2;ctx.stroke();}
+    else{ctx.fillStyle='rgba(255,255,255,0.06)';ctx.fill();ctx.strokeStyle='rgba(255,255,255,0.12)';ctx.lineWidth=1;ctx.stroke();}
+  }
+}
+
+document.getElementById('dt-canvas').addEventListener('click',e=>{
+  if(DT.phase!=='recall')return;
+  const cv=e.target,rect=cv.getBoundingClientRect();
+  const sx=cv.width/rect.width,sy=cv.height/rect.height;
+  const x=(e.clientX-rect.left)*sx,y=(e.clientY-rect.top)*sy;
+  const G=DT.G,cell=cv.width/G,col=0|x/cell,row=0|y/cell,idx=row*G+col;
+  const p=DT.marked.indexOf(idx);if(p===-1)DT.marked.push(idx);else DT.marked.splice(p,1);
+  drawDots(false);
+});
+
+function dtClear(){DT.marked=[];drawDots(false);}
+
+function submitDots(){
+  if(DT.over||DT.phase!=='recall')return;
+  const tgt=new Set(DT.targets),mk=new Set(DT.marked);
+  const hit=[...tgt].filter(i=>mk.has(i)).length,extra=[...mk].filter(i=>!tgt.has(i)).length;
+  if(S.practice){
+    DT.over=true;DT.phase='done';drawDots(true);   // show where the dots really were
+    const missed=7-hit,ok=!missed&&!extra;
+    S._iv.push(setTimeout(()=>practiceDone(ok,ok?'You marked all 7 dots.':`You found ${hit} of 7 dots${extra?` and marked ${extra} extra`:''}. In the real test, mark all 7 exactly.`),1500));
+    return;
+  }
+  DT.hits+=hit;DT.extras+=extra;
+  DT.xs.push(Math.min(1,(7-hit+extra)/7));   // wrong share: missed + extra dots, out of 7
+  nextDots();
+}
+
+function finishDots(){
+  DT.over=true;
+  const sc=puzzleScore(DT.xs);
+  record('dots',Object.assign(sc,{unfinished:DT.n-DT.xs.length,hits:DT.hits,extras:DT.extras,
+    wrong_shares:DT.xs.map(x=>+x.toFixed(2))}),`score ${sc.score} (${sc.correct}/${sc.puzzles} patterns perfect)`);
+}
+
+// ─────────────────────────────────────────
+// TASK: SYMMETRY
+// ─────────────────────────────────────────
+let SY={ok:0,bad:0,tot:0,cur:null,left:120};
+
+function startSym(){
+  clearIv();
+  SY={ok:0,bad:0,tot:0,cur:null,left:120};
+  ['sym-ok','sym-bad','sym-tot'].forEach(id=>document.getElementById(id).textContent='0');
+  nav('sc-sym');
+  nextSymItem();
+  if(S.practice)return;
+  practiceLabels('symmetry',false);
+  document.getElementById('sym-timer').textContent=fmt(SY.left);
+  const iv=setInterval(()=>{
+    SY.left--;
+    document.getElementById('sym-timer').textContent=fmt(SY.left);
+    document.getElementById('sym-timer').classList.toggle('warn',SY.left<=20);
+    if(SY.left<=0){clearInterval(iv);submitSym();}
+  },1000);
+  S._iv.push(iv);
+}
+
+// Fresh random shape every item (so run A and run B never share shapes).
+// Symmetric: left half mirrored onto the right. Asymmetric: 2–3 right-half cells flipped.
+function genSymItem(){
+  const W=8,H=5+(0|Math.random()*3);
+  let rows;
+  do{rows=[...Array(H)].map(()=>{const h=[...Array(W/2)].map(()=>Math.random()<0.5?'X':' ');return h.concat([...h].reverse());});}
+  while(rows.flat().filter(c=>c==='X').length<10);
+  const sym=Math.random()<0.5;
+  if(!sym){
+    const k=2+(0|Math.random()*2),used=new Set();
+    while(used.size<k){
+      const r=0|Math.random()*H,c=W/2+(0|Math.random()*W/2);
+      if(used.has(r+','+c))continue;
+      used.add(r+','+c);rows[r][c]=rows[r][c]==='X'?' ':'X';
+    }
+  }
+  return{r:rows.map(r=>r.join('')),sym};
+}
+
+function nextSymItem(){
+  SY.cur=genSymItem();
+  drawSymShape(SY.cur);
+}
+
+function drawSymShape(item){
+  const cv=document.getElementById('sym-canvas');
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  const rows=item.r,cols=rows.reduce((m,r)=>Math.max(m,r.length),0);
+  const cell=Math.min(Math.floor(W/(cols+2)),Math.floor(H/(rows.length+2)));
+  const ox=Math.floor((W-cols*cell)/2),oy=Math.floor((H-rows.length*cell)/2);
+  // Draw axis
+  ctx.strokeStyle='rgba(232,163,23,0.18)';ctx.setLineDash([4,4]);ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(W/2,oy-6);ctx.lineTo(W/2,H-oy+6);ctx.stroke();ctx.setLineDash([]);
+  rows.forEach((row,ri)=>{
+    for(let ci=0;ci<row.length;ci++){
+      if(row[ci]==='X'){
+        ctx.fillStyle='#e8a317';
+        ctx.roundRect(ox+ci*cell+2,oy+ri*cell+2,cell-4,cell-4,3);
+        ctx.fill();
+      }
+    }
+  });
+}
+
+function answerSym(yes){
+  const ok=SY.cur.sym===yes;
+  if(S.practice)return practiceDone(ok,`That shape was ${SY.cur.sym?'symmetric':'not symmetric'} — compare its left and right halves across the dashed line.`);
+  SY.tot++;if(ok)SY.ok++;else SY.bad++;
+  flash('sym-canvas-wrap',ok);
+  document.getElementById('sym-ok').textContent=SY.ok;
+  document.getElementById('sym-bad').textContent=SY.bad;
+  document.getElementById('sym-tot').textContent=SY.tot;
+  nextSymItem();
+}
+
+function submitSym(){
+  clearIv();
+  const acc=SY.tot?Math.round(SY.ok/SY.tot*100):0,score=SY.ok-SY.bad;
+  record('symmetry',{correct:SY.ok,wrong:SY.bad,total:SY.tot,accuracy:acc,score},`score ${score} (${SY.ok}/${SY.tot} correct)`);
+}
+
+// ─────────────────────────────────────────
+// TASK: ROTATION
+// ─────────────────────────────────────────
+let RT={ok:0,bad:0,tot:0,isMirror:false,left:120};
+
+function startRot(){
+  clearIv();
+  RT={ok:0,bad:0,tot:0,isMirror:false,left:120};
+  ['rot-ok','rot-bad','rot-tot'].forEach(id=>document.getElementById(id).textContent='0');
+  nav('sc-rot');
+  nextRotItem();
+  if(S.practice)return;
+  practiceLabels('rotation',false);
+  document.getElementById('rot-timer').textContent=fmt(RT.left);
+  const iv=setInterval(()=>{
+    RT.left--;
+    document.getElementById('rot-timer').textContent=fmt(RT.left);
+    document.getElementById('rot-timer').classList.toggle('warn',RT.left<=20);
+    if(RT.left<=0){clearInterval(iv);submitRot();}
+  },1000);
+  S._iv.push(iv);
+}
+
+// Fresh random 7-cell shape every item. Only chiral shapes are used (the mirror image
+// can't be produced by rotation), so "rotated" vs "mirrored" always has one right answer.
+const normCells=cs=>{const mx=Math.min(...cs.map(c=>c[0])),my=Math.min(...cs.map(c=>c[1]));return cs.map(([x,y])=>(x-mx)+','+(y-my)).sort().join(';');};
+function isChiral(cs){
+  const mir=normCells(cs.map(([x,y])=>[-x,y]));
+  let r=cs;
+  for(let i=0;i<4;i++){if(normCells(r)===mir)return false;r=r.map(([x,y])=>[-y,x]);}
+  return true;
+}
+function genRotShape(){
+  for(;;){
+    const cells=[[0,0]],has=(x,y)=>cells.some(c=>c[0]===x&&c[1]===y);
+    while(cells.length<7){
+      const [x,y]=cells[0|Math.random()*cells.length],[dx,dy]=[[1,0],[-1,0],[0,1],[0,-1]][0|Math.random()*4];
+      if(!has(x+dx,y+dy))cells.push([x+dx,y+dy]);
+    }
+    const w=Math.max(...cells.map(c=>c[0]))-Math.min(...cells.map(c=>c[0]))+1,h=Math.max(...cells.map(c=>c[1]))-Math.min(...cells.map(c=>c[1]))+1;
+    if(w<=5&&h<=5&&isChiral(cells))return cells;
+  }
+}
+
+function drawRotShape(cv,cells,deg,mirror){
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height,PAD=22;
+  const xs=cells.map(c=>c[0]),ys=cells.map(c=>c[1]);
+  const mnx=Math.min(...xs),mny=Math.min(...ys),w=Math.max(...xs)-mnx+1,h=Math.max(...ys)-mny+1;
+  const sc=(Math.min(W,H)-PAD*2)/Math.max(w,h),cx=mnx+w/2,cy=mny+h/2;
+  ctx.clearRect(0,0,W,H);
+  ctx.save();ctx.translate(W/2,H/2);ctx.rotate(deg*Math.PI/180);if(mirror)ctx.scale(-1,1);
+  ctx.fillStyle='rgba(129,140,248,0.8)';ctx.strokeStyle='#a5b4fc';ctx.lineWidth=1.5;
+  cells.forEach(([x,y])=>{const px=(x-cx)*sc,py=(y-cy)*sc;ctx.fillRect(px,py,sc,sc);ctx.strokeRect(px,py,sc,sc);});
+  ctx.restore();
+}
+
+function nextRotItem(){
+  const cells=genRotShape();
+  const rots=[0,90,180,270];
+  const rA=rots[0|Math.random()*4],rB=rots[0|Math.random()*4];
+  RT.isMirror=Math.random()>0.5;
+  drawRotShape(document.getElementById('rot-a'),cells,rA,false);
+  drawRotShape(document.getElementById('rot-b'),cells,rB,RT.isMirror);
+}
+
+function answerRot(userMirror){
+  const ok=RT.isMirror===userMirror;
+  if(S.practice)return practiceDone(ok,`Shape B was ${RT.isMirror?'a mirror image':'just rotated'} — a mirror image can't be turned to match Shape A.`);
+  RT.tot++;if(ok)RT.ok++;else RT.bad++;
+  flash('rot-wrap',ok);
+  document.getElementById('rot-ok').textContent=RT.ok;
+  document.getElementById('rot-bad').textContent=RT.bad;
+  document.getElementById('rot-tot').textContent=RT.tot;
+  nextRotItem();
+}
+
+function submitRot(){
+  clearIv();
+  const acc=RT.tot?Math.round(RT.ok/RT.tot*100):0,score=RT.ok-RT.bad;
+  record('rotation',{correct:RT.ok,wrong:RT.bad,total:RT.tot,accuracy:acc,score},`score ${score} (${RT.ok}/${RT.tot} correct)`);
+}
+
+// ─────────────────────────────────────────
+// FLASH FEEDBACK
+// ─────────────────────────────────────────
+function flash(id,ok){
+  const el=document.getElementById(id)||document.querySelector('.'+id);
+  if(!el)return;
+  el.classList.add(ok?'fl-ok':'fl-bad');
+  setTimeout(()=>el.classList.remove('fl-ok','fl-bad'),320);
+}
+
+
+// ─────────────────────────────────────────
+// KEYBOARD SHORTCUTS
+// ─────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('sc-sym').classList.contains('hidden')){
+    if(e.key.toLowerCase()==='y')answerSym(true);
+    if(e.key.toLowerCase()==='n')answerSym(false);
+  }
+  if(!document.getElementById('sc-rot').classList.contains('hidden')){
+    if(e.key.toLowerCase()==='r')answerRot(false);
+    if(e.key.toLowerCase()==='m')answerRot(true);
+  }
+});
+
+// ─────────────────────────────────────────
+// TASK: NUMBER SEQUENCE
+// ─────────────────────────────────────────
+let NS={over:true};
+
+function startNumSeq(){
+  clearIv();
+  NS={xs:[],times:[],n:0,wrongTotal:0,over:false,circles:[],order:[],next:0,hits:0,wrong:0,phase:'memo',t0:0};
+  nav('sc-numseq');
+  if(!S.practice)testTimer(PUZZLE_SECS,'ns-timer',finishNumSeq);
+  nsNewRound();
+}
+
+function nsNewRound(){
+  Object.assign(NS,{n:NS.n+1,circles:[],order:shuffle([0,1,2,3,4,5,6,7,8,9]),next:0,hits:0,wrong:0,phase:'memo'});
+  const arena=document.getElementById('ns-arena');
+  arena.innerHTML='';
+  arena.style.pointerEvents='none';
+
+  // Place 10 circles randomly without overlaps; narrow (phone) screens get a tall area and smaller circles
+  const W=arena.offsetWidth||620, narrow=W<500, H=narrow?460:340, R=narrow?28:36;
+  arena.style.height=H+'px';
+  let placed;
+  for(let attempt=0;attempt<100;attempt++){
+    placed=[];
+    for(let k=0;k<10;k++){
+      let x,y,tries=0;
+      do{
+        x=R+Math.random()*(W-2*R);
+        y=R+Math.random()*(H-2*R);
+        tries++;
+      }while(tries<200&&placed.some(p=>Math.hypot(p.x-x,p.y-y)<R*2.4));
+      placed.push({x,y});
+    }
+    if(placed.every((p,i)=>placed.every((q,j)=>i===j||Math.hypot(p.x-q.x,p.y-q.y)>=R*2.4)))break;
+  }
+  NS.order.forEach((digit,k)=>{
+    const {x,y}=placed[k];
+
+    const c=document.createElement('div');
+    c.className='ns-circle';
+    c.dataset.digit=digit;
+    c.style.cssText=`position:absolute;left:${x-R}px;top:${y-R}px;width:${R*2}px;height:${R*2}px;
+      border-radius:50%;background:rgba(232,163,23,0.15);border:2.5px solid #e8a317;
+      display:flex;align-items:center;justify-content:center;
+      font-size:${narrow?'1.3rem':'1.6rem'};font-weight:900;color:#fff;cursor:pointer;
+      transition:transform 0.12s,background 0.12s;user-select:none;`;
+    c.textContent=digit;
+    c.addEventListener('click',()=>nsClick(c,digit));
+    arena.appendChild(c);
+    NS.circles.push(c);
+  });
+
+  document.getElementById('ns-phase-lbl').textContent=`${S.practice?'PRACTICE':'PATTERN '+NS.n} · MEMORISE`;
+  document.getElementById('ns-instr').textContent='Remember the position of each number… 8';
+  document.getElementById('ns-next').textContent='—';
+  document.getElementById('ns-hits').textContent='0';
+
+  // 8 s to memorise, then the digits are hidden
+  let cd=8;
+  document.getElementById('ns-bar').style.width='100%';
+  const iv=setInterval(()=>{
+    if(NS.over){clearInterval(iv);return;}
+    cd--;
+    document.getElementById('ns-instr').textContent=`Remember the position of each number… ${cd}`;
+    document.getElementById('ns-bar').style.width=(cd/8*100)+'%';
+    if(cd<=0){clearInterval(iv);nsStartRecall();}
+  },1000);
+  S._iv.push(iv);
+}
+
+function nsStartRecall(){
+  NS.phase='recall';NS.t0=Date.now();
+  NS.circles.forEach(c=>{c.textContent='';});
+  document.getElementById('ns-arena').style.pointerEvents='auto';
+  document.getElementById('ns-phase-lbl').textContent=`${S.practice?'PRACTICE':'PATTERN '+NS.n} · RECALL`;
+  document.getElementById('ns-instr').textContent='Click circles in order: 0 → 1 → 2 … → 9';
+  document.getElementById('ns-next').textContent=NS.next;
+}
+
+function nsClick(el,digit){
+  if(NS.over||NS.phase!=='recall')return;
+  if(digit===NS.next){
+    el.style.background='rgba(34,197,94,0.3)';
+    el.style.borderColor='#22c55e';
+    el.style.color='#22c55e';
+    el.style.pointerEvents='none';
+    NS.hits++;NS.next++;
+    document.getElementById('ns-hits').textContent=NS.hits;
+    document.getElementById('ns-next').textContent=NS.next<10?NS.next:'✓ Done!';
+    if(NS.next>=10){
+      if(S.practice){
+        NS.over=true;NS.phase='done';const w=NS.wrong;
+        S._iv.push(setTimeout(()=>practiceDone(!w,w?`You finished with ${w} wrong click${w>1?'s':''}. In the real test, each layout counts as correct only with no wrong clicks.`:'All 10 in order with no wrong clicks.'),600));
+        return;
+      }
+      NS.phase='done';
+      NS.xs.push(Math.min(1,NS.wrong/10));   // wrong share: wrong clicks, out of 10
+      NS.times.push((Date.now()-NS.t0)/1000);
+      S._iv.push(setTimeout(()=>{if(!NS.over)nsNewRound();},400));
+    }
+  }else{
+    // Wrong — counted; they keep going
+    NS.wrong++;NS.wrongTotal++;
+    el.style.background='rgba(239,68,68,0.25)';
+    el.style.borderColor='#ef4444';
+    setTimeout(()=>{
+      el.style.background='rgba(232,163,23,0.15)';
+      el.style.borderColor='#e8a317';
+    },300);
+  }
+}
+
+function finishNumSeq(){
+  NS.over=true;
+  const sc=puzzleScore(NS.xs),mean=NS.times.length?+(NS.times.reduce((a,b)=>a+b,0)/NS.times.length).toFixed(2):'';
+  record('numseq',Object.assign(sc,{unfinished:NS.n-NS.xs.length,wrong_clicks:NS.wrongTotal,mean_recall_s:mean,
+    wrong_shares:NS.xs.map(x=>+x.toFixed(2))}),`score ${sc.score} (${sc.correct}/${sc.puzzles} layouts perfect)`);
+}
+
+// Roll number from a ?roll= link
+(()=>{
+  const r=new URLSearchParams(location.search).get('roll');
+  if(r){document.getElementById('roll-inp').value=r;login();}
+  if(!API_URL)document.querySelector('#sc-login .sub').insertAdjacentHTML('afterend',
+    '<p class="warn-box" style="margin-top:-10px;">Demo mode — no server configured, so nothing is saved online.</p>');
+})();
+
+</script>
+</body>
+</html>
