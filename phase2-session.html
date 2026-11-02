@@ -188,7 +188,7 @@
 <div id="sc-howto" class="session-screen hidden">
   <div class="s-card" style="max-width:620px;">
     <h2>📋 How Phase 2 Works</h2>
-    <p class="sub">About 20–25 minutes in one sitting. Please don't switch tabs during the tests.</p>
+    <p class="sub">About 25–30 minutes in one sitting, including a 1-minute break between rounds. Please don't switch tabs during the tests.</p>
     <ol class="howto-list">
       <li>A short <strong>mood check</strong> (under a minute).</li>
       <li id="howto-practice" hidden></li>
@@ -257,6 +257,18 @@
   </div>
 </div>
 
+<!-- ══════════════════════ 60 s BREAK (before rounds 2–4) ══════════════════════ -->
+<div id="sc-break" class="session-screen hidden" style="text-align:center;">
+  <div class="s-card" style="text-align:center;max-width:560px;">
+    <div class="round-badge" id="br-badge">Break</div>
+    <div class="big-emoji">☕</div>
+    <h2>Short break</h2>
+    <p class="sub" style="margin-bottom:10px;">Rest your eyes and relax for a minute — no audio. The next round opens automatically when the countdown ends.</p>
+    <div class="timer" id="br-timer" style="margin:14px 0 6px;">1:00</div>
+    <div class="pbar"><div class="pbar-fill" id="br-bar" style="width:100%"></div></div>
+  </div>
+</div>
+
 <!-- ══════════════════════ 30 s LISTENING ══════════════════════ -->
 <div id="sc-listen" class="session-screen hidden" style="text-align:center;">
   <div class="s-card" style="text-align:center;max-width:560px;">
@@ -309,10 +321,10 @@
         <div class="timer" id="ty-timer">3:00</div>
       </div>
     </div>
-    <p style="color:rgba(255,255,255,0.58);font-size:0.83rem;margin-bottom:8px;">Type these words in <strong style="color:#e8a317">reverse order</strong> (last word first), then press <span class="kbd">Enter</span> for the next line. Caps don't matter.</p>
+    <p style="color:rgba(255,255,255,0.58);font-size:0.83rem;margin-bottom:8px;">Type these words in <strong style="color:#e8a317">reverse order</strong> (last word first), then press <span class="kbd">Enter</span> for the next line. Caps don't matter. <strong style="color:#e8a317">You can't erase or edit</strong> what you've typed, so type carefully.</p>
     <div class="orig-text" id="ty-orig">—</div>
     <p style="color:rgba(232,163,23,0.75);font-size:0.8rem;margin:8px 0 4px;">👇 Type the reversed version below:</p>
-    <textarea class="s-ta" id="ty-inp" placeholder="Start typing in reverse order…" style="min-height:76px;" spellcheck="false" autocomplete="off"></textarea>
+    <textarea class="s-ta" id="ty-inp" placeholder="Start typing in reverse order…" style="min-height:76px;" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
     <div style="text-align:center;margin-top:14px;">
       <button class="btn-go" onclick="typingLineDone()">Next line ↵</button>
     </div>
@@ -434,7 +446,7 @@
       <div style="color:rgba(255,255,255,0.45);font-size:0.82rem;">Next to click: <span id="ns-next" style="color:#e8a317;font-weight:800;font-size:1.1rem;">—</span></div>
       <div>
         <span id="ns-hits" style="color:#22c55e;font-weight:700;">0</span>
-        <span style="color:rgba(255,255,255,0.35);font-size:0.8rem;"> / 10 correct</span>
+        <span style="color:rgba(255,255,255,0.35);font-size:0.8rem;"> / <span id="ns-count">7</span> correct</span>
       </div>
     </div>
   </div>
@@ -465,7 +477,11 @@ const ESSAYS=[
 {title:"The Rise of Ancient Rome",text:`Rome began as a small village on the Tiber River around the 8th century BCE. Legend says it was founded by twin brothers Romulus and Remus, raised by a she-wolf. By 509 BCE the Romans expelled their kings and created a republic governed by elected consuls and guided by a Senate of wealthy citizens.\n\nOver centuries, Rome expanded aggressively. Its disciplined army conquered the Italian peninsula, then North Africa, Greece, Spain, and much of Western Europe. Roads, aqueducts, and a legal system unified these territories into an empire that facilitated trade and cultural exchange.\n\nAt its height in the 2nd century CE, the empire housed roughly 60 million people. It gifted the world ideas about law, governance, and architecture. Latin, Rome's language, evolved into modern Italian, French, Spanish, Portuguese, and Romanian. Economic strain and repeated invasions eventually brought down the Western Empire in 476 CE, while the Eastern Empire survived as Byzantium for nearly a thousand more years.`},
 {title:"How Vaccines Work",text:`Vaccines are among medicine's most powerful tools. They train the immune system to recognise and fight specific pathogens — bacteria or viruses — without causing the disease. A vaccine introduces a harmless version or fragment of the pathogen: a weakened form, a killed form, or just a protein from its surface.\n\nThe immune system responds by producing antibodies — proteins that bind and neutralise the pathogen. It also creates memory cells that remain long after the response ends. If the real pathogen enters the body later, memory cells recognise it quickly and mount a rapid defence, often eliminating it before symptoms appear.\n\nDifferent vaccines work differently. Live-attenuated vaccines use weakened pathogens and give strong, long-lasting immunity. Inactivated vaccines use killed pathogens. Newer mRNA vaccines deliver genetic instructions so cells produce a harmless protein fragment that triggers immunity. Widespread vaccination creates herd immunity — enough people are protected that the pathogen struggles to spread, shielding even the unvaccinated. This strategy has eliminated smallpox and greatly reduced polio and measles worldwide.`},
 {title:"The Amazon Rainforest",text:`The Amazon rainforest covers roughly 5.5 million square kilometres across nine South American countries, mostly in Brazil. The world's largest tropical rainforest, it is often called the "lungs of the Earth" because it absorbs vast amounts of carbon dioxide and produces oxygen, helping regulate global climate.\n\nThe Amazon is extraordinarily biodiverse — home to an estimated 10 percent of all species on Earth, including more than 40,000 plant species, 1,300 bird species, 3,000 fish types, and millions of insects, many still unknown to science. Indigenous peoples have lived here for thousands of years, holding deep knowledge of its plants and ecology.\n\nThe Amazon faces severe threats. Cattle ranching, soy farming, illegal logging, and infrastructure projects destroy millions of hectares each year. Burning trees releases stored carbon into the atmosphere, accelerating climate change. Scientists warn that if deforestation continues, the Amazon could reach a tipping point, converting to dry savanna with catastrophic consequences for biodiversity and global climate stability.`},
-{title:"Light and Photosynthesis",text:`Photosynthesis is the process by which plants, algae, and some bacteria convert light into chemical energy stored as sugar. It occurs in chloroplasts, which contain a pigment called chlorophyll. Chlorophyll absorbs red and blue light and reflects green light — which is why most plants look green.\n\nThe process has two stages. In the light-dependent reactions, sunlight energises electrons in the chlorophyll, driving production of ATP and NADPH — energy-carrying molecules — while splitting water molecules and releasing oxygen as a byproduct. This oxygen is what most life on Earth breathes.\n\nIn the Calvin cycle, the plant uses ATP and NADPH to convert carbon dioxide into glucose. This glucose powers the plant and, through the food chain, nearly all other organisms on Earth. Changes in sunlight, carbon dioxide, or water supply directly affect photosynthesis rates, making it a crucial process to understand for food security and climate science. Without photosynthesis, almost no life on Earth would exist.`}
+{title:"Light and Photosynthesis",text:`Photosynthesis is the process by which plants, algae, and some bacteria convert light into chemical energy stored as sugar. It occurs in chloroplasts, which contain a pigment called chlorophyll. Chlorophyll absorbs red and blue light and reflects green light — which is why most plants look green.\n\nThe process has two stages. In the light-dependent reactions, sunlight energises electrons in the chlorophyll, driving production of ATP and NADPH — energy-carrying molecules — while splitting water molecules and releasing oxygen as a byproduct. This oxygen is what most life on Earth breathes.\n\nIn the Calvin cycle, the plant uses ATP and NADPH to convert carbon dioxide into glucose. This glucose powers the plant and, through the food chain, nearly all other organisms on Earth. Changes in sunlight, carbon dioxide, or water supply directly affect photosynthesis rates, making it a crucial process to understand for food security and climate science. Without photosynthesis, almost no life on Earth would exist.`},
+// Phase 2 only (not in session.html): keeps readers from re-reading a Phase 1 essay. Rubrics in Grader.gs.
+{title:"How Volcanoes Form",text:`Volcanoes form where molten rock, called magma, rises from deep inside the Earth to the surface. Most volcanoes lie along the edges of tectonic plates, the giant slabs that make up the planet's outer shell. Where one plate sinks beneath another, water released from the sinking plate helps melt the rock above it, and the magma rises. Where plates pull apart, as along mid-ocean ridges, magma wells up to fill the gap.\n\nSome volcanoes, such as those of Hawaii, sit far from any plate edge, above hotspots where unusually hot rock rises from deep below. Magma that reaches the surface is called lava. Runny lava flows gently and builds wide, low shield volcanoes, while thick, gas-rich magma traps pressure and erupts explosively, building steep cone-shaped volcanoes.\n\nEruptions can bury towns under ash and send fast clouds of hot gas and rock racing downhill. Yet volcanic ash weathers into very fertile soil, and scientists now watch for earthquakes and escaping gas to warn people before eruptions.`},
+{title:"The Honeybee Colony",text:`A honeybee colony can hold tens of thousands of bees, yet it works almost like a single organism. At its centre is one queen, the only female that lays eggs, up to about two thousand a day in summer. The male bees, called drones, have one main job: to mate with young queens from other colonies.\n\nMost of the colony are female worker bees, and their jobs change as they age. Young workers clean the cells, feed the larvae and build wax comb. Older workers guard the entrance and finally fly out to collect nectar and pollen. A forager that finds good flowers returns and performs a waggle dance, which tells her sisters the direction and distance of the food.\n\nBees turn nectar into honey by adding enzymes and fanning it with their wings until most of the water evaporates. While feeding, they carry pollen between flowers, pollinating many of the crops people eat. Disease, pesticides and habitat loss now threaten colonies in many countries.`},
+{title:"The Printing Press",text:`Before the fifteenth century, books in Europe were copied by hand, often by monks, and a single book could take many months to finish. Around 1440, Johannes Gutenberg, a goldsmith in Mainz, Germany, developed a printing press that used movable metal type: individual letters that could be arranged into pages, inked, pressed onto paper and then reused.\n\nHis most famous work, the Gutenberg Bible, was completed around 1455. The invention spread quickly. Within fifty years, presses were running in more than two hundred European cities, and millions of books had been printed. Books became far cheaper and more widely available, and many more people learned to read.\n\nPrinting let new ideas travel fast and in identical copies. It helped spread the Protestant Reformation, supported the Scientific Revolution by letting scientists share exact results, and helped standardise spelling and national languages. Movable type was not entirely new, however: printers in China and Korea had used it centuries earlier.`},
 ];
 
 // ─────────────────────────────────────────
@@ -479,11 +495,11 @@ const WORDS=`time year people way day man thing woman life child world school st
 // ─────────────────────────────────────────
 const TASKS={
   reading: {name:"Reading + Summary",    icon:"📖", desc:"Read a short essay (2 min), then write a summary (1.5 min) from memory.", dur:"~3.5 min"},
-  typing:  {name:"Reverse Typing",       icon:"⌨️", desc:"3 minutes — lines of 10 random words: type each line in reverse order (last word first), press Enter for the next.", dur:"3 min"},
+  typing:  {name:"Reverse Typing",       icon:"⌨️", desc:"3 minutes — lines of 10 random words: type each line in reverse order (last word first), press Enter for the next. You can't erase what you type.", dur:"3 min"},
   dots:    {name:"Dot Memory Puzzle",    icon:"🟣", desc:"2 minutes — memorise 7 dots (6 s), mark where they were, then the next pattern. Do as many as you can.", dur:"2 min"},
   symmetry:{name:"Symmetry Test",        icon:"🔄", desc:"2 minutes — for each shape, say if it is left-right symmetric or not.", dur:"2 min"},
   rotation:{name:"Rotated Image Test",   icon:"🔃", desc:"2 minutes — is Shape B a rotation of A, or a mirrored version?", dur:"2 min"},
-  numseq:  {name:"Number Sequence",      icon:"🔢", desc:"2 minutes — memorise where 0–9 are (8 s), then click them in order. Do as many layouts as you can.", dur:"2 min"},
+  numseq:  {name:"Number Sequence",      icon:"🔢", desc:"2 minutes — memorise where 0–6 are (8 s), then click them in order. Do as many layouts as you can.", dur:"2 min"},
 };
 
 // ─────────────────────────────────────────
@@ -496,9 +512,10 @@ const LISTEN_SECS=30;    // each round's audio plays this long before the test s
 // tools/prep_phase2_audio.py, so it matches the white noise at −18 LUFS) and set its title here.
 const CONDS={
   white_noise: {name:'White noise',                     icon:'🌫️', title:'',    file:''},
-  western:     {name:'Western classical',               icon:'🎻', title:'TBD', file:'audio/phase2/western.mp3'},
-  indian_vocal:{name:'Indian classical (vocal)',        icon:'🎤', title:'TBD', file:'audio/phase2/indian_vocal.mp3'},
-  indian_instr:{name:'Indian classical (instrumental)', icon:'🪕', title:'TBD', file:'audio/phase2/indian_instr.mp3'},
+  // Track choice and measurements: Project/phase2/phase2_track_selection.md
+  western:     {name:'Western classical',               icon:'🎻', title:'J.S. Bach, Violin Concerto in E major, I. Allegro (Hilary Hahn)',    file:'audio/phase2/western.mp3'},
+  indian_vocal:{name:'Indian classical (vocal)',        icon:'🎤', title:'Raghunayaka, raga Hamsadhwani (Sanjay Subrahmanyan, vocal)',          file:'audio/phase2/indian_vocal.mp3'},
+  indian_instr:{name:'Indian classical (instrumental)', icon:'🪕', title:'Raghunayaka, raga Hamsadhwani (Ambi Subramaniam, violin)',            file:'audio/phase2/indian_instr.mp3'},
 };
 // Balanced 4×4 Latin square (Williams design): each condition once in every round position,
 // and each condition directly follows every other exactly once. The server assigns a row (p2_order 1–4).
@@ -703,8 +720,24 @@ function go(){
   if(k==='practice')return showPractice();
   const [,r,t]=k.match(/^r(\d)(run|mood)$/);
   S.round=+r;
-  if(t==='run')return showIntro();
+  if(t==='run')return S.round>1&&S.breakFor!==S.round?showRoundBreak():showIntro();
   return showForm('mood');
+}
+
+// 60 s of silence before rounds 2–4, so one round's audio and effort don't run straight into the next.
+// Not a saved step: reloading during a break just shows it again.
+const BREAK_SECS=60;
+function showRoundBreak(){
+  stopAudio();hideNP();clearIv();
+  document.getElementById('br-badge').textContent=`Break · Round ${S.round} of ${ROUNDS} next`;
+  nav('sc-break');
+  const t0=Date.now(),el=document.getElementById('br-timer'),bar=document.getElementById('br-bar');
+  const iv=setInterval(()=>{
+    const left=Math.max(0,BREAK_SECS-(Date.now()-t0)/1000);
+    el.textContent=fmt(Math.ceil(left));bar.style.width=(left/BREAK_SECS*100)+'%';
+    if(left<=0){clearInterval(iv);S.breakFor=S.round;go();}
+  },250);
+  S._iv.push(iv);
 }
 
 async function save(rec){
@@ -803,9 +836,17 @@ async function startRound(){
   S._iv.push(iv);
 }
 
+// Phase 1 (session.html) showed ESSAYS[(variantBase+0)%5] and ESSAYS[(variantBase+1)%5]; leave those two out,
+// which leaves 6 of the 8 essays for the 4 rounds.
+function phase2Essay(round){
+  const seen=[S.variantBase%5,(S.variantBase+1)%5];
+  const pool=ESSAYS.map((_,i)=>i).filter(i=>!seen.includes(i));
+  return pool[(S.variantBase+round-1)%pool.length];
+}
+
 function beginTask(){
   Object.assign(S,{listening:false,runT0:Date.now(),blur:0});
-  S.essayIdx=S.variantBase+S.round-1;   // a different essay every round (5 essays, 4 rounds)
+  S.essayIdx=phase2Essay(S.round);   // a different essay every round, never one this person could have read in Phase 1
   ({reading:startReading,typing:startTyping,dots:startDots,symmetry:startSym,rotation:startRot,numseq:startNumSeq})[S.task]();
 }
 
@@ -1047,11 +1088,11 @@ function testTimer(secs,elId,onEnd){
 // ─────────────────────────────────────────
 // TASK: TYPING  (3 min, lines of 10 random words typed in reverse order)
 // ─────────────────────────────────────────
-let TY={lines:[],cur:[],over:true};
+let TY={lines:[],cur:[],over:true,prev:'',blocked:0};
 
 function startTyping(){
   clearIv();
-  TY={lines:[],cur:[],over:false};
+  TY={lines:[],cur:[],over:false,prev:'',blocked:0};
   nav('sc-typing');
   if(!S.practice)testTimer(TYPING_SECS,'ty-timer',finishTyping);
   nextTypingLine();
@@ -1061,7 +1102,7 @@ function nextTypingLine(){
   TY.cur=Array.from({length:10},()=>WORDS[0|Math.random()*WORDS.length]);
   document.getElementById('ty-orig').textContent=TY.cur.join(' ');
   document.getElementById('ty-line').textContent=`Line ${TY.lines.length+1}`;
-  const inp=document.getElementById('ty-inp');inp.value='';inp.focus();
+  const inp=document.getElementById('ty-inp');inp.value='';TY.prev='';inp.focus();
 }
 
 function typingLineDone(){
@@ -1079,13 +1120,37 @@ document.getElementById('ty-inp').addEventListener('keydown',e=>{
   if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();typingLineDone();}
 });
 
+// No erasing (Phase 2): text can only be added at the end of the line. Deleting, cutting, pasting, dropping,
+// undo and typing anywhere but the end are blocked before they happen (beforeinput); anything that still
+// gets through (e.g. a keyboard that ignores beforeinput) is undone straight away (input). Blocked
+// attempts are counted in erase_blocked. Some Android keyboards don't let a page stop a backspace inside a
+// word that is still being composed (underlined); text that has been committed can never be removed.
+(()=>{
+  const inp=document.getElementById('ty-inp');
+  const BLOCK=/^(delete|historyUndo|historyRedo|insertFromPaste|insertFromDrop|insertFromYank|insertReplacementText)/;
+  const atEnd=()=>inp.selectionStart===inp.value.length&&inp.selectionEnd===inp.value.length;
+  const toEnd=()=>{const n=inp.value.length;if(inp.selectionStart!==n||inp.selectionEnd!==n)inp.setSelectionRange(n,n);};
+  inp.addEventListener('beforeinput',e=>{
+    if((BLOCK.test(e.inputType)||(!e.isComposing&&!atEnd()))&&e.cancelable){e.preventDefault();TY.blocked++;toEnd();}
+  });
+  const enforce=()=>{
+    if(inp.value.startsWith(TY.prev)){TY.prev=inp.value;return;}
+    TY.blocked++;inp.value=TY.prev;toEnd();
+  };
+  inp.addEventListener('input',e=>{if(!e.isComposing)enforce();});
+  inp.addEventListener('compositionend',enforce);
+  inp.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowUp','Home','PageUp'].includes(e.key)){e.preventDefault();toEnd();}});
+  ['click','focus','select','keyup'].forEach(ev=>inp.addEventListener(ev,toEnd));
+  ['cut','paste','drop'].forEach(ev=>inp.addEventListener(ev,e=>{e.preventDefault();TY.blocked++;}));
+})();
+
 function finishTyping(){
   TY.over=true;
   const text=document.getElementById('ty-inp').value;
   if(text.trim())TY.lines.push(scoreTypingLine(TY.cur,text));   // the line in progress counts as attempted
   const attempted=TY.lines.length*10,exact=TY.lines.reduce((a,l)=>a+l.exact,0),typo=TY.lines.reduce((a,l)=>a+l.typo,0);
   const score=exact+typo,pct=attempted?Math.round(score/attempted*1000)/10:0;
-  record('typing',{lines:TY.lines.length,words_attempted:attempted,exact,typo,score,score_pct:pct,
+  record('typing',{lines:TY.lines.length,words_attempted:attempted,exact,typo,score,score_pct:pct,erase_blocked:TY.blocked,
     detail:TY.lines.map(l=>({target:l.target.join(' '),typed:l.typed}))},`score ${score}/${attempted} words (${pct}%)`);
 }
 
@@ -1215,9 +1280,29 @@ function finishDots(){
 // ─────────────────────────────────────────
 let SY={ok:0,bad:0,tot:0,cur:null,left:120};
 
+// Anti-guessing (Symmetry, Rotated Image; timed test only). In Phase 1, 3 runs were flagged for fast guessing
+// (accuracy ≤ 60% with far more answers than usual). Presses within MIN_RT_MS of a new shape are ignored and
+// counted (fast_presses); after GUESS_MIN_N answers, accuracy below GUESS_ACC shows a short reminder,
+// at most once per GUESS_GAP_MS (guess_warnings). Typical Phase 1 answers took 1.5–2 s.
+const MIN_RT_MS=350, GUESS_MIN_N=10, GUESS_ACC=0.6, GUESS_GAP_MS=20000;
+const tooFast=st=>!S.practice&&Date.now()-st.t0<MIN_RT_MS&&(st.fast++,true);
+function guessCheck(st,afterId){
+  if(st.tot<GUESS_MIN_N||st.ok/st.tot>=GUESS_ACC||Date.now()-st.lastWarn<GUESS_GAP_MS)return;
+  st.lastWarn=Date.now();st.warned++;
+  let w=document.getElementById(afterId+'-guess');
+  if(!w){
+    w=document.createElement('div');w.id=afterId+'-guess';
+    w.style.cssText='text-align:center;color:#fbbf24;font-size:0.88rem;font-weight:600;margin:4px 0 8px;';
+    document.getElementById(afterId).insertAdjacentElement('afterend',w);
+  }
+  w.textContent='⚠️ Accuracy counts — wrong answers are subtracted. Take a moment to check each shape.';
+  w.hidden=false;
+  clearTimeout(w._t);w._t=setTimeout(()=>{w.hidden=true;},5000);   // not in S._iv, so ending the test can't leave it showing
+}
+
 function startSym(){
   clearIv();
-  SY={ok:0,bad:0,tot:0,cur:null,left:120};
+  SY={ok:0,bad:0,tot:0,cur:null,left:120,t0:0,fast:0,warned:0,lastWarn:0};
   ['sym-ok','sym-bad','sym-tot'].forEach(id=>document.getElementById(id).textContent='0');
   nav('sc-sym');
   nextSymItem();
@@ -1255,6 +1340,7 @@ function genSymItem(){
 function nextSymItem(){
   SY.cur=genSymItem();
   drawSymShape(SY.cur);
+  SY.t0=Date.now();
 }
 
 function drawSymShape(item){
@@ -1280,6 +1366,7 @@ function drawSymShape(item){
 }
 
 function answerSym(yes){
+  if(tooFast(SY))return;
   const ok=SY.cur.sym===yes;
   if(S.practice)return practiceDone(ok,`That shape was ${SY.cur.sym?'symmetric':'not symmetric'} — compare its left and right halves across the dashed line.`);
   SY.tot++;if(ok)SY.ok++;else SY.bad++;
@@ -1287,13 +1374,14 @@ function answerSym(yes){
   document.getElementById('sym-ok').textContent=SY.ok;
   document.getElementById('sym-bad').textContent=SY.bad;
   document.getElementById('sym-tot').textContent=SY.tot;
+  guessCheck(SY,'sym-canvas-wrap');
   nextSymItem();
 }
 
 function submitSym(){
   clearIv();
   const acc=SY.tot?Math.round(SY.ok/SY.tot*100):0,score=SY.ok-SY.bad;
-  record('symmetry',{correct:SY.ok,wrong:SY.bad,total:SY.tot,accuracy:acc,score},`score ${score} (${SY.ok}/${SY.tot} correct)`);
+  record('symmetry',{correct:SY.ok,wrong:SY.bad,total:SY.tot,accuracy:acc,score,fast_presses:SY.fast,guess_warnings:SY.warned},`score ${score} (${SY.ok}/${SY.tot} correct)`);
 }
 
 // ─────────────────────────────────────────
@@ -1303,7 +1391,7 @@ let RT={ok:0,bad:0,tot:0,isMirror:false,left:120};
 
 function startRot(){
   clearIv();
-  RT={ok:0,bad:0,tot:0,isMirror:false,left:120};
+  RT={ok:0,bad:0,tot:0,isMirror:false,left:120,t0:0,fast:0,warned:0,lastWarn:0};
   ['rot-ok','rot-bad','rot-tot'].forEach(id=>document.getElementById(id).textContent='0');
   nav('sc-rot');
   nextRotItem();
@@ -1360,9 +1448,11 @@ function nextRotItem(){
   RT.isMirror=Math.random()>0.5;
   drawRotShape(document.getElementById('rot-a'),cells,rA,false);
   drawRotShape(document.getElementById('rot-b'),cells,rB,RT.isMirror);
+  RT.t0=Date.now();
 }
 
 function answerRot(userMirror){
+  if(tooFast(RT))return;
   const ok=RT.isMirror===userMirror;
   if(S.practice)return practiceDone(ok,`Shape B was ${RT.isMirror?'a mirror image':'just rotated'} — a mirror image can't be turned to match Shape A.`);
   RT.tot++;if(ok)RT.ok++;else RT.bad++;
@@ -1370,13 +1460,14 @@ function answerRot(userMirror){
   document.getElementById('rot-ok').textContent=RT.ok;
   document.getElementById('rot-bad').textContent=RT.bad;
   document.getElementById('rot-tot').textContent=RT.tot;
+  guessCheck(RT,'rot-wrap');
   nextRotItem();
 }
 
 function submitRot(){
   clearIv();
   const acc=RT.tot?Math.round(RT.ok/RT.tot*100):0,score=RT.ok-RT.bad;
-  record('rotation',{correct:RT.ok,wrong:RT.bad,total:RT.tot,accuracy:acc,score},`score ${score} (${RT.ok}/${RT.tot} correct)`);
+  record('rotation',{correct:RT.ok,wrong:RT.bad,total:RT.tot,accuracy:acc,score,fast_presses:RT.fast,guess_warnings:RT.warned},`score ${score} (${RT.ok}/${RT.tot} correct)`);
 }
 
 // ─────────────────────────────────────────
@@ -1417,19 +1508,23 @@ function startNumSeq(){
   nsNewRound();
 }
 
+// Phase 2 uses 7 circles (0–6) instead of Phase 1's 10: in Phase 1 most white-noise runs had no fully
+// correct layout (a floor effect), which leaves no room to see a music effect.
+const NS_COUNT=7;
+
 function nsNewRound(){
-  Object.assign(NS,{n:NS.n+1,circles:[],order:shuffle([0,1,2,3,4,5,6,7,8,9]),next:0,hits:0,wrong:0,phase:'memo'});
+  Object.assign(NS,{n:NS.n+1,circles:[],order:shuffle([...Array(NS_COUNT).keys()]),next:0,hits:0,wrong:0,phase:'memo'});
   const arena=document.getElementById('ns-arena');
   arena.innerHTML='';
   arena.style.pointerEvents='none';
 
-  // Place 10 circles randomly without overlaps; narrow (phone) screens get a tall area and smaller circles
+  // Place NS_COUNT circles randomly without overlaps; narrow (phone) screens get a tall area and smaller circles
   const W=arena.offsetWidth||620, narrow=W<500, H=narrow?460:340, R=narrow?28:36;
   arena.style.height=H+'px';
   let placed;
   for(let attempt=0;attempt<100;attempt++){
     placed=[];
-    for(let k=0;k<10;k++){
+    for(let k=0;k<NS_COUNT;k++){
       let x,y,tries=0;
       do{
         x=R+Math.random()*(W-2*R);
@@ -1461,6 +1556,7 @@ function nsNewRound(){
   document.getElementById('ns-instr').textContent='Remember the position of each number… 8';
   document.getElementById('ns-next').textContent='—';
   document.getElementById('ns-hits').textContent='0';
+  document.getElementById('ns-count').textContent=NS_COUNT;
 
   // 8 s to memorise, then the digits are hidden
   let cd=8;
@@ -1480,7 +1576,7 @@ function nsStartRecall(){
   NS.circles.forEach(c=>{c.textContent='';});
   document.getElementById('ns-arena').style.pointerEvents='auto';
   document.getElementById('ns-phase-lbl').textContent=`${S.practice?'PRACTICE':'PATTERN '+NS.n} · RECALL`;
-  document.getElementById('ns-instr').textContent='Click circles in order: 0 → 1 → 2 … → 9';
+  document.getElementById('ns-instr').textContent=`Click circles in order: 0 → 1 → 2 … → ${NS_COUNT-1}`;
   document.getElementById('ns-next').textContent=NS.next;
 }
 
@@ -1493,15 +1589,15 @@ function nsClick(el,digit){
     el.style.pointerEvents='none';
     NS.hits++;NS.next++;
     document.getElementById('ns-hits').textContent=NS.hits;
-    document.getElementById('ns-next').textContent=NS.next<10?NS.next:'✓ Done!';
-    if(NS.next>=10){
+    document.getElementById('ns-next').textContent=NS.next<NS_COUNT?NS.next:'✓ Done!';
+    if(NS.next>=NS_COUNT){
       if(S.practice){
         NS.over=true;NS.phase='done';const w=NS.wrong;
-        S._iv.push(setTimeout(()=>practiceDone(!w,w?`You finished with ${w} wrong click${w>1?'s':''}. In the real test, each layout counts as correct only with no wrong clicks.`:'All 10 in order with no wrong clicks.'),600));
+        S._iv.push(setTimeout(()=>practiceDone(!w,w?`You finished with ${w} wrong click${w>1?'s':''}. In the real test, each layout counts as correct only with no wrong clicks.`:`All ${NS_COUNT} in order with no wrong clicks.`),600));
         return;
       }
       NS.phase='done';
-      NS.xs.push(Math.min(1,NS.wrong/10));   // wrong share: wrong clicks, out of 10
+      NS.xs.push(Math.min(1,NS.wrong/NS_COUNT));   // wrong share: wrong clicks, out of NS_COUNT
       NS.times.push((Date.now()-NS.t0)/1000);
       S._iv.push(setTimeout(()=>{if(!NS.over)nsNewRound();},400));
     }
@@ -1521,7 +1617,7 @@ function finishNumSeq(){
   NS.over=true;
   const sc=puzzleScore(NS.xs),mean=NS.times.length?+(NS.times.reduce((a,b)=>a+b,0)/NS.times.length).toFixed(2):'';
   record('numseq',Object.assign(sc,{unfinished:NS.n-NS.xs.length,wrong_clicks:NS.wrongTotal,mean_recall_s:mean,
-    wrong_shares:NS.xs.map(x=>+x.toFixed(2))}),`score ${sc.score} (${sc.correct}/${sc.puzzles} layouts perfect)`);
+    wrong_shares:NS.xs.map(x=>+x.toFixed(2)),circles:NS_COUNT}),`score ${sc.score} (${sc.correct}/${sc.puzzles} layouts perfect)`);
 }
 
 // Roll number from a ?roll= link

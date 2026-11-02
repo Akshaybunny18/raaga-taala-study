@@ -43,6 +43,7 @@ def prepare(cond, src):
 
 
 def main():
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')   # Windows consoles default to cp1252 and choke on '→'
     jobs = []
     for arg in sys.argv[1:]:
         cond, _, path = arg.partition('=')

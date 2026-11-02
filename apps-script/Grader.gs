@@ -139,7 +139,7 @@ function listGroqModels() {
   console.log(resp.getResponseCode() === 200 ? JSON.parse(resp.getContentText()).data.map(m => m.id).sort().join('\n') : resp.getContentText());
 }
 
-// ── Essays (must match ESSAYS in session.html) and their 10 key ideas ──
+// ── Essays (must match ESSAYS in session.html / phase2-session.html) and their 10 key ideas ──
 const RUBRICS = {
   "The Water Cycle": {
     text: `Water moves constantly through the environment in the water cycle. The sun heats surface water in oceans, lakes, and rivers, causing it to evaporate and rise as water vapor. As the vapor ascends and cools, it condenses around tiny dust particles to form clouds. When enough droplets collect, they fall as precipitation — rain, snow, sleet, or hail.
@@ -234,6 +234,63 @@ In the Calvin cycle, the plant uses ATP and NADPH to convert carbon dioxide into
       "Glucose powers the plant and, through the food chain, nearly all other organisms.",
       "Photosynthesis rates depend on sunlight, carbon dioxide and water supply.",
       "It matters for food security and climate science; without it almost no life on Earth would exist.",
+    ],
+  },
+  "How Volcanoes Form": {   // Phase 2 only
+    text: `Volcanoes form where molten rock, called magma, rises from deep inside the Earth to the surface. Most volcanoes lie along the edges of tectonic plates, the giant slabs that make up the planet's outer shell. Where one plate sinks beneath another, water released from the sinking plate helps melt the rock above it, and the magma rises. Where plates pull apart, as along mid-ocean ridges, magma wells up to fill the gap.
+
+Some volcanoes, such as those of Hawaii, sit far from any plate edge, above hotspots where unusually hot rock rises from deep below. Magma that reaches the surface is called lava. Runny lava flows gently and builds wide, low shield volcanoes, while thick, gas-rich magma traps pressure and erupts explosively, building steep cone-shaped volcanoes.
+
+Eruptions can bury towns under ash and send fast clouds of hot gas and rock racing downhill. Yet volcanic ash weathers into very fertile soil, and scientists now watch for earthquakes and escaping gas to warn people before eruptions.`,
+    ideas: [
+      "Volcanoes form where magma (molten rock) rises from deep inside the Earth to the surface.",
+      "Most volcanoes lie along the edges of tectonic plates, the slabs that make up Earth's outer shell.",
+      "Where one plate sinks beneath another, water from the sinking plate helps melt the rock above, and magma rises.",
+      "Where plates pull apart, such as along mid-ocean ridges, magma wells up to fill the gap.",
+      "Some volcanoes (e.g. Hawaii) form far from plate edges, above hotspots where unusually hot rock rises.",
+      "Magma that reaches the surface is called lava.",
+      "Runny lava flows gently and builds wide, low shield volcanoes.",
+      "Thick, gas-rich magma traps pressure and erupts explosively, building steep cone-shaped volcanoes.",
+      "Eruptions can bury towns under ash and send fast clouds of hot gas and rock downhill.",
+      "Volcanic ash weathers into fertile soil, and scientists watch for earthquakes and gas to warn people before eruptions.",
+    ],
+  },
+  "The Honeybee Colony": {   // Phase 2 only
+    text: `A honeybee colony can hold tens of thousands of bees, yet it works almost like a single organism. At its centre is one queen, the only female that lays eggs, up to about two thousand a day in summer. The male bees, called drones, have one main job: to mate with young queens from other colonies.
+
+Most of the colony are female worker bees, and their jobs change as they age. Young workers clean the cells, feed the larvae and build wax comb. Older workers guard the entrance and finally fly out to collect nectar and pollen. A forager that finds good flowers returns and performs a waggle dance, which tells her sisters the direction and distance of the food.
+
+Bees turn nectar into honey by adding enzymes and fanning it with their wings until most of the water evaporates. While feeding, they carry pollen between flowers, pollinating many of the crops people eat. Disease, pesticides and habitat loss now threaten colonies in many countries.`,
+    ideas: [
+      "A colony can hold tens of thousands of bees and works almost like a single organism.",
+      "Each colony has one queen, the only female that lays eggs.",
+      "The queen can lay up to about two thousand eggs a day in summer.",
+      "Male bees (drones) mainly exist to mate with young queens from other colonies.",
+      "Most of the colony are female worker bees, whose jobs change as they age.",
+      "Young workers clean the cells, feed the larvae and build wax comb.",
+      "Older workers guard the entrance and then fly out to collect nectar and pollen.",
+      "A forager's waggle dance tells other bees the direction and distance of food.",
+      "Honey is made by adding enzymes to nectar and fanning it until most of the water evaporates.",
+      "Bees pollinate many food crops, and colonies are threatened by disease, pesticides and habitat loss.",
+    ],
+  },
+  "The Printing Press": {   // Phase 2 only
+    text: `Before the fifteenth century, books in Europe were copied by hand, often by monks, and a single book could take many months to finish. Around 1440, Johannes Gutenberg, a goldsmith in Mainz, Germany, developed a printing press that used movable metal type: individual letters that could be arranged into pages, inked, pressed onto paper and then reused.
+
+His most famous work, the Gutenberg Bible, was completed around 1455. The invention spread quickly. Within fifty years, presses were running in more than two hundred European cities, and millions of books had been printed. Books became far cheaper and more widely available, and many more people learned to read.
+
+Printing let new ideas travel fast and in identical copies. It helped spread the Protestant Reformation, supported the Scientific Revolution by letting scientists share exact results, and helped standardise spelling and national languages. Movable type was not entirely new, however: printers in China and Korea had used it centuries earlier.`,
+    ideas: [
+      "Before the 15th century, European books were copied by hand (often by monks), and a book could take months.",
+      "Around 1440 Johannes Gutenberg, a goldsmith in Mainz, Germany, developed a printing press.",
+      "It used movable metal type: individual letters arranged into pages, inked, pressed onto paper and reused.",
+      "The Gutenberg Bible was completed around 1455.",
+      "Within fifty years, presses were running in more than two hundred European cities.",
+      "Millions of books had been printed within those fifty years.",
+      "Books became much cheaper and more widely available, and more people learned to read.",
+      "Printing let new ideas spread quickly in identical copies.",
+      "It helped the Protestant Reformation and the Scientific Revolution, and standardised spelling and languages.",
+      "Movable type had been used centuries earlier in China and Korea.",
     ],
   },
 };

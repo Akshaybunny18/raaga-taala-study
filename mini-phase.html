@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini Phase — Raaga &amp; Taala Study</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    .clip-card { border:1.5px solid #e0ddf0; border-radius:14px; padding:20px 22px; margin-bottom:22px; background:#fafafe; }
+    .clip-card h3 { font-size:1rem; color:var(--indigo); margin-bottom:10px; }
+    .clip-card audio { width:100%; margin-bottom:6px; }
+    .clip-status { font-size:0.8rem; color:var(--text-light); margin-bottom:12px; }
+    .clip-card fieldset { border:none; padding:0; margin:0; }
+    .clip-card fieldset:disabled { opacity:0.45; }
+    .q { margin-top:14px; }
+    .q > span { display:block; font-weight:600; font-size:0.88rem; color:var(--text-dark); margin-bottom:6px; }
+    .scale7 { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+    .scale7 .end { font-size:0.75rem; color:var(--text-light); width:118px; }
+    .scale7 .end.r { text-align:right; }
+    .scale7 label { display:flex; flex-direction:column; align-items:center; font-size:0.78rem; color:var(--text-mid); cursor:pointer; }
+    .scale7 input { accent-color:var(--indigo-light); width:18px; height:18px; }
+    .words label { display:inline-flex; align-items:center; gap:6px; margin:0 14px 6px 0; font-size:0.85rem; cursor:pointer; }
+    .msg { text-align:center; color:#b91c1c; font-size:0.88rem; margin-top:12px; min-height:1.2em; }
+    @media (max-width:560px){ .form-container{ padding:28px 18px; } .scale7 .end{ min-width:100%; } .scale7 .end.r{ text-align:left; } }
+  </style>
+</head>
+<body>
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo" style="text-decoration:none">🎵 Raaga &amp; Taala Study</a>
+    </div>
+  </nav>
+
+  <div class="form-page">
+    <div class="form-container">
+
+      <!-- Intro + login -->
+      <div id="pg-intro">
+        <div class="form-header">
+          <span class="section-tag">Mini Phase</span>
+          <h2>Help Us Choose the Phase 2 Music</h2>
+          <p>Listen to 7 short clips (30 seconds each) and rate each one. It takes about <strong>8–10 minutes</strong>. There are no right answers — we want your honest first impression.</p>
+        </div>
+        <div class="form-group">
+          <label for="roll">Roll number <span class="hint">The one you used in Phase 1, if you took part.</span></label>
+          <input type="text" id="roll" autocomplete="off" placeholder="e.g. 2024102014" />
+        </div>
+        <div class="form-group">
+          <label for="name">Name <span class="hint">Optional.</span></label>
+          <input type="text" id="name" autocomplete="off" />
+        </div>
+        <p style="color:var(--text-mid);font-size:0.9rem;margin-bottom:8px;">🎧 Please use <strong>headphones</strong> in a quiet place. Set a comfortable volume on the first clip and don't change it after that.</p>
+        <div class="form-submit"><button class="btn-submit" onclick="begin()">Start →</button></div>
+        <div class="msg" id="intro-msg"></div>
+      </div>
+
+      <!-- Clips -->
+      <div id="pg-clips" hidden>
+        <div class="form-header" style="margin-bottom:24px;">
+          <span class="section-tag">Mini Phase</span>
+          <h2>Listen and Rate</h2>
+          <p>Play each clip. Its questions unlock after 25 seconds of listening. Imagine this music playing quietly while you study or read.</p>
+        </div>
+        <div id="clips"></div>
+        <div class="form-group">
+          <label for="comment">Anything else you noticed? <span class="hint">Optional.</span></label>
+          <textarea id="comment"></textarea>
+        </div>
+        <div class="form-submit"><button class="btn-submit" id="btn-send" onclick="send()">Submit ratings</button></div>
+        <div class="msg" id="send-msg"></div>
+      </div>
+
+      <!-- Done -->
+      <div id="pg-done" hidden>
+        <div class="form-header">
+          <span class="section-tag">Mini Phase</span>
+          <h2>Thank you! 🎶</h2>
+          <p id="done-text">Your ratings are saved. They help us pick the music for Phase 2.</p>
+        </div>
+        <div class="form-submit" style="margin-top:0;margin-bottom:20px;"><button class="btn-submit" id="btn-retry" onclick="retry()" hidden>Retry</button></div>
+        <div style="text-align:center;"><a href="index.html" class="btn-primary" style="display:inline-block;">← Back to homepage</a></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script src="main.js"></script>
+  <script>
+// Mini phase: a listening check before Phase 2 (see Project/phase2/phase2_track_selection.md, section 8).
+// Each clip is the 0:30–1:00 excerpt of a candidate track (the chosen track or its backup per condition).
+// The clip → track key is kept out of this public site (Project/phase2/audio/mini_phase_clips/).
+// Saved to the Results sheet as phase 0: one row per clip (step_key mini_clipN) and one 'mini_final' row.
+const CLIPS=[1,2,3,4,5,6,7].map(n=>({n,file:`audio/mini/clip_${n}.mp3`}));
+const LISTEN_MIN=25;   // seconds of listening before a clip's questions unlock
+const SCALES=[
+  ['pleasant','How pleasant is this music?','Very unpleasant','Very pleasant'],
+  ['energy','How calm or energetic is it?','Very calm','Very energetic'],
+  ['familiar','How familiar does it sound to you?','Not at all familiar','Very familiar'],
+  ['distracting','How distracting would it be while you study or read?','Not at all','Extremely'],
+];
+const WORDS=[['none','No words / no singing'],['not_understood','Singing, but I couldn\'t understand the words'],['some','I understood some words'],['most','I understood most words']];
+const M={roll:'',name:'',order:[],listened:{},sent:false};
+
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function begin(){
+  const roll=document.getElementById('roll').value.trim().toUpperCase();
+  if(!roll){document.getElementById('intro-msg').textContent='Please enter your roll number.';return;}
+  M.roll=roll;M.name=document.getElementById('name').value.trim();
+  M.order=shuffle(CLIPS);
+  const box=document.getElementById('clips');box.innerHTML='';
+  M.order.forEach((c,i)=>box.appendChild(clipCard(c,i+1)));
+  document.getElementById('pg-intro').hidden=true;document.getElementById('pg-clips').hidden=false;
+  window.scrollTo(0,0);
+}
+
+function clipCard(c,pos){
+  const d=document.createElement('div');d.className='clip-card';d.id=`card-${c.n}`;
+  const scales=SCALES.map(([k,q,lo,hi])=>`
+    <div class="q"><span>${q}</span><div class="scale7"><span class="end">${lo}</span>
+      ${[1,2,3,4,5,6,7].map(v=>`<label><input type="radio" name="${k}-${c.n}" value="${v}" />${v}</label>`).join('')}
+      <span class="end r">${hi}</span></div></div>`).join('');
+  const words=`<div class="q words"><span>Could you make out any words?</span>${WORDS.map(([v,t])=>
+      `<label><input type="radio" name="words-${c.n}" value="${v}" />${esc(t)}</label>`).join('')}</div>`;
+  d.innerHTML=`<h3>Clip ${pos} of ${CLIPS.length}</h3>
+    <audio controls preload="none" src="${c.file}"></audio>
+    <div class="clip-status" id="st-${c.n}">Play the clip — questions unlock after ${LISTEN_MIN} s.</div>
+    <fieldset id="fs-${c.n}" disabled>${scales}${words}</fieldset>`;
+  // Count real listening time (not seeking): add up the time between timeupdate ticks while playing
+  const a=d.querySelector('audio');let last=null;M.listened[c.n]=0;
+  a.addEventListener('play',()=>{CLIPS.forEach(o=>{if(o.n!==c.n){const x=document.querySelector(`#card-${o.n} audio`);if(x&&!x.paused)x.pause();}});last=a.currentTime;});
+  a.addEventListener('seeking',()=>{last=null;});
+  a.addEventListener('seeked',()=>{last=a.currentTime;});
+  a.addEventListener('timeupdate',()=>{
+    if(last!==null&&!a.paused){const dt=a.currentTime-last;if(dt>0&&dt<1.5)M.listened[c.n]+=dt;}
+    last=a.currentTime;
+    const s=Math.floor(M.listened[c.n]);
+    if(M.listened[c.n]>=LISTEN_MIN){document.getElementById(`fs-${c.n}`).disabled=false;
+      document.getElementById(`st-${c.n}`).textContent='✓ Now answer the questions below (you can keep listening).';}
+    else document.getElementById(`st-${c.n}`).textContent=`Listening… ${s} / ${LISTEN_MIN} s`;
+  });
+  a.addEventListener('ended',()=>{last=null;});
+  return d;
+}
+
+const val=name=>{const el=document.querySelector(`input[name="${name}"]:checked`);return el?el.value:'';};
+
+async function send(){
+  if(M.sent)return;
+  const msg=document.getElementById('send-msg');
+  const missing=M.order.map((c,i)=>[c,i+1]).filter(([c])=>
+    M.listened[c.n]<LISTEN_MIN||SCALES.some(([k])=>!val(`${k}-${c.n}`))||!val(`words-${c.n}`)).map(([,p])=>p);
+  if(missing.length){msg.textContent=`Please listen to and answer every question for clip ${missing.join(', ')}.`;return;}
+  const btn=document.getElementById('btn-send');btn.disabled=true;btn.textContent='Saving…';msg.textContent='';
+  const device=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)?'phone':'laptop';
+  const base={roll:M.roll,name:M.name,phase:0,step:'mini',device,client_ts:new Date().toISOString()};
+  let pending=0;
+  for(const [i,c] of M.order.entries()){
+    const rec=Object.assign({},base,{step_key:`mini_clip${c.n}`,clip:`clip_${c.n}`,position:i+1,
+      listened_s:Math.round(M.listened[c.n]),words:val(`words-${c.n}`)});
+    SCALES.forEach(([k])=>{rec[k]=Number(val(`${k}-${c.n}`));});
+    const out=await API.submit(rec);pending=out.pending||0;
+  }
+  M.finalRec=Object.assign({},base,{step_key:'mini_final',order:M.order.map(c=>c.n).join('>'),
+    comment:document.getElementById('comment').value.trim()});
+  pending=(await API.submit(M.finalRec)).pending||0;
+  M.sent=true;
+  document.getElementById('pg-clips').hidden=true;document.getElementById('pg-done').hidden=false;
+  showPending(pending);
+  window.scrollTo(0,0);
+}
+
+// api.js keeps unsent records and retries them on the next submit; re-sending the final record flushes
+// that queue (the server ignores a step_key it already has, so nothing is saved twice).
+function showPending(n){
+  const t=document.getElementById('done-text'),b=document.getElementById('btn-retry');
+  if(!n){t.textContent='Your ratings are saved. They help us pick the music for Phase 2.';b.hidden=true;return;}
+  t.textContent=`${n} answer${n>1?'s':''} could not be sent yet (connection problem?). They are kept on this device — press Retry, and please don't close this page until it says they are saved.`;
+  b.hidden=false;
+}
+async function retry(){
+  const b=document.getElementById('btn-retry');b.disabled=true;b.textContent='Retrying…';
+  showPending((await API.submit(M.finalRec)).pending||0);
+  b.disabled=false;b.textContent='Retry';
+}
+  </script>
+</body>
+</html>

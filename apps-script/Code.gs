@@ -225,13 +225,17 @@ function pickBalanced_(sh, pool) {
 // Phase 2 assignment: the test used least so far (ties at random), then the Latin-square order
 // used least among participants with that test (ties by overall use, then at random).
 // So each test gets about the same number of people, and within each test the 4 orders fill evenly.
+// Dot Memory counts double, so it gets about half as many people: it was the least sensitive test in
+// Phase 1 (+0.09 SD, 5 of 12 unchanged), so its participants are better spent on the other tests.
+const P2_TASK_WEIGHT = { dots: 2 };
+
 function pickPhase2_(sh, pool) {
   const vals = sh.getDataRange().getValues(), h = vals[0];
   const ct = h.indexOf('p2_task'), co = h.indexOf('p2_order');
   const rows = vals.slice(1).map(r => [String(r[ct]), Number(r[co])]).filter(r => r[0] && r[1]);
   const least = (keys, count, tie) => keys.map(k => [count(k), tie ? tie(k) : 0, Math.random(), k])
     .sort((x, y) => x[0] - y[0] || x[1] - y[1] || x[2] - y[2])[0][3];
-  const task = least(pool, t => rows.filter(r => r[0] === t).length);
+  const task = least(pool, t => rows.filter(r => r[0] === t).length * (P2_TASK_WEIGHT[t] || 1));
   const order = least([1, 2, 3, 4], o => rows.filter(r => r[0] === task && r[1] === o).length,
                                     o => rows.filter(r => r[1] === o).length);
   return [task, order];

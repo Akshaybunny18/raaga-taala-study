@@ -125,22 +125,32 @@ Scores (Results tab, reading rows only):
 Empty summaries get 0 without calling the LLM. If Groq is down or rate-limited, the
 remaining rows are simply picked up on the next run. To re-grade a row, clear its
 `score_recall_pct` cell. To edit the key ideas, change `RUBRICS` in `Grader.gs` (keep
-the essay texts identical to `ESSAYS` in `session.html`).
+the essay texts identical to `ESSAYS` in `session.html` and `phase2-session.html`; the last three essays
+exist only in Phase 2).
 
 For the report: hand-grade ~20 summaries with the same key-idea lists and compare them
 with `score_recall_pct` to show the automatic grading agrees with a human.
 
 ## 6. Phase 2
 
-`phase2-session.html` uses the same Sheet and web app. **Redeploy `Code.gs`** (new version, §1)
-before Phase 2 opens. No song worker is needed: the tracks are fixed and served with the site.
+`phase2-session.html` uses the same Sheet and web app. Before Phase 2 opens:
+1. Paste the current **`Code.gs`** into the Apps Script editor and **redeploy** (new version, §1).
+   If saves fail with `TypeError: Cannot read properties of undefined (reading 'map')` (found on 3 Nov:
+   reads worked, every save failed), the deployed code is out of sync with this file. Paste this file
+   again in full and deploy a new version. Unsent saves wait in each participant's browser and are re-sent
+   on their next save.
+2. Paste the current **`Grader.gs`** too (it has rubrics for the 3 Phase-2-only essays). The grading
+   trigger runs the saved code, so no redeploy is needed for it, but it must be saved.
+
+No song worker is needed: the tracks are fixed and served with the site.
 
 **Who can take it:** only roll numbers whose Phase 1 `final` step is saved. Others are sent back
 to Phase 1.
 
 **Assignment** (written once to Participants on first login, as `p2_task` and `p2_order`):
 - `p2_task`: one of the 6 tests, whichever has been used least in Phase 2 so far (ties at random),
-  independent of the participant's Phase 1 tests.
+  independent of the participant's Phase 1 tests. Dot Memory counts double (`P2_TASK_WEIGHT` in
+  `Code.gs`), so it gets about half as many people: it was the least sensitive test in Phase 1.
 - `p2_order`: a row of a balanced 4×4 Latin square (each condition once in every round position, and
   each condition directly after every other once), the one used least among people with the same test:
 
@@ -151,16 +161,39 @@ to Phase 1.
   | 3 | indian_vocal | indian_instr | western | white_noise |
   | 4 | indian_instr | white_noise | indian_vocal | western |
 
-**Tracks:** `audio/phase2/western.mp3`, `indian_vocal.mp3`, `indian_instr.mp3` (placeholders until the
-real pieces are chosen). Prepare the real ones with
-`python tools/prep_phase2_audio.py western=<file> indian_vocal=<file> indian_instr=<file>`
-(ffmpeg; matches them to the white noise at −18 LUFS), then set each `title` in `CONDS` at the top of
-`phase2-session.html`. Tracks should be at least 4 minutes long; shorter ones loop.
+**Tracks** (chosen and measured in `Project/phase2/phase2_track_selection.md`):
+
+| file | piece | segment used |
+|---|---|---|
+| `audio/phase2/indian_instr.mp3` | *Raghunayaka* (raga Hamsadhwani, Adi tala, Tyagaraja) — Ambi Subramaniam, violin | 0:02–4:02 |
+| `audio/phase2/indian_vocal.mp3` | the same kriti — Sanjay Subrahmanyan, vocal | 0:18–4:18 |
+| `audio/phase2/western.mp3` | J.S. Bach, Violin Concerto in E major BWV 1042, I. Allegro — Hilary Hahn | 0:01–4:01 |
+
+Each is exactly 4:00 with a 1 s fade-in and 3 s fade-out, made with
+`python tools/prep_phase2_audio.py western=<file> indian_vocal=<file> indian_instr=<file>` from lossless
+cuts of the originals (all measure −18.4 LUFS, matched to the white noise). A round needs at most
+30 s + 3 min (Reverse Typing), so 4 min never loops. To swap a track, cut the new segment to 4:00, run
+the tool, and update its `title` in `CONDS` at the top of `phase2-session.html`.
+These are commercial recordings: they are used here for study playback only.
 
 **Flow:** audio check → instructions → `start` mood check → `practice` (3 untimed, silent puzzles for
 Symmetry / Rotation / Dot Memory / Number Sequence, 1 line for Reverse Typing, none for Reading) →
 4 rounds, each: 30 s of the round's audio with nothing to do → the test, audio continuing (Reading:
-audio stops for the summary, as in Phase 1) → mood form → `final`.
+audio stops for the summary, as in Phase 1) → mood form → **60 s silent break** before rounds 2–4
+(`BREAK_SECS`; not a saved step, so a reload during it shows it again) → `final`. About 25–30 minutes.
+
+**Test changes from Phase 1** (Phase 2 only; `session.html` is unchanged):
+- **Number Sequence:** 7 circles (0–6) instead of 10 (`NS_COUNT`), because most Phase 1 white-noise
+  runs had no fully correct layout. Runs record `res_circles` = 7.
+- **Symmetry / Rotated Image:** presses within 350 ms of a new shape are ignored (`res_fast_presses`);
+  after 10 answers, accuracy below 60% shows an "accuracy counts" reminder at most every 20 s
+  (`res_guess_warnings`). Practice puzzles are not affected.
+- **Reverse Typing:** nothing can be erased or edited, only added at the end of the line. Backspace,
+  Delete, cut, paste, drop, undo and clicks/arrows into the middle are blocked; blocked attempts are
+  counted in `res_erase_blocked`. Some Android keyboards don't let a page stop a backspace inside a
+  word that is still being composed (underlined); committed text can never be removed.
+- **Reading:** 8 essays (the 5 from Phase 1 + 3 new ones). Each round shows a different essay, never
+  one of the two this roll number could have read in Phase 1 (`phase2Essay`).
 
 **Results** rows have `phase` = 2 and `order_id` (= `p2_order`):
 
@@ -173,3 +206,17 @@ audio stops for the summary, as in Phase 1) → mood form → `final`.
 | `final` | `rank_white_noise`, `rank_western`, `rank_indian_vocal`, `rank_indian_instr` (1 = best for focus … 4), `best` (a condition or `no_difference`), `best_why`, `vocal`, `vs_phase1`, `usual` |
 
 Reading runs are graded by `Grader.gs` exactly like Phase 1 (each round gets a different essay).
+
+## 7. Mini phase (track listening check)
+
+`mini-phase.html` (not linked from the homepage; share the URL directly) asks people to listen to 7
+thirty-second clips, `audio/mini/clip_1.mp3` … `clip_7.mp3`, in a random order, and rate each one 1–7 for
+pleasantness, energy, familiarity and how distracting it would be while studying, plus whether they could
+make out the words. Questions unlock after 25 s of actual listening. The clips are the 0:30–1:00 excerpts
+of each chosen track and its backup; which clip is which is kept out of this public site, in
+`Project/phase2/audio/mini_phase_clips/CLIP_KEY_do_not_show_respondents.csv`.
+
+Results go to the same Results tab with **`phase` = 0**: one row per clip (`step_key` `mini_clip1` …
+`mini_clip7`, with `clip`, `position`, `listened_s`, `pleasant`, `energy`, `familiar`, `distracting`, `words`)
+and one `mini_final` row (`order`, `comment`). Filter by `phase` so these never mix with Phase 1/2 data.
+Roll number `DEMO` keeps everything in the browser for testing.
