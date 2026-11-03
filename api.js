@@ -79,6 +79,28 @@ const API = (() => {
 
   const norm = r => String(r || '').trim().toUpperCase();
 
+  // Sends every queued save (plus rec, if given); whatever fails stays queued in localStorage.
+  // Runs one at a time, so a resend on page load can't overwrite the queue a save just wrote.
+  // The server skips steps it already has, so resending is always safe.
+  let chain = Promise.resolve();
+  function flush(rec) {
+    const run = async () => {
+      let queue = [];
+      try { queue = JSON.parse(localStorage.getItem('study_unsent') || '[]'); } catch (_) {}
+      if (rec) queue.push(rec);
+      const left = [];
+      for (const r of queue) {
+        try { const out = await post(Object.assign({ action: 'submit' }, r)); if (!out.ok) throw new Error(out.error); }
+        catch (_) { left.push(r); }
+      }
+      try { localStorage.setItem('study_unsent', JSON.stringify(left)); } catch (_) {}
+      return { ok: !rec || !left.includes(rec), pending: left.length };
+    };
+    return (chain = chain.then(run, run));
+  }
+  // Saves that failed earlier (e.g. while the server was down) go up as soon as any study page opens
+  if (API_URL) setTimeout(() => { try { if (JSON.parse(localStorage.getItem('study_unsent') || '[]').length) flush(); } catch (_) {} }, 0);
+
   return {
     isDemo,
     profile: (roll, pool) => isDemo(roll) ? Promise.resolve(demo.profile(norm(roll), pool))
@@ -95,18 +117,6 @@ const API = (() => {
     register: data => isDemo(data.roll) ? Promise.resolve(demo.register(Object.assign({}, data, { roll: norm(data.roll) })))
                                         : post(Object.assign({ action: 'register' }, data)),
     // Saves one step; failed saves are queued in localStorage and retried on the next call.
-    async submit(rec) {
-      if (isDemo(rec.roll)) return demo.submit(rec);
-      let queue = [];
-      try { queue = JSON.parse(localStorage.getItem('study_unsent') || '[]'); } catch (_) {}
-      queue.push(rec);
-      const left = [];
-      for (const r of queue) {
-        try { const out = await post(Object.assign({ action: 'submit' }, r)); if (!out.ok) throw new Error(out.error); }
-        catch (_) { left.push(r); }
-      }
-      try { localStorage.setItem('study_unsent', JSON.stringify(left)); } catch (_) {}
-      return { ok: !left.includes(rec), pending: left.length };
-    },
+    submit: rec => isDemo(rec.roll) ? Promise.resolve(demo.submit(rec)) : flush(rec),
   };
 })();

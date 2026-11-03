@@ -1,5 +1,7 @@
 // ===== Raaga & Taala Study — automatic grading of reading summaries =====
 // Lives next to Code.gs in the same Apps Script project (uses its sheet helpers).
+// All .gs files share one global scope, so never define a name here that Code.gs also defines
+// (a duplicate ensureCols_ broke every save on 3 Nov 2026) — run tools/check_apps_script.py before pasting.
 // Every 10 minutes it scores ungraded "Reading + Summary" runs in the Results tab
 // against 10 key ideas per essay, using an LLM on Groq's free tier.
 //
@@ -101,16 +103,6 @@ function callGrader_(key, model, title, rubric, summary) {
 function emptyScore_(rubric) {
   return { score_recall_pct: 0, score_recalled: 0, score_partial: 0, score_errors: 0,
            score_detail: JSON.stringify({ ideas: rubric.ideas.map(() => 'missing'), errors: [], note: 'empty summary' }) };
-}
-
-function ensureCols_(sh, keys) {
-  const h = headers_(sh);
-  keys.forEach(k => {
-    if (h.indexOf(k) !== -1) return;
-    h.push(k);
-    if (sh.getMaxColumns() < h.length) sh.insertColumnsAfter(sh.getMaxColumns(), 10);
-    sh.getRange(1, h.length).setValue(k).setFontWeight('bold');
-  });
 }
 
 // ── Run these by hand from the editor (select the function → ▶ Run) ──

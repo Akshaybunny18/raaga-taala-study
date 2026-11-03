@@ -27,8 +27,22 @@ session.html ─profile/submit─▶ Apps Script ──▶ Sheet: Results       
 The `Participants` and `Results` tabs and the `raaga-taala-study-audio` Drive folder
 are created automatically on first use.
 
-**After editing `Code.gs`** you must publish a new version: Deploy → Manage deployments →
-✏️ → Version: *New version* → Deploy. The `/exec` URL stays the same.
+**After editing `Code.gs` or `Grader.gs`** you must publish a new version: Deploy → Manage deployments →
+✏️ → Version: *New version* → Deploy. The `/exec` URL stays the same. The web app runs a snapshot of
+*all* `.gs` files, so a change to Grader.gs also reaches participants' saves only after a deploy.
+
+**Before pasting, run `python tools/check_apps_script.py`.** All `.gs` files share one global scope:
+a name defined in two files makes one silently replace the other. That is what broke every save on
+3 Nov 2026 (`TypeError: Cannot read properties of undefined (reading 'map')`): Grader.gs had its own
+`ensureCols_`, which returned nothing, and it replaced the Code.gs one that saving relies on.
+
+**Recovering failed saves.** A save that fails stays queued in the participant's browser, and is
+re-sent on their next save or whenever they open any page of the site. Participants who finished while
+saves were failing get a "Download backup" file; collect those and run
+`python tools/import_backups.py <files…>` (a dry run listing what would be sent) and then the same with
+`--send`. The server skips steps it already has, so re-importing is safe. If someone did a step twice
+(they reloaded after a failed save and the site asked again), the earliest attempt is kept and the
+re-dos are listed.
 
 ## 2. Song worker (team laptop, during study sessions)
 
@@ -134,13 +148,9 @@ with `score_recall_pct` to show the automatic grading agrees with a human.
 ## 6. Phase 2
 
 `phase2-session.html` uses the same Sheet and web app. Before Phase 2 opens:
-1. Paste the current **`Code.gs`** into the Apps Script editor and **redeploy** (new version, §1).
-   If saves fail with `TypeError: Cannot read properties of undefined (reading 'map')` (found on 3 Nov:
-   reads worked, every save failed), the deployed code is out of sync with this file. Paste this file
-   again in full and deploy a new version. Unsent saves wait in each participant's browser and are re-sent
-   on their next save.
-2. Paste the current **`Grader.gs`** too (it has rubrics for the 3 Phase-2-only essays). The grading
-   trigger runs the saved code, so no redeploy is needed for it, but it must be saved.
+1. Run `python tools/check_apps_script.py` (see §1 — a name clash between the files broke all saves on 3 Nov).
+2. Paste the current **`Code.gs`** and **`Grader.gs`** (it has rubrics for the 3 Phase-2-only essays)
+   into the Apps Script editor, save both, and **deploy a new version** (§1).
 
 No song worker is needed: the tracks are fixed and served with the site.
 
