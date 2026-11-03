@@ -54,7 +54,7 @@ function gradePending() {
       if (res.stop) { console.warn(res.reason); break; }   // API down / rate-limited → next run
       if (!res.score) { console.warn('Row ' + (i + 1) + ': ' + res.reason); continue; }
       score = res.score;
-      Utilities.sleep(2500);                                // stay under the free-tier rate limit
+      Utilities.sleep(15000);                                // stay under the free-tier rate limit
     }
     score.scored_at = new Date().toISOString();
 
