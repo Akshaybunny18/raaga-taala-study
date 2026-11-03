@@ -13,7 +13,7 @@
 //   score_recalled, score_partial, score_errors (statements contradicting the essay)
 //   score_detail (JSON: verdict per key idea + error list), score_model, scored_at
 
-const DEFAULT_GRADER_MODEL = 'llama-3.3-70b-versatile';   // check listGroqModels() if Groq retires it
+const DEFAULT_GRADER_MODEL = 'openai/gpt-oss-120b';   // check listGroqModels() if Groq retires it
 const GROQ_URL   = 'https://api.groq.com/openai/v1';
 const GRADE_BATCH = 25;      // max rows per run (each run must finish within Apps Script's 6 min)
 const SCORE_COLS = ['score_recall_pct','score_recalled','score_partial','score_errors','score_detail','score_model','scored_at'];
